@@ -3,6 +3,7 @@ import { Tile } from "./Tile";
 import { Version } from "./sp_documents";
 
 export interface ResourcePack {
+    type: 'resource_pack';
     fullPath: string;
     relativePath: string;
     manifestPath: string;
@@ -21,7 +22,9 @@ export interface ResourcePack {
 }
 
 export interface ResourcePackManifest {
+    type: 'manifest';
     name: string;
+    displayName: string;
     version: Version;
     settings: ResourcePackManifestSettings;
 }

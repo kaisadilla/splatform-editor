@@ -1,7 +1,8 @@
 import { SPDocumentType, Version } from "./sp_documents";
 
 export interface Level {
-    type: SPDocumentType;
+    type: 'level';
+    displayName: string;
     version: Version;
     settings: LevelSettings;
     layers: TileLayer[];
@@ -47,6 +48,7 @@ export interface LevelEvent {
 export function getNewLevel () : Level {
     return {
         type: 'level',
+        displayName: "New level",
         version: {
             major: 1,
             minor: 1,

@@ -1,4 +1,7 @@
+import { Version } from "./sp_documents";
+
 export interface Entity {
+    type: 'entity';
     name: string;
     behavior: string;
     behaviorProperties: {[prop: string]: any};
@@ -12,6 +15,7 @@ export interface Entity {
 
 export function getNewEntity () : Entity {
     return {
+        type: 'entity',
         name: "New entity",
         behavior: "goomba",
         behaviorProperties: {

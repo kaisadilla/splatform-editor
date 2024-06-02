@@ -11,6 +11,7 @@ import '@mantine/core/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import 'react-material-symbols/sharp'; // 'rounded' | 'sharp' | 'outlined'.
 import { AppContextProvider } from 'context/useAppContext';
+import { UserContextProvider } from 'context/useUserContext';
 
 export default function App () {
     // TODO: Themes!
@@ -35,6 +36,7 @@ export default function App () {
         <MantineProvider>
 
         <AppContextProvider>
+        <UserContextProvider>
 
             <div className="app" style={darkTheme}>
                 <Window />
@@ -43,7 +45,8 @@ export default function App () {
                 id={DEFAULT_TOOLTIP_ID}
                 className="tooltip default-tooltip"
             />
-        
+            
+        </UserContextProvider>
         </AppContextProvider>
 
         </MantineProvider>

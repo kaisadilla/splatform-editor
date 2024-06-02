@@ -1,4 +1,5 @@
 export interface Tile {
+    type: 'tile';
     name: string;
     behavior: string;
     behaviorProperties: {[prop: string]: any};
@@ -15,6 +16,7 @@ export interface Tile {
 
 export function getNewTile () : Tile {
     return {
+        type: 'tile',
         name: "New tile",
         behavior: "tile",
         behaviorProperties: {},

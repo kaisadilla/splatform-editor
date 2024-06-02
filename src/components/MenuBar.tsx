@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { FileIcons } from 'icons';
 import Ipc from 'main/ipc/ipcRenderer';
 import { useAppContext } from 'context/useAppContext';
+import { useUserContext } from 'context/useUserContext';
 
 export interface MenuBarProps {
     
@@ -11,6 +12,7 @@ export interface MenuBarProps {
 
 function MenuBar (props: MenuBarProps) {
     const { resourcePacks } = useAppContext();
+    const userCtx = useUserContext();
 
     useEffect(() => {
         console.log(resourcePacks);
@@ -31,7 +33,7 @@ function MenuBar (props: MenuBarProps) {
                             <img src={FileIcons.level} alt="" />
                             <span>Level</span>
                         </div>),
-                        callback: () => console.log("New level!"),
+                        callback: handleNew_level,
                     },
                     {
                         key: "world",
@@ -39,6 +41,7 @@ function MenuBar (props: MenuBarProps) {
                             <img src={FileIcons.world} alt="" />
                             <span>World</span>
                         </div>),
+                        callback: handleNew_world,
                     },
                     {
                         key: "game",
@@ -46,6 +49,7 @@ function MenuBar (props: MenuBarProps) {
                             <img src={FileIcons.game} alt="" />
                             <span>Game</span>
                         </div>),
+                        callback: handleNew_game,
                     },
                     {
                         key: "resource-pack",
@@ -60,6 +64,7 @@ function MenuBar (props: MenuBarProps) {
                             <img src={FileIcons.entity} alt="" />
                             <span>Entity</span>
                         </div>),
+                        callback: handleNew_entity,
                     },
                     {
                         key: "tile",
@@ -67,6 +72,7 @@ function MenuBar (props: MenuBarProps) {
                             <img src={FileIcons.tile} alt="" />
                             <span>Tile</span>
                         </div>),
+                        callback: handleNew_tile,
                     },
                 ]
             },
@@ -133,6 +139,26 @@ function MenuBar (props: MenuBarProps) {
             />
         </div>
     );
+
+    function handleNew_level () {
+        userCtx.createNewLevel();
+    }
+
+    function handleNew_world () {
+        userCtx.createNewWorld();
+    }
+
+    function handleNew_game () {
+        userCtx.createNewGame();
+    }
+
+    function handleNew_entity () {
+        userCtx.createNewEntity();
+    }
+
+    function handleNew_tile () {
+        userCtx.createNewTile();
+    }
 }
 
 export default MenuBar;

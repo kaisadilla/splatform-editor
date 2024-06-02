@@ -73,6 +73,7 @@ async function _readResourcePackFolder (path: string) : Promise<ResourcePack> {
     }
 
     return {
+        type: 'resource_pack',
         fullPath: _path(path),
         relativePath: _path(Path.parse(path).dir),
         manifestPath: _path(path + "/manifest.sm-res"),

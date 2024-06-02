@@ -1,7 +1,11 @@
 .tab-ribbon-boxes {
     .tab-ribbon-list {
+        @include horizontal-list;
+        @include thin-scrollbar;
+
         background: $color-component-1;
         border-top: 1px solid $color-component-3;
+        margin-left: -1px;
 
         &::before {
             border-color: $color-component-3;
