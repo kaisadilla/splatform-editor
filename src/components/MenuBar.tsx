@@ -38,12 +38,36 @@ function MenuBar (props: MenuBarProps) {
                 
             }
         ]
-    }
+    };
+    const editData: MenuItemData = {
+        label: <div className="menu-bar-button">Edit</div>,
+        items: [
+            {
+                label: "Preferences"
+            },
+        ]
+    };
 
     return (
         <div className="menu-bar">
             <NestedDropdown
                 menuItemsData={fileData}
+                MenuProps={{
+                    elevation: 0, // shadows, which are removed globally anyway
+                    classes: {
+                        root: "titlebar-menu-bar-root",
+                        paper: "menu-bar-paper",
+                        list: "menu-bar-list",
+                    },
+                }}
+                ButtonProps={{
+                    classes: {
+                        root: "menu-bar-section",
+                    },
+                }}
+            />
+            <NestedDropdown
+                menuItemsData={editData}
                 MenuProps={{
                     elevation: 0,
                     classes: {
@@ -55,7 +79,6 @@ function MenuBar (props: MenuBarProps) {
                 ButtonProps={{
                     classes: {
                         root: "menu-bar-section",
-                        icon: "iconn",
                     },
                 }}
             />

@@ -1,0 +1,10 @@
+{
+    "name": "Level end border",
+    "behavior": "tile",
+    "sprite": "level_end_border",
+    "animation": {
+        "type": "static",
+        "slices": [1, 1],
+        "frame": 0
+    }
+}

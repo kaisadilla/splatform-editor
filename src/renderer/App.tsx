@@ -8,7 +8,7 @@ import { MantineProvider, createTheme as createMantineTheme } from '@mantine/cor
 import darkTheme from 'styles/main.scss';
 import '@mantine/core/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
-import { ThemeProvider, createTheme as createMuiTheme } from '@mui/material';
+import { Shadows, ThemeProvider, createTheme as createMuiTheme } from '@mui/material';
 
 export default function App () {
     // TODO: Themes!
@@ -24,7 +24,8 @@ export default function App () {
         },
         transitions: {
             create: () => 'none', // disable all transitions
-        }
+        },
+        shadows: new Array(25).fill("none") as Shadows
     })
     
     return (

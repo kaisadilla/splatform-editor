@@ -1,0 +1,33 @@
+{
+    "name": "Question block",
+    "behavior": "questionBlock",
+    "behaviorProperties": {
+        "isHidden": false,
+        "contentType": "Coin",
+        "hitMode": "once",
+        "containedEntity": null,
+        "containedTile": null,
+        "maxHitCount": 1,
+        "hitTimer": 5,
+        "persistsUntilHit": false,
+        "revertToCoin": false
+    },
+    "configurableProperties": [
+        "isHidden",
+        "contentType",
+        "hitMode",
+        "containedEntity",
+        "containedTile",
+        "maxHitCount",
+        "hitTimer",
+        "persistsUntilHit",
+        "revertToCoin"
+    ],
+    "sprite": "block_question",
+    "animation": {
+        "type": "dynamic",
+        "slices": [4, 1],
+        "frames": [0, 1, 2, 3],
+        "frameTimes": 0.15
+    }
+}

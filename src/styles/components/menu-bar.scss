@@ -11,21 +11,21 @@
         padding: 0;
 
         &:hover .menu-bar-button {
-            background-color: $color-component-2;
+            background-color: $color-component-3;
         }
 
         &:active .menu-bar-button {
-            background-color: $color-component-2;
+            background-color: $color-component-3;
+        }
+    
+        &.menu-bar-section-open .menu-bar-button {
+            background-color: $color-component-3;
         }
 
         .menu-bar-button {
             padding: 1px 8px;
             border-radius: 4px;
         }
-    }
-
-    .iconn {
-        display: none;
     }
 }
 

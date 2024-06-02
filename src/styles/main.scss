@@ -1,6 +1,7 @@
 @import "root";
 
 @import "elements/drag-region";
+@import "elements/tab-ribbon";
 
 @import "components/menu-bar";
 @import "components/title-bar";
@@ -13,6 +14,7 @@
     min-height: 0;
     max-width: 100vw;
     max-height: 100vh;
+    border: 1px solid $color-highlight;
 }
 
 .tooltip.default-tooltip {

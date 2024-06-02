@@ -1,0 +1,54 @@
+{
+    "type": "level",
+    "version": {
+        "major": 1,
+        "minor": 1,
+        "revision": 1
+    },
+    "settings": {
+        "width": 176,
+        "height": 27,
+        "background": "default_0",
+        "music": "overworld",
+        "time": 300
+    },
+    "layers": [
+        {
+            "name": "Background layer",
+            "settings": {
+            },
+            "tiles": [
+                {
+                    "position": [154, 0],
+                    "tile": "level_end_border"
+                }
+            ]
+        },
+        {
+            "name": "Main layer",
+            "settings": {
+                "checksCollisions": true
+            },
+            "tiles": [
+                {
+                    "position": [14, 19],
+                    "tile": "question_block",
+                    "behaviorProperties": {
+                        "contentType": "Entity",
+                        "containedEntity": "Super Mushroom"
+                    }
+                }
+            ]
+        }
+    ],
+    "spawns": [
+        {
+            "id": 0,
+            "position": [30.0, 24.0],
+            "entity": "red_goomba",
+            "behaviorProperties": {
+                "startingDirectionRight": false
+            }
+        }
+    ]
+}
