@@ -13,3 +13,9 @@ export const FileIcons = {
     entity: entityIcon,
     tile: tileIcon,
 };
+
+export const ToolIcons = {
+    json: require("@assets/icons/json.png"),
+    play: require("@assets/icons/play.png"),
+    playGreen: require("@assets/icons/play-green.png"),
+}

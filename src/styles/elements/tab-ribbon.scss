@@ -1,4 +1,12 @@
-.tab-ribbon-boxes {
+.tab-root.tab-root {
+    flex: 1;
+    min-height: 0;
+    @include vertical-gallery;
+
+    .tab-ribbon-root {
+        flex-shrink: 0;
+    }
+
     .tab-ribbon-list {
         @include horizontal-list;
         @include thin-scrollbar;
@@ -49,7 +57,16 @@
         font-size: 15pt;
     }
 
-    .tab-ribbon-empty-space {
-        border-bottom: 1px solid red;
+    .tab-panel-container {
+        @include vertical-gallery;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .tab-panel {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
     }
 }

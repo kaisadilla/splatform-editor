@@ -3,10 +3,13 @@
 @import "elements/drag-region";
 @import "elements/tab-ribbon";
 
+@import "components/editors/editor";
+@import "components/editors/level-editor";
 @import "components/menu-bar";
 @import "components/title-bar";
 
 .app {
+    position: relative;
     background-color: $color-background;
     width: 100vw;
     height: 100vh;
@@ -15,6 +18,12 @@
     max-width: 100vw;
     max-height: 100vh;
     border: 1px solid $color-highlight;
+    overflow: hidden;
+}
+
+.window {
+    @include vertical-gallery;
+    @include fill-container;
 }
 
 .tooltip.default-tooltip {

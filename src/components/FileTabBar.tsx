@@ -2,6 +2,8 @@ import { ScrollArea, Tabs } from '@mantine/core';
 import { MaterialSymbol } from 'react-material-symbols';
 import React from 'react';
 import { useUserContext } from 'context/useUserContext';
+import { FileIcons } from 'icons';
+import { SPDocumentType } from 'models/sp_documents';
 
 export interface FileTabDefinition {
     value: string;
@@ -10,24 +12,35 @@ export interface FileTabDefinition {
 }
 
 export interface FileTabBarProps {
-    files: FileTabDefinition[];
+    
 }
 
-function FileTabBar ({
-    files,
-}: FileTabBarProps) {
-    const { createNewLevel } = useUserContext();
+function FileTabBar ({}: FileTabBarProps) {
+    const { openDocuments, createNewLevel } = useUserContext();
+
+    const files = [];
+
+    for (const doc of openDocuments) {
+        files.push({
+            value: doc.id,
+            displayName: doc.fileName ?? doc.id,
+            icon: _getFileIcon(doc.content.type),
+        });
+    }
 
     return (
         <ScrollArea
             scrollbars='x'
             type='hover'
+            classNames={{
+                root: "tab-ribbon-root"
+            }}
             //scrollbarSize={8}
             //onWheel={(evt) => console.log(evt)} // TODO: Add horizontal wheel scroll.
         >
             <Tabs.List>
                 {files.map(f => (
-                    <Tabs.Tab value={f.value}>
+                    <Tabs.Tab value={f.value} key={f.value}>
                         <img src={f.icon} alt="" />
                         <span>{f.displayName}</span>
                     </Tabs.Tab>
@@ -42,6 +55,17 @@ function FileTabBar ({
     function k () {
         createNewLevel();
     }
+}
+
+function _getFileIcon (fileType: SPDocumentType) {
+    if (fileType === 'level') return FileIcons.level;
+    if (fileType === 'world') return FileIcons.world;
+    if (fileType === 'game') return FileIcons.game;
+    if (fileType === 'resource_pack') return FileIcons.manifest;
+    if (fileType === 'entity') return FileIcons.entity;
+    if (fileType === 'tile') return FileIcons.tile;
+
+    return FileIcons.manifest;
 }
 
 export default FileTabBar;

@@ -1,0 +1,34 @@
+.level-editor {
+    display: grid;
+    grid-template: "tool tool tool" 32px
+                   "pall cont prop" 1fr / 1fr 1fr 1fr;
+
+    .level-toolbar {
+        grid-area: tool;
+
+        @include horizontal-toolbar;
+        border-bottom: 1px solid $color-component-3;
+
+        button {
+            @include center-content;
+            padding: 2px;
+
+            img {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    }
+
+    .palette {
+        grid-area: pall;
+    }
+
+    .level-content {
+        grid-area: cont;
+    }
+
+    .properties-panel {
+        grid-area: prop;
+    }
+}

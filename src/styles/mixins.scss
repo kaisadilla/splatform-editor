@@ -60,7 +60,15 @@
     flex-wrap: nowrap;
     align-items: center;
     overflow-x: auto;
-    overflow-y: none;
+    overflow-y: hidden;
+}
+
+@mixin horizontal-toolbar () {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    overflow: hidden;
 }
 
 @mixin horizontal-gallery () {
@@ -68,7 +76,15 @@
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    overflow: none;
+    overflow: hidden;
+}
+
+@mixin vertical-gallery () {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    overflow: hidden;
 }
 
 @mixin default-scrollbar {

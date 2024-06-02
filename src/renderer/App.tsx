@@ -13,6 +13,9 @@ import 'react-material-symbols/sharp'; // 'rounded' | 'sharp' | 'outlined'.
 import { AppContextProvider } from 'context/useAppContext';
 import { UserContextProvider } from 'context/useUserContext';
 
+import loader from '@monaco-editor/loader';
+import * as monaco from 'monaco-editor';
+
 export default function App () {
     // TODO: Themes!
     //document.documentElement.style.setProperty('--color-primary', "#00ffff");
@@ -30,6 +33,9 @@ export default function App () {
         },
         shadows: new Array(25).fill("none") as Shadows
     })
+
+    loader.config({ monaco });
+    loader.init().then(monacoInstance => { /* ... */ });
     
     return (
         <ThemeProvider theme={muiTheme}>
@@ -45,7 +51,7 @@ export default function App () {
                 id={DEFAULT_TOOLTIP_ID}
                 className="tooltip default-tooltip"
             />
-            
+
         </UserContextProvider>
         </AppContextProvider>
 
