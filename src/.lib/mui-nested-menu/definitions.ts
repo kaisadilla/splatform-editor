@@ -10,4 +10,5 @@ export interface MenuItemData {
     disabled?: boolean;
     sx?: SxProps;
     delay?: number;
+    key: string;
 }

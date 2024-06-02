@@ -42,6 +42,17 @@
         padding: 4px 4px;
         &:hover {
             background-color: $color-highlight;
+            color: $color-highlight-text;
+        }
+    }
+
+    .menu-bar-option-with-icon {
+        @include horizontal-gallery;
+        gap: 8px;
+
+        > img {
+            width: 16px;
+            height: 16px;
         }
     }
 }

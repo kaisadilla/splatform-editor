@@ -2,9 +2,14 @@
     .tab-ribbon-list {
         background: $color-component-1;
         border-top: 1px solid $color-component-3;
+
+        &::before {
+            border-color: $color-component-3;
+        }
     }
 
     .tab-ribbon-tab {
+        background: $color-component-1;
         border-radius: 0;
         border-left: 1px solid $color-component-3;
         border-bottom: 1px solid $color-component-3;
@@ -15,7 +20,9 @@
         }
 
         &:hover {
-            background-color: $color-component-1;
+            background-color: $color-background;
+            border-left: 1px solid $color-component-3;
+            border-bottom: 1px solid $color-component-3;
         }
 
         &[data-active=true] {
@@ -30,5 +37,15 @@
             @include horizontal-gallery;
             gap: 6px;
         }
+    }
+
+    .tab-ribbon-new-tab {
+        @include center-content;
+        width: 38px;
+        font-size: 15pt;
+    }
+
+    .tab-ribbon-empty-space {
+        border-bottom: 1px solid red;
     }
 }

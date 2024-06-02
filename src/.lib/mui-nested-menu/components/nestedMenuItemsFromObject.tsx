@@ -20,13 +20,13 @@ export function nestedMenuItemsFromObject({
     handleClose,
 }: nestedMenuItemsFromObjectProps) {
     return items.map((item) => {
-        const { leftIcon, rightIcon, label, items, callback, sx, disabled, delay } = item;
+        const { leftIcon, rightIcon, label, items, callback, sx, disabled, delay, key } = item;
 
         if (items && items.length > 0) {
             // Recurse deeper
             return (
                 <NestedMenuItem
-                    key={label}
+                    key={key}
                     leftIcon={leftIcon}
                     rightIcon={rightIcon}
                     label={label}
@@ -47,7 +47,7 @@ export function nestedMenuItemsFromObject({
             // No children elements, return MenuItem
             return (
                 <IconMenuItem
-                    key={label}
+                    key={key}
                     leftIcon={leftIcon}
                     rightIcon={rightIcon}
                     label={label}

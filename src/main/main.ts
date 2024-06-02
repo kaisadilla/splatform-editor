@@ -16,6 +16,7 @@ import MenuBuilder from "./menu";
 import { resolveHtmlPath } from "./util";
 import { fileURLToPath } from "url";
 import { WindowType } from "./WindowType";
+import { createIpcHandlers } from "./ipc/ipcMain";
 
 const OPEN_DEVTOOLS_IN_DEBUG_MODE = false;
 
@@ -201,7 +202,7 @@ app.whenReady().then(() => {
 .catch(console.log);
 
 function createIpcMethods () {
-    //createIpcHandlers(ipcMain);
+    createIpcHandlers(ipcMain);
 }
 
 function registerProtocols () {

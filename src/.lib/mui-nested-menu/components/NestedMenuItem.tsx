@@ -20,7 +20,7 @@ import { IconMenuItem } from './IconMenuItem';
 export type NestedMenuItemProps = Omit<MenuItemProps, 'button'> & {
     parentMenuOpen: boolean;
     component?: ElementType;
-    label?: string;
+    label?: JSX.Element | string;
     renderLabel?: () => ReactNode;
     rightIcon?: ReactNode;
     leftIcon?: ReactNode;

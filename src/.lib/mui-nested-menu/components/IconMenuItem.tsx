@@ -26,7 +26,7 @@ type IconMenuItemProps = {
     MenuItemProps?: MenuItemProps;
     className?: string;
     disabled?: boolean;
-    label?: string;
+    label?: JSX.Element | string;
     renderLabel?: () => React.ReactNode;
     leftIcon?: React.ReactNode;
     onClick?: (event: React.MouseEvent<HTMLElement>) => void;

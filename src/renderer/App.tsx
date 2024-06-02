@@ -4,11 +4,13 @@ import { Tooltip } from 'react-tooltip';
 import { DEFAULT_TOOLTIP_ID } from 'names';
 import Window from 'Window';
 import { MantineProvider, createTheme as createMantineTheme } from '@mantine/core';
+import { Shadows, ThemeProvider, createTheme as createMuiTheme } from '@mui/material';
 
 import darkTheme from 'styles/main.scss';
 import '@mantine/core/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
-import { Shadows, ThemeProvider, createTheme as createMuiTheme } from '@mui/material';
+import 'react-material-symbols/sharp'; // 'rounded' | 'sharp' | 'outlined'.
+import { AppContextProvider } from 'context/useAppContext';
 
 export default function App () {
     // TODO: Themes!
@@ -30,15 +32,21 @@ export default function App () {
     
     return (
         <ThemeProvider theme={muiTheme}>
-            <MantineProvider>
-                <div className="app" style={darkTheme}>
-                    <Window />
-                </div>
-                <Tooltip
-                    id={DEFAULT_TOOLTIP_ID}
-                    className="tooltip default-tooltip"
-                />
-            </MantineProvider>
+        <MantineProvider>
+
+        <AppContextProvider>
+
+            <div className="app" style={darkTheme}>
+                <Window />
+            </div>
+            <Tooltip
+                id={DEFAULT_TOOLTIP_ID}
+                className="tooltip default-tooltip"
+            />
+        
+        </AppContextProvider>
+
+        </MantineProvider>
         </ThemeProvider>
     );
 }

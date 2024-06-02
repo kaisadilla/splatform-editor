@@ -1,6 +1,8 @@
 {
     "name": "Level end border",
     "behavior": "tile",
+    "behaviorProperties": {},
+    "configurableProperties": [],
     "sprite": "level_end_border",
     "animation": {
         "type": "static",

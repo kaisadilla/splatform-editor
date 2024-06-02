@@ -1,22 +1,25 @@
-import { Tabs } from '@mantine/core';
+import { CloseIcon, Tabs } from '@mantine/core';
 import TitleBar from 'components/TitleBar';
-import React from 'react';
-import levelIcon from "@assets/icons/level-file.png";
-import worldIcon from "@assets/icons/world-file.png";
-import gameIcon from "@assets/icons/game-file.png";
-import manifestIcon from "@assets/icons/manifest-file.png";
-import entityIcon from "@assets/icons/entity-file.png";
-import tileIcon from "@assets/icons/tile-file.png";
+import { AppStatus, useAppContext } from 'context/useAppContext';
+import { FileIcons } from 'icons';
+import React, { useState } from 'react';
+import { MaterialSymbol } from 'react-material-symbols';
 
 export interface WindowProps {
     
 }
 
 function Window (props: WindowProps) {
+    const { appStatus } = useAppContext();
+    
+    if (appStatus != AppStatus.Ready) {
+        return <div>Loading...</div>
+    }
 
     return (
         <div className="window">
             <TitleBar />
+
             <Tabs
                 defaultValue="a"
                 classNames={{
@@ -28,29 +31,32 @@ function Window (props: WindowProps) {
             >
                 <Tabs.List>
                     <Tabs.Tab value="a">
-                        <img src={levelIcon} alt="" />
+                        <img src={FileIcons.level} alt="" />
                         <span>level1-1.sp-lev</span>
                     </Tabs.Tab>
                     <Tabs.Tab value="b">
-                        <img src={worldIcon} alt="" />
+                        <img src={FileIcons.world} alt="" />
                         <span>world1.sp-wld</span>
                     </Tabs.Tab>
                     <Tabs.Tab value="c">
-                        <img src={gameIcon} alt="" />
+                        <img src={FileIcons.game} alt="" />
                         <span>smb3.sp-gme</span>
                     </Tabs.Tab>
                     <Tabs.Tab value="d">
-                        <img src={manifestIcon} alt="" />
+                        <img src={FileIcons.manifest} alt="" />
                         <span>smb3.sp-res</span>
                     </Tabs.Tab>
                     <Tabs.Tab value="e">
-                        <img src={entityIcon} alt="" />
+                        <img src={FileIcons.entity} alt="" />
                         <span>goomba.spr-ent</span>
                     </Tabs.Tab>
                     <Tabs.Tab value="f">
-                        <img src={tileIcon} alt="" />
+                        <img src={FileIcons.tile} alt="" />
                         <span>question_block.spr-til</span>
                     </Tabs.Tab>
+                    <button className="tab-ribbon-tab tab-ribbon-new-tab">
+                        <MaterialSymbol icon="add" />
+                    </button>
                 </Tabs.List>
 
                 <Tabs.Panel value="a">

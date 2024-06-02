@@ -1,4 +1,10 @@
-export type SPDocumentType = "level" | "world" | "game" | "resource_pack";
+export type SPDocumentType =
+    'level'
+    | 'world'
+    | 'game' 
+    | 'resource_pack'
+    | 'entity'
+    | 'tile';
 
 export interface Version {
     major: number;

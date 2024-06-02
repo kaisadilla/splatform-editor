@@ -98,6 +98,7 @@
     "@mantine/notifications": "^7.10.1",
     "@monaco-editor/react": "^4.6.0",
     "@mui/material": "^5.15.19",
+    "@types/winreg": "^1.2.36",
     "chokidar": "^3.6.0",
     "dayjs": "^1.11.11",
     "detect-file-encoding-and-language": "^2.4.0",
@@ -114,6 +115,8 @@
     "react-chartjs-2": "^5.2.0",
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
+    "react-headless-tabs": "^6.0.4",
+    "react-material-symbols": "^4.4.0",
     "react-resize-detector": "^10.0.1",
     "react-router-dom": "^6.8.1",
     "react-slider": "^2.0.6",
@@ -121,7 +124,8 @@
     "react-tooltip": "^5.26.3",
     "sortablejs": "^1.15.2",
     "tinycolor2": "^1.6.0",
-    "ts-gaussian": "^3.0.4"
+    "ts-gaussian": "^3.0.4",
+    "winreg": "^1.2.5"
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
