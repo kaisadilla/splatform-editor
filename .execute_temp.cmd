@@ -1,0 +1,1 @@
+node_modules\electron\dist\electron.exe release\app\dist\main\main.js

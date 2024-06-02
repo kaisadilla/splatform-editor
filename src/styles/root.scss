@@ -1,0 +1,128 @@
+@import "variables";
+@import "mixins";
+@import "fonts";
+
+:root {
+    @include no-highlight();
+
+    font-family: $font-std;
+    font-weight: $w-regular;
+    font-size: 10pt;
+    color: var(--text-color);
+
+    --bg-color-dark: #0f121b;
+    --bg-color: var(--component-color-dark-0);
+    --text-color: var(--text-color-white);
+    --text-color-1: var(--text-color-white-1);
+    --text-color-2: var(--text-color-white-2);
+
+    --component-color-theme-0: var(--component-color-dark-0);
+    --component-color-theme-1: var(--component-color-dark-1);
+    --component-color-theme-2: var(--component-color-dark-2);
+    --component-color-theme-3: var(--component-color-dark-3);
+    --component-color-theme-4: var(--component-color-dark-4);
+    --component-color-theme-5: var(--component-color-dark-5);
+    --component-color-theme-6: var(--component-color-dark-6);
+
+    --transparent-color-theme-1: var(--transparent-color-black-1);
+    --transparent-color-theme-2: var(--transparent-color-black-2);
+    --transparent-color-theme-3: var(--transparent-color-black-3);
+    --transparent-color-theme-4: var(--transparent-color-black-4);
+
+    --highlight-text-color: var(--text-color-white);
+    --highlight-text-color-1: var(--text-color-white-1);
+    --highlight-text-color-2: var(--text-color-white-2);
+    --highlight-color: #a10325;
+    --highlight-color-l1: #b9183b;
+    --highlight-color-l2: #c22749;
+    --highlight-color-l3: #ca4965;
+    --highlight-color-d2: #8a0723;
+    --highlight-color-d3: #70091f;
+    --highlight-color-d4: #550819;
+    --highlight-color-d5: #310610;
+
+    --component-color-dark-0: #0f121b;
+    --component-color-dark-1: #1b1f2b;
+    --component-color-dark-2: #2d3038;
+    --component-color-dark-3: #3c3f46;
+    --component-color-dark-4: #474a51;
+    --component-color-dark-5: #5e6167;
+    --component-color-dark-6: #74777c;
+
+    --component-color-light-0: #e2e9ff;
+    --component-color-light-1: #c5cadb;
+    --component-color-light-2: #bdc3d8;
+    --component-color-light-3: #9fa5b9;
+    --component-color-light-4: #868ca0;
+    --component-color-light-5: #737785;
+    --component-color-light-6: #5e6069;
+
+    --transparent-color-white-1: #ffffff10;
+    --transparent-color-white-2: #ffffff20;
+    --transparent-color-white-3: #ffffff30;
+    --transparent-color-white-4: #ffffff60;
+
+    --transparent-color-black-1: #00000010;
+    --transparent-color-black-2: #00000020;
+    --transparent-color-black-3: #00000030;
+    --transparent-color-black-4: #00000060;
+
+    --text-color-white: #eeeeee;
+    --text-color-white-1: #b9b9b9;
+    --text-color-white-2: #858585;
+    --text-color-black: #111111;
+    --text-color-black-1: #363636;
+    --text-color-black-2: #5a5a5a;
+
+    --color-danger: #df1021;
+    --color-success-l1: #25d14d;
+    --color-success: #28a745;
+    --color-success-d1: #1f8a38;
+    --color-golden: #ffb300;
+}
+
+// style for higher pixel density screens
+@media (min-resolution: 1.25dppx), (-webkit-min-device-pixel-ratio: 1.25) {
+    :root {
+        font-weight: $w-light;
+    }
+}
+
+* {
+    @include default-scrollbar();
+    
+    box-sizing: border-box;
+}
+
+b, strong {
+    font-weight: $w-semibold;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+button {
+    font-family: $font-std;
+    font-size: 12pt;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    color: $color-text;
+
+    &:hover:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
+h2 {
+    font-size: 14pt;
+    font-weight: $w-light;
+    padding: 0;
+    margin: 0;
+}
+
+input {
+    font-family: $font-std;
+}

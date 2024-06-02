@@ -1,0 +1,82 @@
+/**********
+ * Colors *
+ **********/
+$color-background: var(--bg-color);
+$color-text: var(--text-color);
+$color-text-1: var(--text-color-1);
+$color-text-2: var(--text-color-2);
+
+$color-highlight-text: var(--highlight-text-color);
+$color-highlight-text-1: var(--highlight-text-color-1);
+$color-highlight-text-2: var(--highlight-text-color-2);
+$color-highlight: var(--highlight-color);
+$color-highlight-l1: var(--highlight-color-l1);
+$color-highlight-l2: var(--highlight-color-l2);
+$color-highlight-l3: var(--highlight-color-l3);
+$color-highlight-d2: var(--highlight-color-d2);
+$color-highlight-d3: var(--highlight-color-d3);
+$color-highlight-d4: var(--highlight-color-d4);
+$color-highlight-d5: var(--highlight-color-d5);
+
+$color-component-1: var(--component-color-theme-1);
+$color-component-2: var(--component-color-theme-2);
+$color-component-3: var(--component-color-theme-3);
+$color-component-4: var(--component-color-theme-4);
+$color-component-5: var(--component-color-theme-5);
+$color-component-6: var(--component-color-theme-6);
+
+$color-transparent-1: var(--transparent-color-theme-1);
+$color-transparent-2: var(--transparent-color-theme-2);
+$color-transparent-3: var(--transparent-color-theme-3);
+$color-transparent-4: var(--transparent-color-theme-4);
+
+$color-text-white: var(--text-color-white);
+$color-text-white-1: var(--text-color-white-1);
+$color-text-white-2: var(--text-color-white-2);
+
+$color-text-black: var(--text-color-black);
+$color-text-black-1: var(--text-color-black-1);
+$color-text-black-2: var(--text-color-black-2);
+
+$color-danger: var(--color-danger);
+$color-success-l1: var(--color-success-l1);
+$color-success: var(--color-success);
+$color-success-d1: var(--color-success-d1);
+$color-golden: var(--color-golden);
+
+$color-tier-legendary: #ff7f27; // #ff6d16
+$color-tier-epic: #ad0ef1; // #760fba
+$color-tier-distinguished: #19f78f;
+
+/*********
+ * Fonts *
+ *********/
+$font-std:
+    "Segoe UI", "Roboto", "Arial", "Tahoma", "Geneva", "Verdana", "sanf-serif";
+$font-mono:
+    "Consolas", "Ubuntu Mono", "Courier New", "Lucida Sans Typewriter",
+    "Courier", "monospace";
+$font-oxanium:
+    "Oxanium", $font-std;
+
+$font-f1:
+    "Formula1 Display", $font-std;
+
+/****************
+ * Font weights *
+ ****************/
+$w-thin: 100;
+$w-extralight: 200;
+$w-light: 300;
+$w-regular: 400;
+$w-medium: 500;
+$w-semibold: 600;
+$w-bold: 700;
+$w-black: 800; // aka extrabold
+$w-extrablack: 900;
+
+$vertical-scroll-width: 17px;
+
+$taskbar-height: 33px;
+$taskbar-windows-default-button-container-width: 121px;
+$taskbar-windows-control-width: 45px;
