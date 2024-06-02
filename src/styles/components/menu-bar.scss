@@ -1,0 +1,53 @@
+.menu-bar {
+    @include horizontal-gallery;
+    align-items: stretch;
+
+    .menu-bar-section.menu-bar-section {
+        border-radius: 0;
+        text-transform: none;
+        color: $color-text;
+        min-width: 0;
+        height: 100%;
+        padding: 0;
+
+        &:hover .menu-bar-button {
+            background-color: $color-component-2;
+        }
+
+        &:active .menu-bar-button {
+            background-color: $color-component-2;
+        }
+
+        .menu-bar-button {
+            padding: 1px 8px;
+            border-radius: 4px;
+        }
+    }
+
+    .iconn {
+        display: none;
+    }
+}
+
+.MuiPaper-root.MuiPaper-root {
+    border-radius: 6px;
+    border: 1px solid $color-component-2;
+    min-width: 140px;
+}
+
+.MuiList-root.MuiList-root {        
+    li {
+        border-radius: 4px;
+        margin: 0 6px;
+        padding: 4px 4px;
+        &:hover {
+            background-color: $color-highlight;
+        }
+    }
+}
+
+.titlebar-menu-bar-root {
+    .menu-bar-paper.menu-bar-paper {
+        margin-top: -6px;
+    }
+}

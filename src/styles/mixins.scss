@@ -54,6 +54,21 @@
     align-items: center;
 }
 
+@mixin horizontal-list () {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: none;
+}
+
+@mixin horizontal-gallery () {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow: none;
+}
+
 @mixin default-scrollbar {
     &::-webkit-scrollbar {
         width: 10px;

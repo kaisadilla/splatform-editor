@@ -1,6 +1,11 @@
 @import "root";
 
-.window {
+@import "elements/drag-region";
+
+@import "components/menu-bar";
+@import "components/title-bar";
+
+.app {
     background-color: $color-background;
     width: 100vw;
     height: 100vh;

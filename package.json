@@ -86,6 +86,8 @@
     }
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@fortawesome/fontawesome-free": "^6.4.0",
     "@fseehawer/react-circular-slider": "^2.6.4",
     "@mantine/core": "^7.10.1",
@@ -95,6 +97,7 @@
     "@mantine/hooks": "^7.10.1",
     "@mantine/notifications": "^7.10.1",
     "@monaco-editor/react": "^4.6.0",
+    "@mui/material": "^5.15.19",
     "chokidar": "^3.6.0",
     "dayjs": "^1.11.11",
     "detect-file-encoding-and-language": "^2.4.0",

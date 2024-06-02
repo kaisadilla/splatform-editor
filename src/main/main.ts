@@ -85,7 +85,7 @@ const createWindow = async () => {
         minWidth: 800,
         minHeight: 600,
         autoHideMenuBar: true,
-        //frame: false,
+        frame: false,
         roundedCorners: false, // macOS
         thickFrame: false,
         webPreferences: {
@@ -96,13 +96,14 @@ const createWindow = async () => {
             nodeIntegration: true,
         },
         // TODO: custom title bar
-        //titleBarStyle: "hidden",
-        //titleBarOverlay: {
-        //    //color: "#0f121b",
-        //    color: "#0f121b",
-        //    symbolColor: "#ffffff",
-        //    height: 33, // default: 44  -> 48 = 61
-        //},
+        titleBarStyle: "hidden",
+        titleBarOverlay: {
+            //color: "#0f121b",
+            color: "#c5cadb",
+            symbolColor: "#000000",
+            height: 33, // default: 44  -> 48 = 61
+            
+        },
     });
 
     mainWindow.setMenu(null);
