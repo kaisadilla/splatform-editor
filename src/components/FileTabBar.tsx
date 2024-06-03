@@ -1,9 +1,10 @@
-import { ScrollArea, Tabs } from '@mantine/core';
+import { CloseButton, Modal, ScrollArea, Tabs } from '@mantine/core';
 import { MaterialSymbol } from 'react-material-symbols';
 import React from 'react';
 import { useUserContext } from 'context/useUserContext';
 import { FileIcons } from 'icons';
 import { SPDocumentType } from 'models/sp_documents';
+import { useDisclosure } from '@mantine/hooks';
 
 export interface FileTabDefinition {
     value: string;
@@ -22,13 +23,13 @@ function FileTabBar ({}: FileTabBarProps) {
 
     for (const doc of userCtx.openDocuments) {
         files.push({
-            value: doc.id,
-            displayName: (doc.fileName ?? doc.id) + (doc.hasUnsavedChanges ? "*" : ""),
+            id: doc.id,
+            displayName: (doc.baseName ?? doc.id) + (doc.hasUnsavedChanges ? "*" : ""),
             icon: _getFileIcon(doc.content.type),
         });
     }
 
-    return (
+    return (<>
         <ScrollArea
             scrollbars='x'
             type='hover'
@@ -40,20 +41,39 @@ function FileTabBar ({}: FileTabBarProps) {
         >
             <Tabs.List>
                 {files.map(f => (
-                    <Tabs.Tab value={f.value} key={f.value}>
+                    <Tabs.Tab
+                        key={f.id}
+                        value={f.id}
+                        rightSection={<CloseButton
+                            classNames={{
+                                root: "sp-close-button",
+                            }}
+                            size='sm'
+                            onClick={(evt) => handleCloseDocument(evt, f.id)}
+                        />}
+                    >
                         <img src={f.icon} alt="" />
                         <span>{f.displayName}</span>
                     </Tabs.Tab>
                 ))}
-                <button className="tab-ribbon-tab tab-ribbon-new-tab" onClick={k}>
+                <button
+                    className="tab-ribbon-tab tab-ribbon-new-tab"
+                    onClick={handleCreateDocument}
+                >
                     <MaterialSymbol icon="add" />
                 </button>
             </Tabs.List>
         </ScrollArea>
-    );
+    </>);
 
-    function k () {
+    function handleCreateDocument () {
         userCtx.createNewLevel();
+    }
+
+    function handleCloseDocument (
+        evt: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: string) {
+        userCtx.closeDocument(id);
+        evt.stopPropagation();
     }
 }
 

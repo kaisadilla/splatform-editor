@@ -25,6 +25,7 @@ export type SPDocumentContent =
 
 export interface SPDocument {
     id: string;
+    baseName?: string;
     fileName?: string;
     fullPath?: string;
     hasUnsavedChanges: boolean;

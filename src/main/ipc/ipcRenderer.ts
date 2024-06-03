@@ -1,6 +1,7 @@
 import { ResourcePack } from "models/ResourcePack";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE } from "./ipcNames";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT } from "./ipcNames";
 import { FileInfo } from "main/files/documentFiles";
+import { SPDocumentType } from "models/sp_documents";
 
 const Ipc = {
     /**
@@ -35,6 +36,32 @@ const Ipc = {
     ) : Promise<string> {
         return await getIpcRenderer().invoke(HANDLER_SAVE_NEW_TEXT_FILE, {
             title, content, filters,
+        });
+    },
+
+    async saveNewDocument (
+        type: SPDocumentType, content: string,
+    ) : Promise<string> {
+        return await getIpcRenderer().invoke(HANDLER_SAVE_NEW_DOCUMENT, {
+            type, content,
+        });
+    },
+
+    /**
+     * Prompts the user to confirm if they want to close the document, and to
+     * save or discard changes if that's the case.
+     * @param type The type of the document being closed.
+     * @param fullPath The full path of the file containing this document, or
+     * `null` if this document hasn't been saved to the disk yet.
+     * @param content The current contents of the document.
+     * @returns True if the user chose to close the tab, or false if they
+     * canceled the action.
+     */
+    async closeDocument (
+        type: SPDocumentType, fullPath: string | null, content: string
+    ) : Promise<boolean> {
+        return await getIpcRenderer().invoke(HANDLER_CLOSE_DOCUMENT, {
+            type, fullPath, content
         });
     },
 }

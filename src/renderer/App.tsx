@@ -5,13 +5,13 @@ import { DEFAULT_TOOLTIP_ID } from 'names';
 import Window from 'Window';
 import { MantineProvider, createTheme as createMantineTheme } from '@mantine/core';
 import { Shadows, ThemeProvider, createTheme as createMuiTheme } from '@mui/material';
+import { AppContextProvider } from 'context/useAppContext';
+import { UserContextProvider } from 'context/useUserContext';
 
-import darkTheme from 'styles/main.scss';
 import '@mantine/core/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import 'react-material-symbols/sharp'; // 'rounded' | 'sharp' | 'outlined'.
-import { AppContextProvider } from 'context/useAppContext';
-import { UserContextProvider } from 'context/useUserContext';
+import darkTheme from 'styles/main.scss';
 
 import loader from '@monaco-editor/loader';
 import * as monaco from 'monaco-editor';

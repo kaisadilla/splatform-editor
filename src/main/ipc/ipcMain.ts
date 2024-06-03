@@ -1,7 +1,8 @@
 import { getWinPath } from "../util";
-import { openTextFile, saveNewTextFile } from "../files/documentFiles";
-import { getInstalledResourcePacks, getUserdataFolderPath } from "../files/read";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE } from "./ipcNames";
+import { confirmDocumentClose, openTextFile, saveNewDocument, saveNewTextFile } from "../files/documentFiles";
+import { getInstalledResourcePacks, getUserdataFolderPath } from "../files/gameData";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT } from "./ipcNames";
+import { SPDocumentType } from "models/sp_documents";
 
 export function createIpcHandlers (ipcMain: Electron.IpcMain) {
     ipcMain.handle(HANDLER_SANITY, async (evt, obj) => {
@@ -27,6 +28,14 @@ export function createIpcHandlers (ipcMain: Electron.IpcMain) {
     ipcMain.handle(HANDLER_SAVE_NEW_TEXT_FILE, async (evt, args: SaveNewTextFileArgs) => {
         return saveNewTextFile(args.title, args.content, args.filters);
     });
+
+    ipcMain.handle(HANDLER_SAVE_NEW_DOCUMENT, async (evt, args: SaveNewDocumentArgs) => {
+        return saveNewDocument(args.type, args.content);
+    });
+
+    ipcMain.handle(HANDLER_CLOSE_DOCUMENT, async (evt, args: CloseDocumentArgs) => {
+        return confirmDocumentClose(args.type, args.fullPath, args.content);
+    });
 }
 
 export interface ReadTextFileArgs {
@@ -38,4 +47,15 @@ export interface SaveNewTextFileArgs {
     title: string;
     content: string;
     filters: Electron.FileFilter[];
+}
+
+export interface SaveNewDocumentArgs {
+    type: SPDocumentType;
+    content: string;
+}
+
+export interface CloseDocumentArgs {
+    type: SPDocumentType;
+    fullPath: string | null;
+    content: string;
 }

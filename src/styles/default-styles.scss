@@ -1,0 +1,6 @@
+.sp-close-button.sp-close-button {
+    &:hover {
+        background-color: $color-danger;
+        color: $color-text-white;
+    }
+}

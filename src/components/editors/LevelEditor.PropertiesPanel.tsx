@@ -31,6 +31,7 @@ function LevelEditor_PropertiesPanel ({
                             size='sm'
                             label="Name"
                             value={level.displayName}
+                            readOnly
                         />
                         <NumberInput
                             size='sm'
@@ -39,6 +40,7 @@ function LevelEditor_PropertiesPanel ({
                             min={10}
                             max={100_000}
                             allowDecimal={false}
+                            readOnly
                         />
                         <NumberInput
                             size='sm'
@@ -47,21 +49,25 @@ function LevelEditor_PropertiesPanel ({
                             min={10}
                             max={100_000}
                             allowDecimal={false}
+                            readOnly
                         />
                         <TextInput
                             size='sm'
                             label="Background"
                             value={level.settings.background}
+                            readOnly
                         />
                         <TextInput
                             size='sm'
                             label="Music"
                             value={level.settings.music}
+                            readOnly
                         />
                         <TextInput
                             size='sm'
                             label="Time"
                             value={level.settings.time}
+                            readOnly
                         />
                     </Accordion.Panel>
                 </Accordion.Item>

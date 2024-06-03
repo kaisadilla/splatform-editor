@@ -30,6 +30,8 @@ function Window (props: WindowProps) {
         return <div>Loading...</div>
     }
 
+    console.log("reload!", userCtx.activeTab);
+
     return (
         <div className="window">
             <TitleBar />
