@@ -15,6 +15,7 @@ export enum AppStatus {
 
 interface AppContextState {
     appStatus: AppStatus;
+    userdataPath: string;
     resourcePacks: ResourcePack[];
 }
 
@@ -24,6 +25,7 @@ const useAppContext = () => useContext(AppContext);
 const AppContextProvider = ({ children }: any) => {
     const [state, setState] = useState<AppContextState>({
         appStatus: AppStatus.LoadingData,
+        userdataPath: "",
         resourcePacks: [] as ResourcePack[],
     });
 
@@ -44,11 +46,13 @@ const AppContextProvider = ({ children }: any) => {
     );
 
     async function loadData () {
+        const userdataPath = await Ipc.getUserdataPath();
         const resourcePacks = await Ipc.loadResourcePacks();
 
         setState(prevState => ({
             ...prevState,
             appStatus: AppStatus.Ready,
+            userdataPath: userdataPath,
             resourcePacks: resourcePacks,
         }));
     }

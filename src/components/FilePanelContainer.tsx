@@ -11,8 +11,6 @@ export interface FilePanelContainerProps {
 function FilePanelContainer (props: FilePanelContainerProps) {
     const { openDocuments } = useUserContext();
 
-    console.log("open docs", openDocuments);
-
     return (<div className="tab-panel-container">
         <Tabs.Panel value={NO_DOCUMENT_ID}>
             <h1>TODO: Welcome panel.</h1>

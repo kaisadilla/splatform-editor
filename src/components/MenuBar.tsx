@@ -88,7 +88,7 @@ function MenuBar (props: MenuBarProps) {
             {
                 key: "save-copy",
                 label: "Save copy",
-                
+                callback: handleSaveCopy,
             }
         ]
     };
@@ -158,6 +158,10 @@ function MenuBar (props: MenuBarProps) {
 
     function handleNew_tile () {
         userCtx.createNewTile();
+    }
+
+    function handleSaveCopy () {
+        userCtx.saveDocumentCopy(userCtx.getActiveDocument());
     }
 }
 

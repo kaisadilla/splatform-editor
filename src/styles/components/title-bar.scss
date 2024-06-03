@@ -7,9 +7,7 @@
     padding-top: 1px;
     align-items: stretch;
     position: sticky;
-    top: 1px; // Windows' windows have a 1px margin on their title bar.
     left: 0;
-    margin-bottom: 1px; // compensates the top 1px offset
     flex-shrink: 0;
     z-index: 100000000;
 

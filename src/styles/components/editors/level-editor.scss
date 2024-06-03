@@ -1,13 +1,14 @@
 .level-editor {
-    display: grid;
-    grid-template: "tool tool tool" 32px
-                   "pall cont prop" 1fr / 1fr 1fr 1fr;
+    //display: grid;
+    //grid-template: "tool tool tool" 32px
+    //               "pall cont prop" 1fr / 1fr 1fr 340px;
+    @include vertical-gallery;
+    justify-content: stretch;
 
     .level-toolbar {
-        grid-area: tool;
-
         @include horizontal-toolbar;
         border-bottom: 1px solid $color-component-3;
+        height: 32px;
 
         button {
             @include center-content;
@@ -20,15 +21,69 @@
         }
     }
 
-    .palette {
-        grid-area: pall;
+    .level-edition-container {
+        flex: 1;
+        min-height: 0;
+        position: relative;
+
+        .palette-container {
+            
+        }
+    
+        .level-content-container {
+            
+        }
+    
+        .properties-panel-container {
+            display: flex;
+            justify-content: start;
+            min-height: 0;
+
+            .level-properties {
+                @include fill-container;
+                display: flex;
+                justify-content: stretch;
+
+                .level-properties-accordion-root {
+                    @include vertical-list;
+                    @include fill-container;
+                    align-items: stretch;
+                }
+            }
+        }
     }
 
-    .level-content {
-        grid-area: cont;
-    }
+    .tile-palette {
+        @include fill-container;
 
-    .properties-panel {
-        grid-area: prop;
+        .palette-root {
+            @include vertical-list;
+            @include fill-container;
+            align-items: stretch;
+
+            .palette-panel-content {
+                @include horizontal-gallery(wrap);
+            }
+        }
+
+        .tile-button {
+            @include center-content;
+            width: 26px;
+            height: 26px;
+
+            &:hover {
+                background-color: $color-component-1;
+                border: 1px solid $color-component-3;
+            }
+
+            > .tile-image {
+                box-sizing: content-box;
+                border: 1px solid $color-component-3;
+            }
+
+            &.selected > .tile-image {
+                border: 3px solid $color-highlight;
+            }
+        }
     }
 }

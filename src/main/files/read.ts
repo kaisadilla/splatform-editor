@@ -9,11 +9,24 @@ import { Tile } from "models/Tile";
 const REGKEY_USER_FOLDER = '\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders';
 const TEXT_FORMAT = "utf-8";
 
+/**
+ * Adjusts the path for the currenet operating system.
+ * @param path The path to adjust.
+ */
+export function getWinPath (path: string) {
+    return _winPath(path);
+}
+
+export async function getUserdataFolderPath () {
+    const personalFolder = await _getWindowsPersonalFolder();
+    return personalFolder + "/My Games/SPlatform";
+}
+
 export async function getInstalledResourcePacks () {
     const start = Date.now();
 
-    const personalFolder = await _getWindowsPersonalFolder();
-    const resPath = personalFolder + "/My Games/SPlatform/resource-packs";
+    const personalFolder = await getUserdataFolderPath();
+    const resPath = personalFolder + "/resource-packs";
 
     const resFolders = (await fsAsync.readdir(resPath, {
         withFileTypes: true,
@@ -51,7 +64,7 @@ async function _readResourcePackFolder (path: string) : Promise<ResourcePack> {
     const spriteUiFiles = await _scandirForFileType(path + "/sprites/ui", ".png");
 
     const entityFiles = await _scandirForFileType(path + "/entities", ".spr-ent");
-    const tileFiles = await _scandirForFileType(path + "/entities", ".spr-til");
+    const tileFiles = await _scandirForFileType(path + "/tiles", ".spr-til");
 
     const entityMetadata = [] as DataAssetMetadata<Entity>[];
     const tileMetadata = [] as DataAssetMetadata<Tile>[];
@@ -74,9 +87,9 @@ async function _readResourcePackFolder (path: string) : Promise<ResourcePack> {
 
     return {
         type: 'resource_pack',
-        fullPath: _path(path),
-        relativePath: _path(Path.parse(path).dir),
-        manifestPath: _path(path + "/manifest.sm-res"),
+        fullPath: getWinPath(path),
+        relativePath: getWinPath(Path.parse(path).dir),
+        manifestPath: getWinPath(path + "/manifest.sm-res"),
         manifest: manifest,
         backgrounds: backgroundFiles,
         entities: entityMetadata,
@@ -109,20 +122,12 @@ async function _scandirForFileType (path: string, ...extensions: string[]) {
                 fileName: file.name,
                 baseName: file.base,
                 extension: file.ext,
-                fullPath: _path(path + "/" + res.name),
+                fullPath: getWinPath(path + "/" + res.name),
             });
         }
     }
 
     return targetedFiles;
-}
-
-/**
- * Adjusts the path for the currenet operating system.
- * @param path The path to adjust.
- */
-function _path (path: string) {
-    return _winPath(path);
 }
 
 function _getWindowsPersonalFolder () : Promise<string> {

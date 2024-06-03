@@ -10,11 +10,15 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 interface UserContextState {
     openDocuments: SPDocument[];
+    activeTab: string | null;
+    getActiveDocument: () => SPDocument;
+    setActiveTab: (id: string) => void;
     createNewLevel: () => SPDocument;
     createNewWorld: () => SPDocument;
     createNewGame: () => SPDocument;
     createNewEntity: () => SPDocument;
     createNewTile: () => SPDocument;
+    saveDocumentCopy: (doc: SPDocument) => Promise<string | null>;
 }
 
 const UserContext = createContext<UserContextState>({} as UserContextState);
@@ -23,12 +27,32 @@ const useUserContext = () => useContext(UserContext);
 const UserContextProvider = ({ children }: any) => {
     const [state, setState] = useState<UserContextState>({
         openDocuments: [] as SPDocument[],
+        activeTab: null,
     } as UserContextState);
     const [internal, setInternal] = useState({
         nextDocumentIndex: 1,
     })
 
     const value = useMemo(() => {
+        /**
+         * Returns the document in the tab that is currently active.
+         */
+        function getActiveDocument () : SPDocument {
+            return state.openDocuments.find(d => d.id === state.activeTab)
+                ?? {} as SPDocument;
+        }
+
+        /**
+         * Sets which tab is currently active.
+         * @param id The id of the document contained by that tab.
+         */
+        function setActiveTab (id: string) {
+            setState(prevState => ({
+                ...prevState,
+                activeTab: id,
+            }))
+        }
+
         function createNewLevel () : SPDocument {
             const level = getNewLevel();
             return createNewDocument(level);
@@ -49,14 +73,21 @@ const UserContextProvider = ({ children }: any) => {
             const tile = getNewTile();
             return createNewDocument(tile);
         }
+        async function saveDocumentCopy (doc: SPDocument) {
+            const path = await saveNewDocument(doc);
+            return path;
+        }
 
         return {
             ...state,
+            getActiveDocument,
+            setActiveTab,
             createNewLevel,
             createNewWorld,
             createNewGame,
             createNewEntity,
             createNewTile,
+            saveDocumentCopy,
         };
     }, [state]);
 
@@ -71,6 +102,7 @@ const UserContextProvider = ({ children }: any) => {
         const doc: SPDocument = {
             id: `Untitled ${docIndex}`,
             content: content,
+            hasUnsavedChanges: true,
         };
 
         setState(prevState => ({
@@ -93,6 +125,53 @@ const UserContextProvider = ({ children }: any) => {
         }))
 
         return index;
+    }
+
+    async function saveNewDocument (document: SPDocument) : Promise<string | null> {
+        let path = null as string | null;
+        const json = JSON.stringify(document.content, null, 4);
+        if (document.content.type == 'level') {
+            path = await Ipc.saveNewTextFile("Save level", json, [
+                {
+                    name: "SPlatform level",
+                    extensions: ["sp-lev", "json"]
+                }
+            ])
+        }
+        else if (document.content.type == 'world') {
+            path = await Ipc.saveNewTextFile("Save world", json, [
+                {
+                    name: "SPlatform world",
+                    extensions: ["sp-wld", "json"]
+                }
+            ])
+        }
+        else if (document.content.type == 'game') {
+            path = await Ipc.saveNewTextFile("Save game", json, [
+                {
+                    name: "SPlatform game",
+                    extensions: ["sp-gme", "json"]
+                }
+            ])
+        }
+        else if (document.content.type == 'entity') {
+            path = await Ipc.saveNewTextFile("Save entity", json, [
+                {
+                    name: "SPlatform entity",
+                    extensions: ["spr-ent", "json"]
+                }
+            ])
+        }
+        else if (document.content.type == 'tile') {
+            path = await Ipc.saveNewTextFile("Save tile", json, [
+                {
+                    name: "SPlatform tile",
+                    extensions: ["spr-til", "json"]
+                }
+            ])
+        }
+
+        return path;
     }
 }
 

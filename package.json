@@ -118,6 +118,7 @@
     "react-dom": "^18.2.0",
     "react-headless-tabs": "^6.0.4",
     "react-material-symbols": "^4.4.0",
+    "react-resizable-panels": "^2.0.19",
     "react-resize-detector": "^10.0.1",
     "react-router-dom": "^6.8.1",
     "react-slider": "^2.0.6",

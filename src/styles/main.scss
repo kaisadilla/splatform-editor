@@ -1,7 +1,10 @@
 @import "root";
 
+@import "elements/accordion-panel";
 @import "elements/drag-region";
 @import "elements/tab-ribbon";
+@import "elements/tile-image";
+@import "elements/resizable-panel";
 
 @import "components/editors/editor";
 @import "components/editors/level-editor";
@@ -22,60 +25,13 @@
 }
 
 .window {
-    @include vertical-gallery;
+    @include vertical-gallery();
     @include fill-container;
 }
 
-.tooltip.default-tooltip {
-    background-color: $color-highlight;
-    color: white;
-    border-radius: 0;
-    padding: 6px 12px; // default: 8px 16px
-}
-
-.nav-bar-header {
-    padding: 0 12px 3px 12px;
-    margin: 0 0 9px 0;
-    border-bottom: 1px solid $color-highlight;
-}
-
-.h3-header {
-    padding: 0 0 3px 0;
-    margin: 0 0 9px 0;
-    font-size: 10pt;
-    font-weight: $w-regular;
-    text-align: center;
-    border-bottom: 1px solid $color-highlight;
-    margin-top: 4px;
-    margin-bottom: 0;
-}
-
-.status-bar {
-    margin-top: 8px;
-    padding-top: 8px;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: left;
-    align-items: start;
-    gap: 8px;
-    border-top: 1px solid $color-highlight;
-
-    .default-button {
-        width: 180px;
-    }
-
-    > .datum {
-        font-style: italic;
-        color: $color-text-1;
-    }
-
-    > .tools {
-        flex: 1;
-        display: flex;
-        justify-content: right;
-        gap: 8px;
-    }
+.form {
+    @include vertical-list;
+    padding: 8px;
 }
 
 .invert-color {

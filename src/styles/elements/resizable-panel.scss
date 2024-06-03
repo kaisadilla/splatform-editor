@@ -1,0 +1,26 @@
+.sp-resize-handle-horiz {
+    position: relative;
+    width: 1px;
+
+    > .separator-handle-container {
+        display: flex;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: -3px;
+        height: 100%;
+        width: 5px;
+
+        > .separator-handle {
+            height: 100%;
+            width: 1px;
+            border-left: 1px solid $color-component-3;
+            transition: all 0.15s ease-out;
+        }
+
+        &:hover > .separator-handle {
+            width: 5px;
+            border-left: 5px solid $color-highlight;
+        }
+    }
+}

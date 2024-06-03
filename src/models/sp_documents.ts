@@ -27,6 +27,7 @@ export interface SPDocument {
     id: string;
     fileName?: string;
     fullPath?: string;
+    hasUnsavedChanges: boolean;
     content: SPDocumentContent;
 };
 

@@ -1,0 +1,21 @@
+{
+    "name": "Green vertical pipe",
+    "tiles": [
+        {
+            "position": [0, 0],
+            "tile": "pipe_vertical_green_notch_left"
+        },
+        {
+            "position": [1, 0],
+            "tile": "pipe_vertical_green_notch_right"
+        },
+        {
+            "position": [0, -1],
+            "tile": "pipe_vertical_green_left"
+        },
+        {
+            "position": [1, -1],
+            "tile": "pipe_vertical_green_right"
+        }
+    ]
+}

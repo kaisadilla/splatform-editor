@@ -1,0 +1,16 @@
+.sp-accordion-panel {
+    .sp-accordion-panel-control {
+        &:hover {
+            background-color: $color-component-1;
+        }
+
+        &.sp-small .sp-accordion-panel-label {
+            padding: 2px;
+        }
+    }
+
+    .sp-accordion-panel-panel {
+        @include vertical-gallery;
+        
+    }
+}

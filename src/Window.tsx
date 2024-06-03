@@ -16,15 +16,15 @@ export interface WindowProps {
 
 function Window (props: WindowProps) {
     const { appStatus } = useAppContext();
-    const { openDocuments } = useUserContext();
-
-    const [activeTab, setActiveTab] = useState(NO_DOCUMENT_ID);
+    const userCtx = useUserContext();
 
     useEffect(() => {
-        if (openDocuments.length > 0) {
-            setActiveTab(openDocuments[openDocuments.length - 1].id);
+        if (userCtx.openDocuments.length > 0) {
+            userCtx.setActiveTab(
+                userCtx.openDocuments[userCtx.openDocuments.length - 1].id
+            );
         }
-    }, [openDocuments.length]);
+    }, [userCtx.openDocuments.length]);
     
     if (appStatus != AppStatus.Ready) {
         return <div>Loading...</div>
@@ -34,9 +34,9 @@ function Window (props: WindowProps) {
         <div className="window">
             <TitleBar />
             <Tabs
-                value={activeTab}
+                value={userCtx.activeTab}
                 // @ts-ignore - false syntax error.
-                onChange={setActiveTab}
+                onChange={userCtx.setActiveTab}
                 classNames={{
                     root: "tab-root",
                     list: "tab-ribbon-list",
@@ -45,9 +45,8 @@ function Window (props: WindowProps) {
                     panel: "tab-panel",
                 }}
             >
-                <FileTabBar/>
-                <FilePanelContainer
-                />
+                <FileTabBar />
+                <FilePanelContainer />
             </Tabs>
         </div>
     );

@@ -16,14 +16,14 @@ export interface FileTabBarProps {
 }
 
 function FileTabBar ({}: FileTabBarProps) {
-    const { openDocuments, createNewLevel } = useUserContext();
+    const userCtx = useUserContext();
 
     const files = [];
 
-    for (const doc of openDocuments) {
+    for (const doc of userCtx.openDocuments) {
         files.push({
             value: doc.id,
-            displayName: doc.fileName ?? doc.id,
+            displayName: (doc.fileName ?? doc.id) + (doc.hasUnsavedChanges ? "*" : ""),
             icon: _getFileIcon(doc.content.type),
         });
     }
@@ -53,7 +53,7 @@ function FileTabBar ({}: FileTabBarProps) {
     );
 
     function k () {
-        createNewLevel();
+        userCtx.createNewLevel();
     }
 }
 

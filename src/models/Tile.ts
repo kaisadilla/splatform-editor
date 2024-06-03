@@ -1,6 +1,7 @@
 export interface Tile {
     type: 'tile';
     name: string;
+    category: string | null;
     behavior: string;
     behaviorProperties: {[prop: string]: any};
     configurableProperties: string[];
@@ -18,6 +19,7 @@ export function getNewTile () : Tile {
     return {
         type: 'tile',
         name: "New tile",
+        category: null,
         behavior: "tile",
         behaviorProperties: {},
         configurableProperties: [],
