@@ -73,32 +73,32 @@ export function formatDateString (dateStr: string) : string {
     return agnosticDate.toISOString().split("T")[0];
 }
 
-export function saveAsFile (fileName: string, content: string) {
-    const blob = new Blob([content], {
-        type: "text/plain;charset=utf-8"
-    });
-    saveAs(blob, fileName);
-}
-
-export function readTextFile (file: File) : Promise<string | null> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsText(file, "UTF-8");
-    
-        reader.onload = (evt => {
-            const content = evt.target?.result;
-            if (content && typeof content === "string") {
-                resolve(content);
-            }
-            else if (content) {
-                reject("Content type was not string.");
-            }
-            else {
-                reject("No content was found on the file given.");
-            }
-        });
-    });
-}
+///export function saveAsFile (fileName: string, content: string) {
+///    const blob = new Blob([content], {
+///        type: "text/plain;charset=utf-8"
+///    });
+///    saveAs(blob, fileName);
+///}
+///
+///export function readTextFile (file: File) : Promise<string | null> {
+///    return new Promise((resolve, reject) => {
+///        const reader = new FileReader();
+///        reader.readAsText(file, "UTF-8");
+///    
+///        reader.onload = (evt => {
+///            const content = evt.target?.result;
+///            if (content && typeof content === "string") {
+///                resolve(content);
+///            }
+///            else if (content) {
+///                reject("Content type was not string.");
+///            }
+///            else {
+///                reject("No content was found on the file given.");
+///            }
+///        });
+///    });
+///}
 
 export function cropString (
     str: string, maxLength: number, ellipsis: boolean = false

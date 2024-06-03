@@ -23,8 +23,6 @@ function LevelEditor_TilesPalette ({
         tilesByGroup[group].push(tile);
     }
 
-    console.log(pack);
-
     return (
         <ScrollArea
             scrollbars='y'

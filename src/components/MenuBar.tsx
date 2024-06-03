@@ -79,7 +79,7 @@ function MenuBar (props: MenuBarProps) {
             {
                 key: "open",
                 label: "Open",
-                callback: () => console.log("Open level!"),
+                callback: handleOpenDocument,
             },
             {
                 key: "save",
@@ -158,6 +158,10 @@ function MenuBar (props: MenuBarProps) {
 
     function handleNew_tile () {
         userCtx.createNewTile();
+    }
+
+    function handleOpenDocument () {
+        userCtx.openDocument();
     }
 
     function handleSaveCopy () {

@@ -18,13 +18,13 @@ function Window (props: WindowProps) {
     const { appStatus } = useAppContext();
     const userCtx = useUserContext();
 
-    useEffect(() => {
-        if (userCtx.openDocuments.length > 0) {
-            userCtx.setActiveTab(
-                userCtx.openDocuments[userCtx.openDocuments.length - 1].id
-            );
-        }
-    }, [userCtx.openDocuments.length]);
+    //useEffect(() => {
+    //    if (userCtx.openDocuments.length > 0) {
+    //        userCtx.setActiveTab(
+    //            userCtx.openDocuments[userCtx.openDocuments.length - 1].id
+    //        );
+    //    }
+    //}, [userCtx.openDocuments.length]);
     
     if (appStatus != AppStatus.Ready) {
         return <div>Loading...</div>

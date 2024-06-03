@@ -1,6 +1,6 @@
 import { ResourcePack } from "models/ResourcePack";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE } from "./ipcNames";
-import { saveNewTextFile } from "main/files/write";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE } from "./ipcNames";
+import { FileInfo } from "main/files/documentFiles";
 
 const Ipc = {
     /**
@@ -18,6 +18,14 @@ const Ipc = {
 
     async loadResourcePacks () : Promise<ResourcePack[]> {
         return await getIpcRenderer().invoke(HANDLER_LOAD_RESOURCE_PACKS);
+    },
+
+    async openTextFile (title: string, filters: Electron.FileFilter[])
+        : Promise<FileInfo<string> | null>
+    {
+        return await getIpcRenderer().invoke(HANDLER_OPEN_TEXT_FILE, {
+            title, filters,
+        });
     },
 
     async saveNewTextFile (

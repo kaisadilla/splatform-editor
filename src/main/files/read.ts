@@ -5,17 +5,10 @@ import { DataAssetMetadata, MediaAssetMetadata, ResourcePack, ResourcePackManife
 import Path from "path";
 import { Entity } from "models/Entity";
 import { Tile } from "models/Tile";
+import { getWinPath } from "../util";
 
 const REGKEY_USER_FOLDER = '\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders';
 const TEXT_FORMAT = "utf-8";
-
-/**
- * Adjusts the path for the currenet operating system.
- * @param path The path to adjust.
- */
-export function getWinPath (path: string) {
-    return _winPath(path);
-}
 
 export async function getUserdataFolderPath () {
     const personalFolder = await _getWindowsPersonalFolder();
@@ -150,10 +143,6 @@ function _getWindowsPersonalFolder () : Promise<string> {
             }
         });
     });
-}
-
-function _winPath (path: string) {
-    return path.replaceAll("/", "\\");
 }
 
 function _readTextFile (path: string) {
