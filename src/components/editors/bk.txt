@@ -1,7 +1,7 @@
-import { Sprite, Stage } from '@pixi/react';
+import { Stage, Text } from '@pixi/react';
 import { CSS_VARIABLES, RESOURCE_FOLDERS } from '_constants';
+import EditorCanvas from 'elements/EditorCanvas';
 import { ResourcePack } from 'models/ResourcePack';
-import { Texture } from 'pixi.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Vec2, getClassString, getCssVariableValue } from 'utils';
 
@@ -23,45 +23,84 @@ function _LevelEditor_Content_Canvas ({
     className,
 }: _LevelEditor_Content_CanvasProps) {
     const [btnDown, setBtnDown] = useState<'left' | 'right' | null>(null);
-    const [_inView, _setInView] = useState({xMin: 0, yMin: 0, xMax: 5, yMax: 5});
     const [_temp, _setTemp] = useState<Vec2[]>([]);
+    const [_tempTile, _setTempTile] = useState<HTMLImageElement | null>(null);
+
+    useEffect(() => {
+        load();
+
+        async function load () {
+            const tilePath = pack.fullPath + "\\" + RESOURCE_FOLDERS.sprites.tiles + "\\ground_wooden.png";
+            const img = await loadImage(tilePath);
+            _setTempTile(img);
+            console.log("rel");
+        }
+    }, [])
+
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
     const bgColor = getCssVariableValue(CSS_VARIABLES.ComponentColorTheme0);
 
     useEffect(() => {
         document.addEventListener('mouseup', handleMouseUp);
+
+        const canvas = canvasRef.current;
+        if (canvas === null) {
+            return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        ctxRef.current = ctx;
+
+        if (ctx === null) return;
+        
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 5;
+        
+        //ctx.fillStyle = bgColor;
+        //ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.beginPath();
+        ctx.moveTo(666, 333);
+        ctx.lineTo(100, 100);
+        ctx.stroke();
+
         return () => {
             document.removeEventListener('mouseup', handleMouseUp);
         };
     }, []);
+
+    useEffect(() => {
+        const ctx = ctxRef.current;
+        if (ctx === null) return;
+
+        //ctx.font = "50px arial";
+        //ctx.fillText(`${viewBox.x}, ${viewBox.y}`, 5, 5);
+        //ctx.beginPath();
+        //ctx.moveTo(100, 100);
+        //ctx.lineTo(355, Math.random());
+        //ctx.stroke();
+        //console.log("a");
+
+        drawLevel();
+    }, [viewBox]);
 
     const classStr = getClassString(
         "level-grid-canvas",
         className,
     );
 
-    const texture = useMemo(() => {
-        return Texture.from("asset://" + pack.fullPath + "\\" + RESOURCE_FOLDERS.sprites.tiles + "\\ground_wooden.png");
-    }, []);
-
     return (
-        <Stage
+        <canvas
+            ref={canvasRef}
+            className={classStr}
             width={width * 16}
-            height={height* 16}
-            options={{background: "#bbb"}}
+            height={height * 16}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
-        >
-            {_temp.filter(t => t.x > _inView.xMin && t.x < _inView.xMax && t.y > _inView.yMin && t.y < _inView.yMax)
-                .map(t => <Sprite x={t.x * 16} y={t.y * 16} texture={texture}/>)}
-        </Stage>
-        //<canvas
-        //    className={classStr}
-        //    width={width * 16}
-        //    height={height * 16}
-        //    onMouseDown={handleMouseDown}
-        //    onMouseMove={handleMouseMove}
-        ///>
+        />
     );
 
     function handleMouseDown (evt: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
@@ -75,8 +114,7 @@ function _LevelEditor_Content_Canvas ({
 
     function handleMouseMove (evt: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
         if (btnDown === 'left') {
-            const canvas = evt.currentTarget;
-            const rect = canvas.getBoundingClientRect();
+            const rect = canvasRef.current?.getBoundingClientRect();
             if (!rect) return;
 
             const pos = {
@@ -91,19 +129,26 @@ function _LevelEditor_Content_Canvas ({
                 ...prevState,
                 tilePos,
             ]);
-            const canvasRect = canvas.getBoundingClientRect();
-            _setInView({
-                xMin: (516 - canvasRect.left) / 16,
-                xMax: (516 - canvasRect.left + 1542) / 16,
-                yMin: (104 - canvasRect.top) / 16,
-                yMax: (104 - canvasRect.top + 605) / 16,
-            })
-            console.log(_inView);
+
+            const ctx = ctxRef.current;
+            if (ctx === null || _tempTile === null) return;
+
+            ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+            for (const pos of [..._temp, tilePos]) {
+                ctx.drawImage(_tempTile, pos.x * 16, pos.y * 16);
+            }
         }
     }
 
     function handleMouseUp (evt: MouseEvent) {
         setBtnDown(null);
+    }
+
+    async function drawLevel () {
+        const ctx = ctxRef.current;
+        if (ctx === null) return;
+
+
     }
 }
 

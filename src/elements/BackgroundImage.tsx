@@ -1,31 +1,26 @@
 import { RESOURCE_FOLDERS } from '_constants';
 import { ResourcePack } from 'models/ResourcePack';
-import { Tile } from 'models/Tile';
 import React from 'react';
 import { ImgProps } from 'types';
 import { getClassString } from 'utils';
 
-export interface TileImageProps extends ImgProps {
+export interface BackgroundImageProps extends ImgProps {
     pack: ResourcePack;
-    tile: Tile | null | undefined;
-    scale?: number;
-    bordered?: boolean;
+    background: string | null | undefined;
 }
 
-function TileImage ({
+function BackgroundImage ({
     pack,
-    tile,
-    scale = 1,
-    bordered = false,
+    background,
     src,
     className,
     ...imgProps
-}: TileImageProps) {
+}: BackgroundImageProps) {
     let imgSrc;
 
-    if (tile) {
-        const imgPath = pack.fullPath + "\\" + RESOURCE_FOLDERS.sprites.tiles
-            + "\\" + tile.sprite + ".png";
+    if (background) {
+        const imgPath = pack.fullPath + "\\" + RESOURCE_FOLDERS.backgrounds
+            + "\\" + background + ".png";
         imgSrc = "asset://" + imgPath;
     }
     else {
@@ -33,8 +28,7 @@ function TileImage ({
     }
 
     const classStr = getClassString(
-        "asset-tile-image",
-        bordered && "bordered",
+        "asset-background-image",
         className,
     )
 
@@ -43,13 +37,9 @@ function TileImage ({
             className={classStr}
             src={imgSrc}
             alt=""
-            style={{
-                width: 16 * scale,
-                height: 16 * scale,
-            }}
             {...imgProps}
         />
     );
 }
 
-export default TileImage;
+export default BackgroundImage;

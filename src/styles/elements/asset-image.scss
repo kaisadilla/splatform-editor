@@ -1,4 +1,4 @@
-.tile-image {
+.asset-tile-image {
     object-fit: cover;
     object-position: top left;
     display: block;
@@ -8,4 +8,8 @@
         box-sizing: content-box;
         border: 1px solid $color-component-3;
     }
+}
+
+.asset-background-image {
+    display: block;
 }
