@@ -6,21 +6,33 @@ import { getClassString } from 'utils';
 
 export interface TileImageProps extends ImgProps {
     pack: ResourcePack;
-    tile: Tile;
+    tile: Tile | null | undefined;
+    scale?: number;
+    bordered?: boolean;
 }
 
 function TileImage ({
     pack,
     tile,
+    scale = 1,
+    bordered = false,
     src,
     className,
     ...imgProps
 }: TileImageProps) {
-    const imgPath = pack.fullPath + "\\sprites\\tiles\\" + tile.sprite + ".png";
-    const imgSrc = "asset://" + imgPath;
+    let imgSrc;
+
+    if (tile) {
+        const imgPath = pack.fullPath + "\\sprites\\tiles\\" + tile.sprite + ".png";
+        imgSrc = "asset://" + imgPath;
+    }
+    else {
+        imgSrc = undefined;
+    }
 
     const classStr = getClassString(
         "tile-image",
+        bordered && "bordered",
         className,
     )
 
@@ -29,6 +41,10 @@ function TileImage ({
             className={classStr}
             src={imgSrc}
             alt=""
+            style={{
+                width: 16 * scale,
+                height: 16 * scale,
+            }}
         />
     );
 }

@@ -4,3 +4,31 @@
         color: $color-text-white;
     }
 }
+
+.sp-select.sp-select {
+}
+
+.mantine-Popover-dropdown.mantine-Popover-dropdown {
+    border: 1px solid $color-highlight;
+    padding: 4px;
+
+    .mantine-ScrollArea-viewport {
+        padding: 0;
+    }
+
+    .mantine-Select-option {
+        &:hover {
+            background-color: $color-highlight;
+        }
+    }
+}
+
+.mantine-Select-dropdown {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.mantine-Select-input[data-expanded=true] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}

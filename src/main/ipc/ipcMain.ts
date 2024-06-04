@@ -38,7 +38,9 @@ export function createIpcHandlers (ipcMain: Electron.IpcMain) {
     });
 
     ipcMain.handle(HANDLER_CLOSE_DOCUMENT, async (evt, args: CloseDocumentArgs) => {
-        return confirmDocumentClose(args.type, args.fullPath, args.content);
+        return confirmDocumentClose(
+            args.tabName, args.type, args.fullPath, args.content
+        );
     });
 }
 
@@ -64,6 +66,10 @@ export interface SaveNewDocumentArgs {
 }
 
 export interface CloseDocumentArgs {
+    /**
+     * The name of the file displayed in its tab.
+     */
+    tabName: string;
     type: SPDocumentType;
     fullPath: string | null;
     content: string;

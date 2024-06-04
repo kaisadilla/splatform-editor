@@ -4,9 +4,10 @@
 
 @import "elements/accordion-panel";
 @import "elements/drag-region";
+@import "elements/resizable-panel";
 @import "elements/tab-ribbon";
 @import "elements/tile-image";
-@import "elements/resizable-panel";
+@import "elements/toolbar";
 
 @import "components/editors/editor";
 @import "components/editors/level-editor";
@@ -27,7 +28,7 @@
 }
 
 .window {
-    @include vertical-gallery();
+    @include vertical-gallery-stretch;
     @include fill-container;
 }
 

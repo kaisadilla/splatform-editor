@@ -1,14 +1,35 @@
-import { Accordion, CloseButton, Input, NumberInput, TextInput, Tooltip } from '@mantine/core';
-import { Level } from 'models/Level';
+import { Accordion, CloseButton, Input, NumberInput, Select, TextInput, Tooltip } from '@mantine/core';
+import { useAppContext } from 'context/useAppContext';
+import { Level, LevelSettings } from 'models/Level';
 import React, { useState } from 'react';
+import CSS_CLASSES from 'sp_css_classes';
+import { clampNumber } from 'utils';
+
+const MIN_DIMENSION_VAL = 10;
+const MAX_DIMENSION_VAL = 100_000;
 
 export interface LevelEditor_PropertiesPanelProps {
     level: Level;
+    onChange: (update: Level) => void;
+    onChangeField: (field: keyof Level, val: any) => void;
+    onChangeResourcePack: (val: string | null) => void;
 }
 
 function LevelEditor_PropertiesPanel ({
-    level
+    level,
+    onChange,
+    onChangeField,
+    onChangeResourcePack,
 }: LevelEditor_PropertiesPanelProps) {
+    const { resourcePacks } = useAppContext();
+    const resourcePacksData = [];
+
+    for (const pack of resourcePacks) {
+        resourcePacksData.push({
+            value: pack.folderName,
+            label: pack.manifest.displayName,
+        })
+    }
 
     return (
         <div className="level-properties">
@@ -27,47 +48,71 @@ function LevelEditor_PropertiesPanel ({
                         Level properties
                     </Accordion.Control>
                     <Accordion.Panel>
+                        <Select
+                            size='sm'
+                            label="Resource pack"
+                            placeholder="Select a pack"
+                            data={resourcePacksData}
+                            value={level.resourcePack}
+                            onChange={v => onChangeResourcePack(v)}
+                            allowDeselect={false}
+                            comboboxProps={{
+                                offset: -1,
+                            }}
+                        />
                         <TextInput
                             size='sm'
                             label="Name"
                             value={level.displayName}
-                            readOnly
+                            onChange={evt => onChangeField(
+                                'displayName', evt.currentTarget.value
+                            )}
                         />
                         <NumberInput
                             size='sm'
                             label="Width"
                             value={level.settings.width}
-                            min={10}
-                            max={100_000}
+                            //min={MIN_DIMENSION_VAL}
+                            max={MAX_DIMENSION_VAL}
                             allowDecimal={false}
-                            readOnly
+                            allowNegative={false}
+                            onChange={handleWidthChange}
                         />
                         <NumberInput
                             size='sm'
                             label="Height"
                             value={level.settings.height}
-                            min={10}
-                            max={100_000}
+                            //min={MIN_DIMENSION_VAL}
+                            max={MAX_DIMENSION_VAL}
                             allowDecimal={false}
-                            readOnly
+                            allowNegative={false}
+                            onChange={handleHeightChange}
                         />
                         <TextInput
                             size='sm'
                             label="Background"
                             value={level.settings.background}
-                            readOnly
+                            onChange={evt => handleSettingsValue(
+                                'background', evt.currentTarget.value
+                            )}
                         />
                         <TextInput
                             size='sm'
                             label="Music"
                             value={level.settings.music}
-                            readOnly
+                            onChange={evt => handleSettingsValue(
+                                'music', evt.currentTarget.value
+                            )}
                         />
-                        <TextInput
+                        <NumberInput
                             size='sm'
                             label="Time"
                             value={level.settings.time}
-                            readOnly
+                            min={1}
+                            allowNegative={false}
+                            stepHoldDelay={300}
+                            stepHoldInterval={20}
+                            onChange={handleTimeChange}
                         />
                     </Accordion.Panel>
                 </Accordion.Item>
@@ -86,6 +131,34 @@ function LevelEditor_PropertiesPanel ({
             </Accordion>
         </div>
     );
+
+    function handleSettingsValue (field: keyof LevelSettings, value: any) {
+        onChangeField('settings', {
+            ...level.settings,
+            [field]: value,
+        });
+    }
+
+    function handleWidthChange (value: any) {
+        if (typeof value !== 'number') return;
+
+        value = clampNumber(value, MIN_DIMENSION_VAL, MAX_DIMENSION_VAL);
+        handleSettingsValue('width', value);
+    }
+
+    function handleHeightChange (value: any) {
+        if (typeof value !== 'number') return;
+
+        value = clampNumber(value, MIN_DIMENSION_VAL, MAX_DIMENSION_VAL);
+        handleSettingsValue('height', value);
+    }
+
+    function handleTimeChange (value: any) {
+        if (typeof value !== 'number') return;
+
+        value = Math.max(value, 1);
+        handleSettingsValue('time', value);
+    }
 }
 
 export default LevelEditor_PropertiesPanel;

@@ -11,10 +11,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { deleteArrayItemAt } from "utils";
 
 interface UserContextState {
-    openDocuments: SPDocument[];
+    documents: SPDocument[];
     activeTab: string | null;
     getActiveDocument: () => SPDocument;
     setActiveTab: (id: string) => void;
+    updateDocument: (docId: string, content: SPDocumentContent) => void;
     createNewLevel: () => SPDocument;
     createNewWorld: () => SPDocument;
     createNewGame: () => SPDocument;
@@ -31,7 +32,7 @@ const useUserContext = () => useContext(UserContext);
 
 const UserContextProvider = ({ children }: any) => {
     const [state, setState] = useState<UserContextState>({
-        openDocuments: [] as SPDocument[],
+        documents: [] as SPDocument[],
         activeTab: null,
     } as UserContextState);
     const [internal, setInternal] = useState({
@@ -43,7 +44,7 @@ const UserContextProvider = ({ children }: any) => {
          * Returns the document in the tab that is currently active.
          */
         function getActiveDocument () : SPDocument {
-            return state.openDocuments.find(d => d.id === state.activeTab)
+            return state.documents.find(d => d.id === state.activeTab)
                 ?? {} as SPDocument;
         }
 
@@ -56,6 +57,23 @@ const UserContextProvider = ({ children }: any) => {
                 ...prevState,
                 activeTab: id,
             }))
+        }
+
+        function updateDocument (docId: string, content: SPDocumentContent) {
+            const index = _getDocumentIndexById(docId);
+            if (index === null) return;
+
+            const newArr = [...state.documents];
+            newArr[index] = {
+                ...newArr[index],
+                hasUnsavedChanges: true,
+                content: content,
+            };
+
+            setState(prevState => ({
+                ...prevState,
+                documents: newArr,
+            }));
         }
 
         function createNewLevel () : SPDocument {
@@ -98,8 +116,13 @@ const UserContextProvider = ({ children }: any) => {
          * and the user canceled the operation.
          */
         async function saveDocument (doc: SPDocument) {
+            debugger;
             // TODO: Mark document as without changes.
-            return await _saveDocument(doc);
+            const filePath = await _saveDocument(doc);
+            if (filePath !== null) {
+                _setDocAsUnsaved(doc.id, false);
+            }
+            return filePath;
         }
 
         async function saveDocumentCopy (doc: SPDocument) {
@@ -113,6 +136,7 @@ const UserContextProvider = ({ children }: any) => {
             ...state,
             getActiveDocument,
             setActiveTab,
+            updateDocument,
             createNewLevel,
             createNewWorld,
             createNewGame,
@@ -141,8 +165,8 @@ const UserContextProvider = ({ children }: any) => {
 
         setState(prevState => ({
             ...prevState,
-            openDocuments: [
-                ...prevState.openDocuments,
+            documents: [
+                ...prevState.documents,
                 doc,
             ],
             activeTab: doc.id,
@@ -172,7 +196,7 @@ const UserContextProvider = ({ children }: any) => {
                 name: "SPlatform file",
                 extensions: [
                     "sp-lev", "sp-wld", "sp-gme", "sp-res",
-                    "spr-ent", "spr-til", "spr-tco", "spr-tbr",
+                    "spr-ent", "spr-til", "spr-tic", "spr-tbr",
                     "json"
                 ],
             },
@@ -215,7 +239,7 @@ const UserContextProvider = ({ children }: any) => {
             {
                 name: "SPlatform tile construct",
                 extensions: [
-                    "spr-tco"
+                    "spr-tic"
                 ],
             },
             {
@@ -254,7 +278,7 @@ const UserContextProvider = ({ children }: any) => {
         };
         // try to find the newly opened document within the array of
         // documents that are already opened.
-        const currentDoc = state.openDocuments.find(d => d.fullPath === doc.fullPath);
+        const currentDoc = state.documents.find(d => d.fullPath === doc.fullPath);
         // This file is already opened in the editor. We just make that
         // tab active, but discard the loaded file.
         if (currentDoc) {
@@ -270,8 +294,8 @@ const UserContextProvider = ({ children }: any) => {
         else {
             setState(prevState => ({
                 ...prevState,
-                openDocuments: [
-                    ...prevState.openDocuments,
+                documents: [
+                    ...prevState.documents,
                     doc,
                 ],
                 activeTab: doc.id,
@@ -301,7 +325,10 @@ const UserContextProvider = ({ children }: any) => {
         const json = JSON.stringify(document.content, null, 4);
 
         const closed = await Ipc.closeDocument(
-            document.content.type, document.fullPath ?? null, json
+            document.baseName ?? document.id,
+            document.content.type,
+            document.fullPath ?? null,
+            json
         );
         
         if (closed) {
@@ -339,16 +366,16 @@ const UserContextProvider = ({ children }: any) => {
      * @param document The document to remove.
      */
     function _removeOpenDocument (document: SPDocument) {
-        let index = state.openDocuments.findIndex(d => d.id === document.id);
+        let index = state.documents.findIndex(d => d.id === document.id);
         if (index < 0) return;
 
-        const newArr = [...state.openDocuments];
+        const newArr = [...state.documents];
         deleteArrayItemAt(newArr, index);
         
         index = Math.max(index - 1, 0);
         // if the document we are closing is the active document
         const newActiveTab = document.id === state.activeTab
-            ? newArr[index].id // select a new active document
+            ? (newArr[index]?.id ?? null) // select a new active document
             : state.activeTab; // else don't select anything new
 
         // using setTimeout to launch this in the next frame guarantees that
@@ -358,11 +385,27 @@ const UserContextProvider = ({ children }: any) => {
         setTimeout(
             () => setState(prevState => ({
                 ...prevState,
-                openDocuments: newArr,
+                documents: newArr,
                 activeTab: newActiveTab,
             })),
             0
         );
+    }
+
+    function _setDocAsUnsaved (docId: string, unsaved: boolean) {
+        const index = _getDocumentIndexById(docId);
+        if (index === null) return;
+
+        const newArr = [...state.documents];
+        newArr[index] = {
+            ...newArr[index],
+            hasUnsavedChanges: unsaved,
+        };
+
+        setState(prevState => ({
+            ...prevState,
+            documents: newArr,
+        }));
     }
 
     /**
@@ -371,7 +414,17 @@ const UserContextProvider = ({ children }: any) => {
      * @param id The id to try to find.
      */
     function _getDocumentById (id: string) : SPDocument | null {
-        return state.openDocuments.find(d => d.id === id) ?? null;
+        return state.documents.find(d => d.id === id) ?? null;
+    }
+
+    /**
+     * Returns the index of the document that matches the given id, if it exists,
+     * or null if it doesn't.
+     * @param id The id to try to find.
+     */
+    function _getDocumentIndexById (id: string) : number | null {
+        const index = state.documents.findIndex(d => d.id === id);
+        return index < 0 ? null : index;
     }
 }
 

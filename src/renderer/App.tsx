@@ -7,14 +7,17 @@ import { MantineProvider, createTheme as createMantineTheme } from '@mantine/cor
 import { Shadows, ThemeProvider, createTheme as createMuiTheme } from '@mui/material';
 import { AppContextProvider } from 'context/useAppContext';
 import { UserContextProvider } from 'context/useUserContext';
+import loader from '@monaco-editor/loader';
+import * as monaco from 'monaco-editor';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faArrowPointer, faBrush, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
 
 import '@mantine/core/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
 import 'react-material-symbols/sharp'; // 'rounded' | 'sharp' | 'outlined'.
 import darkTheme from 'styles/main.scss';
 
-import loader from '@monaco-editor/loader';
-import * as monaco from 'monaco-editor';
+import "@pixi/unsafe-eval";
 
 export default function App () {
     // TODO: Themes!
@@ -36,6 +39,8 @@ export default function App () {
 
     loader.config({ monaco });
     loader.init().then(monacoInstance => { /* ... */ });
+
+    initFontAwesome();
     
     return (
         <ThemeProvider theme={muiTheme}>
@@ -57,5 +62,18 @@ export default function App () {
 
         </MantineProvider>
         </ThemeProvider>
+    );
+}
+
+function initFontAwesome () {
+    library.add(
+        faArrowPointer,
+        faEraser,
+        faExpand,
+        faEyeDropper,
+        faEyeDropperEmpty,
+        faFillDrip,
+        faPaintbrush,
+        faUpDownLeftRight,
     );
 }

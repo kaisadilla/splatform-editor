@@ -12,6 +12,7 @@
 
     --bg-color-dark: #0f121b;
     --bg-color: var(--component-color-light-0);
+
     --text-color: var(--text-color-black);
     --text-color-1: var(--text-color-black-1);
     --text-color-2: var(--text-color-black-2);
@@ -31,17 +32,16 @@
     --highlight-text-color-1: var(--text-color-black-1);
     --highlight-text-color-2: var(--text-color-black-2);
     --highlight-color: #02b68f;
-    --highlight-color-l1: #b9183b;
-    --highlight-color-l2: #c22749;
-    --highlight-color-l3: #ca4965;
-    --highlight-color-d2: #8a0723;
-    --highlight-color-d3: #70091f;
-    --highlight-color-d4: #550819;
-    --highlight-color-d5: #310610;
+    --highlight-color-l1: #8fe0cf;
+    --highlight-color-l2: #a9e7da;
+    --highlight-color-d1: #008b6d;
+    --highlight-color-d2: #00644f;
 
     --component-color-dark-0: #0f121b;
     --component-color-dark-1: #1b1f2b;
-    --component-color-dark-2: #3c3f46;
+    --component-color-dark-2: #2d3038;
+    --component-color-dark-3: #3c3f46;
+    --component-color-dark-4: #474a51;
 
     --component-color-light-0: #f3f6ff;
     --component-color-light-1: #e1e4ec;

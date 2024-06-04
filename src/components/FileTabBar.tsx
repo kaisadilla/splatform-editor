@@ -21,7 +21,7 @@ function FileTabBar ({}: FileTabBarProps) {
 
     const files = [];
 
-    for (const doc of userCtx.openDocuments) {
+    for (const doc of userCtx.documents) {
         files.push({
             id: doc.id,
             displayName: (doc.baseName ?? doc.id) + (doc.hasUnsavedChanges ? "*" : ""),

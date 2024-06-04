@@ -4,6 +4,7 @@ import { Version } from "./sp_documents";
 
 export interface ResourcePack {
     type: 'resource_pack';
+    folderName: string;
     fullPath: string;
     relativePath: string;
     manifestPath: string;
@@ -23,7 +24,6 @@ export interface ResourcePack {
 
 export interface ResourcePackManifest {
     type: 'manifest';
-    name: string;
     displayName: string;
     version: Version;
     settings: ResourcePackManifestSettings;
@@ -34,6 +34,7 @@ export interface ResourcePackManifestSettings {
 }
 
 export interface MediaAssetMetadata {
+    id: string;
     baseName: string;
     fileName: string;
     extension: string;
@@ -41,6 +42,7 @@ export interface MediaAssetMetadata {
 }
 
 export interface DataAssetMetadata<T> {
+    id: string;
     baseName: string;
     fileName: string;
     extension: string;

@@ -64,6 +64,15 @@
     overflow-y: hidden;
 }
 
+@mixin horizontal-list-stretch () {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
 @mixin horizontal-toolbar () {
     display: flex;
     flex-direction: row;
@@ -80,6 +89,14 @@
     overflow: hidden;
 }
 
+@mixin horizontal-gallery-stretch ($flex-wrap: nowrap) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: $flex-wrap;
+    align-items: stretch;
+    overflow: hidden;
+}
+
 @mixin vertical-list () {
     display: flex;
     flex-direction: column;
@@ -89,10 +106,28 @@
     overflow-y: auto;
 }
 
+@mixin vertical-list-stretch () {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
 @mixin vertical-gallery () {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
+    align-items: center;
+    overflow: hidden;
+}
+
+@mixin vertical-gallery-stretch () {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
     overflow: hidden;
 }
 

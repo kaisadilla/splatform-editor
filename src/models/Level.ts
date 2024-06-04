@@ -2,6 +2,7 @@ import { SPDocumentType, Version } from "./sp_documents";
 
 export interface Level {
     type: 'level';
+    resourcePack: string | null;
     displayName: string;
     version: Version;
     settings: LevelSettings;
@@ -48,6 +49,7 @@ export interface LevelEvent {
 export function getNewLevel () : Level {
     return {
         type: 'level',
+        resourcePack: null,
         displayName: "New level",
         version: {
             major: 1,

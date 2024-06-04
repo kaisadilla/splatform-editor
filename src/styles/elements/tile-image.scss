@@ -1,7 +1,11 @@
 .tile-image {
-    width: 16px;
-    height: 16px;
     object-fit: cover;
     object-position: top left;
     display: block;
+    image-rendering: pixelated;
+
+    &.bordered {
+        box-sizing: content-box;
+        border: 1px solid $color-component-3;
+    }
 }

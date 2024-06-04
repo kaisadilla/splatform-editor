@@ -37,3 +37,5 @@ export interface Version {
     minor: number;
     revision: number;
 }
+
+export type TilePaint = Tile;

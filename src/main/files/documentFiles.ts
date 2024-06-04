@@ -106,15 +106,20 @@ export function saveNewDocument (
             extensions: ["spr-til", "json"]
         }]);
     }
+    else {
+        console.error("Unknown file type: ", type);
+    }
 
     return filePath;
 }
 
 export function confirmDocumentClose (
+    tabName: string,
     type: SPDocumentType,
     fullPath: string | null,
     content: string
 ) : boolean {
+
     const SAVE_ID = 0;
     const DISCARD_ID = 1;
     const CANCEL_ID = 2;
@@ -122,11 +127,12 @@ export function confirmDocumentClose (
     const resp = dialog.showMessageBoxSync({
         title: "Closing document",
         type: 'warning',
-        message: "Do you want to save the changes you made to <base-name>?",
+        message: `Do you want to save the changes you made to '${tabName}'?`,
         detail: "Your changes will be lost if you don't save them.",
         buttons: ["Save", "Discard", "Cancel"],
         defaultId: SAVE_ID,
         cancelId: CANCEL_ID,
+        noLink: true,
     });
 
     if (resp == SAVE_ID) {
@@ -134,7 +140,7 @@ export function confirmDocumentClose (
             saveNewDocument(type, content);
         }
         else {
-            fs.writeFileSync(fullPath, content);
+            saveDocument(fullPath, content);
         }
     }
 

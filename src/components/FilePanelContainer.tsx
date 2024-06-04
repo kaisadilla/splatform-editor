@@ -3,13 +3,14 @@ import { NO_DOCUMENT_ID } from '_constants';
 import { useUserContext } from 'context/useUserContext';
 import React from 'react';
 import LevelEditor from './editors/LevelEditor';
+import { LevelEditorContextProvider } from 'context/useLevelEditorContext';
 
 export interface FilePanelContainerProps {
     
 }
 
 function FilePanelContainer (props: FilePanelContainerProps) {
-    const { openDocuments } = useUserContext();
+    const { documents: openDocuments } = useUserContext();
 
     return (<div className="tab-panel-container">
         <Tabs.Panel value={NO_DOCUMENT_ID}>
@@ -17,7 +18,12 @@ function FilePanelContainer (props: FilePanelContainerProps) {
         </Tabs.Panel>
         {openDocuments.map(doc => (
             <Tabs.Panel value={doc.id} key={doc.id}>
-                {doc.content.type == 'level' && <LevelEditor doc={doc} />}
+                {
+                    doc.content.type == 'level' &&
+                    <LevelEditorContextProvider>
+                        <LevelEditor doc={doc} />
+                    </LevelEditorContextProvider>
+                }
                 {doc.content.type == 'world' && <div>World!</div>}
                 {doc.content.type == 'game' && <div>Game!</div>}
                 {doc.content.type == 'entity' && <div>Fearsome goomba!</div>}

@@ -9,6 +9,8 @@ import LocalStorage from 'localStorage';
 import LevelEditor_PropertiesPanel from './LevelEditor.PropertiesPanel';
 import LevelEditor_TilesPalette from './LevelEditor.TilesPalette';
 import { useAppContext } from 'context/useAppContext';
+import { useUserContext } from 'context/useUserContext';
+import LevelEditor_Content from './LevelEditor.Content';
 
 export interface LevelEditorProps {
     doc: SPDocument;
@@ -17,9 +19,12 @@ export interface LevelEditorProps {
 function LevelEditor ({
     doc
 }: LevelEditorProps) {
-    const { resourcePacks } = useAppContext();
+    const { getResourcePack } = useAppContext();
+    const { updateDocument } = useUserContext();
 
     const level = doc.content as Level;
+
+    const pack = getResourcePack(level.resourcePack);
 
     return (
         <div className="editor level-editor">
@@ -29,26 +34,46 @@ function LevelEditor ({
             </div>
 
             <PanelGroup className="level-edition-container" direction='horizontal'>
-                <Panel className="palette" defaultSize={6} minSize={4}>
-                    <LevelEditor_TilesPalette pack={resourcePacks[0]} />
+                <Panel className="palette-container" defaultSize={6} minSize={4}>
+                    <LevelEditor_TilesPalette
+                        pack={pack}
+                    />
                 </Panel>
                 <SP_ResizeHandle direction='horizontal' />
                 <Panel className="level-content-container" defaultSize={15} minSize={4}>
-                    <div className="level-grid-container">
-                        <div className="level-grid-tools">(tools)</div>
-                        <div className="level-grid">(grid)</div>
-                    </div>
-                    <div className="level-grid-features">
-                        (terrain / spawns / events) -&gt; background / main
-                    </div>
+                    <LevelEditor_Content
+                        pack={pack}
+                        level={level}
+                    />
                 </Panel>
                 <SP_ResizeHandle direction='horizontal' />
                 <Panel className="properties-panel-container" defaultSize={5} minSize={4}>
-                    <LevelEditor_PropertiesPanel level={level} />
+                    <LevelEditor_PropertiesPanel
+                        level={level}
+                        onChange={handleChange}
+                        onChangeField={handleFieldChange}
+                        onChangeResourcePack={handleResourcePackChange}
+                    />
                 </Panel>
             </PanelGroup>
         </div>
     );
+
+    function handleChange (update: Level) {
+        updateDocument(doc.id, update);
+    }
+
+    function handleFieldChange (field: keyof Level, value: any) {
+        const update = {...level};
+        update[field] = value;
+        updateDocument(doc.id, update);
+    }
+
+    function handleResourcePackChange (value: string | null) {
+        const update = {...level};
+        update.resourcePack = value;
+        updateDocument(doc.id, update);
+    }
 }
 
 export default LevelEditor;

@@ -1,17 +1,28 @@
 import { Accordion, ScrollArea, Tooltip } from '@mantine/core';
 import { useAppContext } from 'context/useAppContext';
+import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import TileImage from 'elements/TileImage';
 import { DataAssetMetadata, ResourcePack } from 'models/ResourcePack';
 import { Tile } from 'models/Tile';
 import React from 'react';
+import { getClassString } from 'utils';
 
 export interface LevelEditor_TilesPaletteProps {
-    pack: ResourcePack
+    pack: ResourcePack | null;
 }
 
 function LevelEditor_TilesPalette ({
     pack,
 }: LevelEditor_TilesPaletteProps) {
+    const { selectedPaint, setSelectedPaint } = useLevelEditorContext();
+    const { getResourcePack } = useAppContext();
+
+    if (pack === null) {
+        return <div className="info-panel">
+            Select a resource pack to start editing this level.
+        </div>;
+    }
+
     const tilesByGroup = {} as {[category: string]: DataAssetMetadata<Tile>[]};
 
     for (const tile of pack.tiles) {
@@ -54,33 +65,51 @@ function LevelEditor_TilesPalette ({
                     <Accordion.Panel>
                         {tilesByGroup[gr].map(t => <_TileButton
                             key={t.baseName}
-                            tile={t}
                             pack={pack}
+                            tile={t}
+                            selected={selectedPaint?.id === t.id}
+                            onClick={() => selectPaint(t)}
                         />)}
                     </Accordion.Panel>
                 </Accordion.Item>))}
             </Accordion>
         </ScrollArea>
     );
+    
+    function selectPaint (tile: DataAssetMetadata<Tile>) {
+        setSelectedPaint({
+            id: tile.id,
+            object: tile.data,
+        })
+    }
 }
 
 interface _TileButtonProps {
     pack: ResourcePack;
     tile: DataAssetMetadata<Tile>;
+    selected: boolean;
+    onClick: () => void;
 }
 
 function _TileButton ({
     pack,
     tile,
+    selected,
+    onClick,
 }: _TileButtonProps) {
+    const classStr = getClassString(
+        "tile-button",
+        selected && "selected",
+    );
 
     return (
         <Tooltip label={tile.data.name}>
-            <div className="tile-button">
+            <div className={classStr} onClick={() => onClick()}>
                 <TileImage
                     key={tile.baseName}
                     tile={tile.data}
                     pack={pack}
+                    bordered
                 />
             </div>
         </Tooltip>

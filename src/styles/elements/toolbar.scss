@@ -1,0 +1,52 @@
+.sp-toolbar {
+    $border-radius: 6px;
+    $border-color: $color-component-2;
+    @include vertical-list;
+
+    .toolbar-button {
+        @include center-content;
+        width: 32px;
+        height: 32px;
+        border: 1px solid $border-color;
+        border-bottom: 0;
+        background: $color-background;
+
+        svg {
+            width: 20px;
+            height: 20px;
+            color: $color-text-2;
+        }
+
+        &:first-child {
+            border-top-left-radius: $border-radius;
+            border-top-right-radius: $border-radius;
+        }
+        &:last-child {
+            border-bottom: 1px solid $border-color;
+            border-bottom-left-radius: $border-radius;
+            border-bottom-right-radius: $border-radius;
+        }
+
+        &:hover {
+            background: $color-component-1;
+            border-color: $color-component-3;
+
+            &:not(:last-child) + .toolbar-button {
+                border-top-color: $color-component-3;
+            }
+        }
+
+        &.selected {
+            background-color: $color-highlight-l1;
+            border-color: $color-highlight;
+
+            svg {
+                color: $color-highlight-d2;
+            }
+
+            &:not(:last-child) + .toolbar-button {
+                border-top-color: $color-highlight;
+            }
+        }
+    }
+}

@@ -1,7 +1,7 @@
 .tab-root.tab-root {
     flex: 1;
     min-height: 0;
-    @include vertical-gallery;
+    @include vertical-gallery-stretch;
 
     .tab-ribbon-root {
         flex-shrink: 0;
@@ -59,7 +59,7 @@
     }
 
     .tab-panel-container {
-        @include vertical-gallery;
+        @include vertical-gallery-stretch;
         flex: 1;
         min-height: 0;
         overflow: hidden;

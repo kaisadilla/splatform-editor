@@ -1,20 +1,24 @@
 .sp-resize-handle-horiz {
     position: relative;
+    box-sizing: border-box;
     width: 1px;
+    background: $color-component-3;
 
     > .separator-handle-container {
+        $width: 8px;
+
         display: flex;
         justify-content: center;
         position: absolute;
         top: 0;
-        left: -3px;
+        left: - calc($width / 2);
         height: 100%;
-        width: 5px;
+        width: 8px;
+        background: transparent;
 
         > .separator-handle {
             height: 100%;
             width: 1px;
-            border-left: 1px solid $color-component-3;
             transition: all 0.15s ease-out;
         }
 

@@ -2,10 +2,9 @@
 
 .sp-lev, .sp-wld, .sp-gme, sp-res
 
-.spr-ent, .spr-til, .spr-tco, .spr-tbr
+.spr-ent, .spr-til, .spr-tic, .spr-tbr
 
- - .spr-tco: tile construct, a prefab of multiple tiles.
- - .spr-tbr: tile brush.
+ - .spr-tic: tile construct, a prefab of multiple tiles.
 
 .spb-l, .spb-w, .spb
 

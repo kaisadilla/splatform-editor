@@ -17,6 +17,7 @@ interface AppContextState {
     appStatus: AppStatus;
     userdataPath: string;
     resourcePacks: ResourcePack[];
+    getResourcePack: (packId: string | null) => ResourcePack | null;
 }
 
 const AppContext = createContext<AppContextState>({} as AppContextState);
@@ -27,15 +28,20 @@ const AppContextProvider = ({ children }: any) => {
         appStatus: AppStatus.LoadingData,
         userdataPath: "",
         resourcePacks: [] as ResourcePack[],
-    });
+    } as AppContextState);
 
     useEffect(() => {
         loadData();
     }, []);
 
     const value = useMemo(() => {
+        function getResourcePack (packId: string | null) {
+            return state.resourcePacks.find(r => r.folderName === packId) ?? null;
+        }
+
         return {
             ...state,
+            getResourcePack,
         }
     }, [state]);
 

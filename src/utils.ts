@@ -9,6 +9,20 @@ export interface ConditionalClass {
     [className: string]: boolean;
 }
 
+export interface WithId<T> {
+    id: string;
+    object: T;
+}
+
+export class Vec2 {
+    public x: number = 0;
+    public y: number = 0;
+
+    public toString () {
+        return `(${this.x}, ${this.y})`;
+    }
+}
+
 /**
  * Generates the className string from the arguments given.
  * Two types of arguments can be passed:
@@ -389,4 +403,13 @@ function __buildSmartFilterRegex (filter: string, caseSensitive?: boolean) {
 
         return /^$/g;
     }
+}
+
+/**
+ * Returns the value of the css variable given.
+ * @param variable The css variable to look for.
+ * @returns 
+ */
+export function getCssVariableValue (variable: string) {
+    return window.getComputedStyle(document.body).getPropertyValue(variable);
 }

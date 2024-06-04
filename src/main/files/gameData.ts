@@ -32,7 +32,7 @@ export async function getInstalledResourcePacks () {
         const manifestPath = folderPath + "/manifest.sm-res";
 
         if (fs.existsSync(manifestPath)) {
-            const pack = await _readResourcePackFolder(folderPath);
+            const pack = await _readResourcePackFolder(folderPath, f);
             resourcePackFolders.push(pack);
         }
     }
@@ -43,7 +43,9 @@ export async function getInstalledResourcePacks () {
     return resourcePackFolders;
 }
 
-async function _readResourcePackFolder (path: string) : Promise<ResourcePack> {
+async function _readResourcePackFolder (path: string, folderName: string)
+    : Promise<ResourcePack>
+{
     // replace removes UTF-8 with BOM characters.
     const manifestJson = _readTextFile(path + "/manifest.sm-res");
     const manifest: ResourcePackManifest = JSON.parse(manifestJson);
@@ -80,6 +82,7 @@ async function _readResourcePackFolder (path: string) : Promise<ResourcePack> {
 
     return {
         type: 'resource_pack',
+        folderName: folderName,
         fullPath: getWinPath(path),
         relativePath: getWinPath(Path.parse(path).dir),
         manifestPath: getWinPath(path + "/manifest.sm-res"),
@@ -112,6 +115,7 @@ async function _scandirForFileType (path: string, ...extensions: string[]) {
 
         if (extensions.includes(file.ext)) {
             targetedFiles.push({
+                id: file.name,
                 fileName: file.name,
                 baseName: file.base,
                 extension: file.ext,
