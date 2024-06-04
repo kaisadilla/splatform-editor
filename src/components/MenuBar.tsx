@@ -84,6 +84,7 @@ function MenuBar (props: MenuBarProps) {
             {
                 key: "save",
                 label: "Save",
+                callback: handleSave,
             },
             {
                 key: "save-copy",
@@ -114,6 +115,7 @@ function MenuBar (props: MenuBarProps) {
                         paper: "menu-bar-paper",
                         list: "menu-bar-list",
                     },
+                    marginThreshold: 0,
                 }}
                 ButtonProps={{
                     classes: {
@@ -162,6 +164,10 @@ function MenuBar (props: MenuBarProps) {
 
     function handleOpenDocument () {
         userCtx.openDocument();
+    }
+
+    function handleSave () {
+        userCtx.saveDocument(userCtx.getActiveDocument());
     }
 
     function handleSaveCopy () {

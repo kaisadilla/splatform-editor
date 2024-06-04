@@ -54,6 +54,22 @@ export function saveNewTextFile (
     return filePath ?? null;
 }
 
+/**
+ * Saves the document given to the path given.
+ * @param fullPath The path of the file to save the content to.
+ * @param content The content to save inside the file.
+ */
+export function saveDocument (fullPath: string, content: string) {
+    fs.writeFileSync(fullPath, content);
+}
+
+/**
+ * Prompts the user to select a path to save the file given.
+ * @param type The type of document to save.
+ * @param content The content of the document.
+ * @returns The path to where the user saved the document, or `null` if the user
+ * decided not to save it.
+ */
 export function saveNewDocument (
     type: SPDocumentType,
     content: string,

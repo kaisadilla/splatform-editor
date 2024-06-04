@@ -9,7 +9,7 @@
     position: sticky;
     left: 0;
     flex-shrink: 0;
-    z-index: 100000000;
+    z-index: 10000;
 
     .app-icon {
         @include center-content;

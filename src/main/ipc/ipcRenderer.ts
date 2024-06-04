@@ -39,6 +39,21 @@ const Ipc = {
         });
     },
 
+    /**
+     * Saves the document given to the path given, overwriting the file if it
+     * exists.
+     * @param fullPath The path of the file to write.
+     * @param content The content to write in the file.
+     * @returns 
+     */
+    async saveDocument (
+        fullPath: string, content: string,
+    ) : Promise<string> {
+        return await getIpcRenderer().invoke(HANDLER_SAVE_NEW_DOCUMENT, {
+            fullPath, content,
+        });
+    },
+
     async saveNewDocument (
         type: SPDocumentType, content: string,
     ) : Promise<string> {

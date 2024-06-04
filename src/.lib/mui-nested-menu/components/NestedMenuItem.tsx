@@ -184,6 +184,7 @@ const NestedMenuItem = forwardRef<HTMLLIElement | null, NestedMenuItemProps>(fun
                     setIsSubMenuOpen(false);
                 }}
                 {...MenuProps}
+                className="nested-menu-popover-root"
             >
                 <div ref={menuContainerRef} style={{ pointerEvents: 'auto' }}>
                     {children}

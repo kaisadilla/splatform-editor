@@ -22,6 +22,7 @@ interface UserContextState {
     createNewTile: () => SPDocument;
     openDocument: () => Promise<SPDocument | null>;
     closeDocument: (id: string) => Promise<boolean>;
+    saveDocument: (doc: SPDocument) => Promise<string | null>;
     saveDocumentCopy: (doc: SPDocument) => Promise<string | null>;
 }
 
@@ -89,7 +90,21 @@ const UserContextProvider = ({ children }: any) => {
             return await _promptCloseDocument(id);
         }
 
+        /**
+         * Saves the current document, overwriting its previous file if it
+         * already exists in disk. If it doesn't, then acts like `saveDocumentCopy()`.
+         * @param doc The document to save.
+         * @returns The full path of the file saved, or null if the file is new
+         * and the user canceled the operation.
+         */
+        async function saveDocument (doc: SPDocument) {
+            // TODO: Mark document as without changes.
+            return await _saveDocument(doc);
+        }
+
         async function saveDocumentCopy (doc: SPDocument) {
+            // TODO: Mark document as without changes and change its full path
+            // to the newly selected path.
             const path = await _saveNewDocument(doc);
             return path;
         }
@@ -105,6 +120,7 @@ const UserContextProvider = ({ children }: any) => {
             createNewTile,
             openDocument,
             closeDocument,
+            saveDocument,
             saveDocumentCopy,
         };
     }, [state]);
@@ -293,6 +309,18 @@ const UserContextProvider = ({ children }: any) => {
         }
 
         return closed;
+    }
+
+    async function _saveDocument (document: SPDocument) : Promise<string | null> {
+        const json = JSON.stringify(document.content, null, 4);
+
+        if (document.fullPath) {
+            Ipc.saveDocument(document.fullPath, json);
+            return document.fullPath;
+        }
+        else {
+            return await _saveNewDocument(document);
+        }
     }
 
     async function _saveNewDocument (document: SPDocument) : Promise<string | null> {

@@ -29,13 +29,28 @@
     }
 }
 
+.MuiPopover-root.MuiPopover-root {
+    z-index: 12000;
+
+    // a class that only appears in menus nested inside
+    // other menus.
+    &.nested-menu-popover-root {
+        .MuiPaper-root.MuiPaper-root {
+            // the necessary offset to align the nested
+            // menu with the element in the parent menu
+            // that spawned it.
+            margin-top: -9px;
+        }
+    }
+}
+
 .MuiPaper-root.MuiPaper-root {
     border-radius: 6px;
     border: 1px solid $color-component-2;
     min-width: 140px;
 }
 
-.MuiList-root.MuiList-root {        
+.MuiList-root.MuiList-root {
     li {
         border-radius: 4px;
         margin: 0 6px;
@@ -57,7 +72,7 @@
     }
 }
 
-.titlebar-menu-bar-root {
+.titlebar-menu-bar-root.titlebar-menu-bar-root {
     .menu-bar-paper.menu-bar-paper {
         margin-top: -6px;
     }
