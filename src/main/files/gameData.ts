@@ -6,12 +6,18 @@ import Path from "path";
 import { Entity } from "models/Entity";
 import { Tile } from "models/Tile";
 import { getWinPath } from "../util";
+import { app } from "electron";
 
 const REGKEY_USER_FOLDER = '\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders';
 const TEXT_FORMAT = "utf-8";
 
 export async function getUserdataFolderPath () {
-    const personalFolder = await _getWindowsPersonalFolder();
+    let personalFolder = await _getWindowsPersonalFolder();
+
+    if (personalFolder.includes("%USERPROFILE%")) {
+        personalFolder = personalFolder.replaceAll("%USERPROFILE%", app.getPath('home'));
+    }
+
     return personalFolder + "/My Games/SPlatform";
 }
 
