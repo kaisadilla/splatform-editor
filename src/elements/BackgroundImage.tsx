@@ -19,9 +19,7 @@ function BackgroundImage ({
     let imgSrc;
 
     if (background) {
-        const imgPath = pack.fullPath + "\\" + RESOURCE_FOLDERS.backgrounds
-            + "\\" + background + ".png";
-        imgSrc = "asset://" + imgPath;
+        imgSrc = getBackgroundImagePath(pack, background);
     }
     else {
         imgSrc = undefined;
@@ -40,6 +38,13 @@ function BackgroundImage ({
             {...imgProps}
         />
     );
+}
+
+export function getBackgroundImagePath (pack: ResourcePack, background: string) {
+    const imgPath = pack.fullPath + "\\" + RESOURCE_FOLDERS.backgrounds
+        + "\\" + background + ".png";
+
+    return "asset://" + imgPath;
 }
 
 export default BackgroundImage;

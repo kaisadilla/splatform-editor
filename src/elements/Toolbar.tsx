@@ -35,19 +35,19 @@ function Toolbar<T> ({
     return (
         <div className={classStr} {...divProps}>
             {buttons.map(b =>
-                <Tooltip label={b.label} position='right' >
-                <button
-                    className={getClassString(
-                        "toolbar-button",
-                        selectedValue === b.value && "selected"
-                    )}
-                    onClick={evt => {
-                        onSelectButton(b.value)
-                        b.onClick?.(evt);
-                    }}
-                >
-                    <FontAwesomeIcon icon={b.icon} size='lg' />
-                </button>
+                <Tooltip key={b.value as string} label={b.label} position='right' >
+                    <button
+                        className={getClassString(
+                            "toolbar-button",
+                            selectedValue === b.value && "selected"
+                        )}
+                        onClick={evt => {
+                            onSelectButton(b.value)
+                            b.onClick?.(evt);
+                        }}
+                    >
+                        <FontAwesomeIcon icon={b.icon} size='lg' />
+                    </button>
                 </Tooltip>)
             }
         </div>

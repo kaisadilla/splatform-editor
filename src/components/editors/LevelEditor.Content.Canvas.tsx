@@ -1,12 +1,17 @@
-import { Sprite, Stage } from '@pixi/react';
+import { ScrollArea } from '@mantine/core';
+import { Sprite, Stage, Text } from '@pixi/react';
 import { CSS_VARIABLES, RESOURCE_FOLDERS } from '_constants';
+import { getBackgroundImagePath } from 'elements/BackgroundImage';
+import { useEditorCanvas } from 'hooks/useEditorCanvas';
 import { ResourcePack } from 'models/ResourcePack';
 import { Texture } from 'pixi.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Vec2, getClassString, getCssVariableValue } from 'utils';
 
+const RULER_WIDTH = 16;
+const SCROLL_WIDTH = 10;
+
 export interface _LevelEditor_Content_CanvasProps {
-    viewBox: DOMRect;
     pack: ResourcePack;
     width: number;
     height: number;
@@ -15,18 +20,75 @@ export interface _LevelEditor_Content_CanvasProps {
 }
 
 function _LevelEditor_Content_Canvas ({
-    viewBox,
     pack,
     width,
     height,
     background,
     className,
 }: _LevelEditor_Content_CanvasProps) {
+    height = width;
+    const ref = useRef<HTMLDivElement | null>(null);
+
+    const [viewBox, setViewBox] = useState(new DOMRect());
+    const [canvasSize, setCanvasSize] = useState({width: 1, height: 1});
     const [btnDown, setBtnDown] = useState<'left' | 'right' | null>(null);
-    const [_inView, _setInView] = useState({xMin: 0, yMin: 0, xMax: 5, yMax: 5});
+
     const [_temp, _setTemp] = useState<Vec2[]>([]);
 
-    const bgColor = getCssVariableValue(CSS_VARIABLES.ComponentColorTheme0);
+    const [scrollTopLeft, setScrollTopLeft] = useState(new Vec2(0, 0));
+
+
+    const [_inView, _setInView] = useState({xMin: 0, yMin: 0, xMax: 5, yMax: 5});
+
+    useEffect(() => {
+        if (ref.current === null) return;
+
+        const observer = new ResizeObserver(() => {
+            if (ref.current) {
+                setViewBox(ref.current.getBoundingClientRect());
+            }
+            else {
+                console.warn("Couldn't obtain canvas container node.");
+                setViewBox(new DOMRect());
+            }
+        })
+        observer.observe(ref.current);
+
+        return () => {
+            observer.disconnect();
+        }
+    }, [ref.current]);
+
+    useEffect(() => {
+        let cWidth = viewBox.width - RULER_WIDTH - SCROLL_WIDTH;
+        let cHeight = viewBox.height - RULER_WIDTH - SCROLL_WIDTH;
+
+        cWidth = Math.min(width * 16, cWidth);
+        cHeight = Math.min(height * 16, cHeight);
+
+        setCanvasSize({width: cWidth, height: cHeight});
+    }, [viewBox]);
+
+    const pixelWidth = useMemo(() => {
+        return width * 16;
+    }, [width]);
+
+    const pixelHeight = useMemo(() => {
+        return width * 16;
+    }, [height]);
+
+    const bgColor = useMemo(() => {
+        getCssVariableValue(CSS_VARIABLES.ComponentColorTheme0)
+    }, []);
+
+    const texBg = useMemo(() => {
+        if (background) {
+            return Texture.from(getBackgroundImagePath(pack, background));
+        }
+        else {
+            return null;
+        }
+    }, [background]);
 
     useEffect(() => {
         document.addEventListener('mouseup', handleMouseUp);
@@ -44,25 +106,57 @@ function _LevelEditor_Content_Canvas ({
         return Texture.from("asset://" + pack.fullPath + "\\" + RESOURCE_FOLDERS.sprites.tiles + "\\ground_wooden.png");
     }, []);
 
+    const $horizRule = [];
+    const $vertRule = [];
+
+    for (let i = 0; i < width; i++) {
+        $horizRule.push(<div key={i} className="ruler-item">{i}</div>);
+        $vertRule.push(<div key={i} className="ruler-item">{i}</div>);
+    }
+
     return (
-        <Stage
-            width={width * 16}
-            height={height* 16}
-            options={{background: "#bbb"}}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-        >
-            {_temp.filter(t => t.x > _inView.xMin && t.x < _inView.xMax && t.y > _inView.yMin && t.y < _inView.yMax)
-                .map(t => <Sprite x={t.x * 16} y={t.y * 16} texture={texture}/>)}
-        </Stage>
-        //<canvas
-        //    className={classStr}
-        //    width={width * 16}
-        //    height={height * 16}
-        //    onMouseDown={handleMouseDown}
-        //    onMouseMove={handleMouseMove}
-        ///>
-    );
+        <div ref={ref} className="level-grid-canvas-viewbox">
+            <div
+                className="level-grid-canvas-scrollarea"
+                //classNames={{
+                //    root: "level-grid-canvas-scrollarea"
+                //}}
+                //scrollbars='xy'
+                //type='auto'
+            >
+                <div className="level-grid-canvas">
+                    <div className="ruler-edge">
+                        
+                    </div>
+                    <div className="horizontal-ruler">
+                        {$horizRule}
+                    </div>
+                    <div className="vertical-ruler">
+                        {$vertRule}
+                    </div>
+                    <Stage
+                        className="canvas-element"
+                        width={canvasSize.width}
+                        height={canvasSize.height}
+                        options={{background: "#bbb"}}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                    >
+                        {texBg && <Sprite
+                            texture={texBg}
+                            x={0}
+                            y={0}
+                            width={canvasSize.width}
+                            height={canvasSize.height}
+                        />}
+                        {_temp.map(t => <Sprite x={t.x * 16} y={t.y * 16} texture={texture}/>)}
+                    </Stage>
+                    <div className="vertical-scroll" />
+                    <div className="horizontal-scroll" />
+                </div>
+            </div>
+        </div>
+    )
 
     function handleMouseDown (evt: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
         if (evt.buttons === 1) {
@@ -98,7 +192,6 @@ function _LevelEditor_Content_Canvas ({
                 yMin: (104 - canvasRect.top) / 16,
                 yMax: (104 - canvasRect.top + 605) / 16,
             })
-            console.log(_inView);
         }
     }
 

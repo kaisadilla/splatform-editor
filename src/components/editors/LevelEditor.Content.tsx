@@ -127,43 +127,17 @@ function _GridCanvas ({
     pack,
     level,
 }: _GridCanvasProps) {
-    const ref = useRef<HTMLDivElement | null>(null);
-    const [viewBox, setViewBox] = useState<DOMRect>(new DOMRect());
-
-    useEffect(() => {
-        if (ref.current) {
-            setViewBox(ref.current.getBoundingClientRect());
-        }
-        else {
-            console.error("Couldn't obtain canvas container node.");
-        }
-    }, []);
-
     const levelCtx = useLevelEditorContext();
 
     return (
-        <div ref={ref} className="level-grid-canvas-container">
-            <div className="level-grid-canvas-bg">
-                <BackgroundImage
-                    className="level-grid-canvas-bg-img"
-                    pack={pack}
-                    background={level.settings.background}
-                    style={{
-                        maxWidth: level.settings.width * 16,
-                        maxHeight: level.settings.height * 16,
-                    }}
-                />
-            </div>
-            <div className="level-grid-canvas-proper-container">
-                <_LevelEditor_Content_Canvas
-                    className="level-grid-canvas"
-                    viewBox={viewBox}
-                    pack={pack}
-                    background={level.settings.background}
-                    width={level.settings.width}
-                    height={level.settings.height}
-                />
-            </div>
+        <div className="level-grid-canvas-container">
+            <_LevelEditor_Content_Canvas
+                className="level-grid-canvas"
+                pack={pack}
+                background={level.settings.background}
+                width={level.settings.width}
+                height={level.settings.height}
+            />
         </div>
     );
 }
