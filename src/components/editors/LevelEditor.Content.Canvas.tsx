@@ -1,12 +1,16 @@
 import { ScrollArea } from '@mantine/core';
-import { Sprite, Stage, Text } from '@pixi/react';
+import { Graphics, Sprite, Stage, Text } from '@pixi/react';
 import { CSS_VARIABLES, RESOURCE_FOLDERS } from '_constants';
 import { getBackgroundImagePath } from 'elements/BackgroundImage';
 import { useEditorCanvas } from 'hooks/useEditorCanvas';
 import { ResourcePack } from 'models/ResourcePack';
 import { Texture } from 'pixi.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Vec2, getClassString, getCssVariableValue } from 'utils';
+import { Rect, Vec2, getClassString, getCssVariableValue } from 'utils';
+import { Graphics as PixiGraphics } from '@pixi/graphics';
+
+// note: 'canvas' refers to the <Stage> element, and 'content canvas' refers
+// to this entire component.
 
 const RULER_WIDTH = 16;
 const SCROLL_WIDTH = 10;
@@ -27,10 +31,15 @@ function _LevelEditor_Content_Canvas ({
     className,
 }: _LevelEditor_Content_CanvasProps) {
     height = width;
-    const ref = useRef<HTMLDivElement | null>(null);
+    const viewboxRef = useRef<HTMLDivElement | null>(null);
+    const scrollareaRef = useRef<HTMLDivElement | null>(null);
 
+    // the position of this component in relation to the whole window.
     const [viewBox, setViewBox] = useState(null as DOMRect | null);
+    // the size of the canvas.
     const [canvasSize, setCanvasSize] = useState({width: 1, height: 1});
+    // the part of the level that is currently visible (in pixels).
+    const [currentView, setCurrentView] = useState(new Rect(0, 0, 1, 1));
     const [btnDown, setBtnDown] = useState<'left' | 'right' | null>(null);
 
     const [_temp, _setTemp] = useState<Vec2[]>([]);
@@ -41,24 +50,24 @@ function _LevelEditor_Content_Canvas ({
     const [_inView, _setInView] = useState({xMin: 0, yMin: 0, xMax: 5, yMax: 5});
 
     useEffect(() => {
-        if (ref.current === null) return;
+        if (viewboxRef.current === null) return;
 
         const observer = new ResizeObserver(() => {
-            if (ref.current) {
+            if (viewboxRef.current) {
                 console.log("resize");
-                setViewBox(ref.current.getBoundingClientRect());
+                setViewBox(viewboxRef.current.getBoundingClientRect());
             }
             else {
                 console.warn("Couldn't obtain canvas container node.");
                 setViewBox(null);
             }
         })
-        observer.observe(ref.current);
+        observer.observe(viewboxRef.current);
 
         return () => {
             observer.disconnect();
         }
-    }, [ref.current]);
+    }, [viewboxRef.current]);
 
     useEffect(() => {
         // TODO: sometimes the last viewbox received becomes zero somehow, and
@@ -121,10 +130,37 @@ function _LevelEditor_Content_Canvas ({
         $vertRule.push(<div key={i} className="ruler-item">{i}</div>);
     }
 
+    const gridLines = (g: PixiGraphics) => {
+        //const xFirst = 17 - (currentView.left % 16);
+        //const yFirst = 16 - (currentView.top % 16);
+        const xFirst = 1 + currentView.left % 16;
+        const yFirst = currentView.top % 16;
+
+        g.clear();
+        g.beginFill(0xff3300);
+        g.lineStyle(1, 0xff3300, 0.5, 0.5);
+
+        for (let x = xFirst; x < canvasSize.width; x += 16) {
+            g.moveTo(x, 0);
+            g.lineTo(x, canvasSize.height);
+        }
+        for (let y = yFirst; y < canvasSize.height; y += 16) {
+            g.moveTo(0, y);
+            g.lineTo(canvasSize.width, y);
+        }
+
+        g.endFill();
+    };
+
+    useEffect(() => {
+    }, [viewBox, currentView]);
+
     return (
-        <div ref={ref} className="level-grid-canvas-viewbox">
+        <div ref={viewboxRef} className="level-grid-canvas-viewbox">
             <div
+                ref={scrollareaRef}
                 className="level-grid-canvas-scrollarea"
+                onScroll={handleScroll}
                 //classNames={{
                 //    root: "level-grid-canvas-scrollarea"
                 //}}
@@ -158,10 +194,11 @@ function _LevelEditor_Content_Canvas ({
                         />}
                         {_temp.map(t => <Sprite
                             key={[t.x, t.y]}
-                            x={t.x * 16}
-                            y={t.y * 16}
+                            x={(t.x * 16) - currentView.left}
+                            y={(t.y * 16) - currentView.top}
                             texture={texture}/>
                         )}
+                        <Graphics draw={gridLines} />
                     </Stage>
                     <div className="vertical-scroll" />
                     <div className="horizontal-scroll" />
@@ -169,6 +206,16 @@ function _LevelEditor_Content_Canvas ({
             </div>
         </div>
     )
+
+    function handleScroll (evt: React.UIEvent<HTMLDivElement, UIEvent>) {
+        const div = evt.currentTarget;
+        //const xMax = div.scrollWidth;
+        //const yMax = div.scrollHeight;
+        const xCurrent = div.scrollLeft;
+        const yCurrent = div.scrollTop;
+
+        recalculateView(xCurrent, yCurrent);
+    }
 
     function handleMouseDown (evt: React.MouseEvent<HTMLCanvasElement, MouseEvent>) {
         if (evt.buttons === 1) {
@@ -186,8 +233,8 @@ function _LevelEditor_Content_Canvas ({
             if (!rect) return;
 
             const pos = {
-                x: evt.clientX - rect.left,
-                y: evt.clientY - rect.top,
+                x: evt.clientX - rect.left + currentView.left,
+                y: evt.clientY - rect.top + currentView.top,
             }
             
             const tilePos = {x: Math.floor(pos.x / 16), y: Math.floor(pos.y / 16)};
@@ -209,6 +256,18 @@ function _LevelEditor_Content_Canvas ({
 
     function handleMouseUp (evt: MouseEvent) {
         setBtnDown(null);
+    }
+
+    /**
+     * Recalculates the part of the level that is visible according to the
+     * topleft pixel that is currently in view in the container.
+     * @param xTop 
+     * @param yTop 
+     */
+    function recalculateView (xTop: number, yTop: number) {
+        setCurrentView(
+            new Rect(xTop, yTop, canvasSize.width, canvasSize.height)
+        );
     }
 }
 

@@ -28,6 +28,24 @@ export class Vec2 {
     }
 }
 
+export class Rect {
+    public left: number = 0;
+    public top: number = 0;
+    public width: number = 0;
+    public height: number = 0;
+
+    public constructor(left: number, top: number, width: number, height: number) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+    }
+
+    public toString () {
+        return `(${this.left}, ${this.top}, ${this.width}, ${this.height})`;
+    }
+}
+
 /**
  * Generates the className string from the arguments given.
  * Two types of arguments can be passed:
