@@ -29,7 +29,7 @@ function _LevelEditor_Content_Canvas ({
     height = width;
     const ref = useRef<HTMLDivElement | null>(null);
 
-    const [viewBox, setViewBox] = useState(new DOMRect());
+    const [viewBox, setViewBox] = useState(null as DOMRect | null);
     const [canvasSize, setCanvasSize] = useState({width: 1, height: 1});
     const [btnDown, setBtnDown] = useState<'left' | 'right' | null>(null);
 
@@ -45,11 +45,12 @@ function _LevelEditor_Content_Canvas ({
 
         const observer = new ResizeObserver(() => {
             if (ref.current) {
+                console.log("resize");
                 setViewBox(ref.current.getBoundingClientRect());
             }
             else {
                 console.warn("Couldn't obtain canvas container node.");
-                setViewBox(new DOMRect());
+                setViewBox(null);
             }
         })
         observer.observe(ref.current);
@@ -60,12 +61,18 @@ function _LevelEditor_Content_Canvas ({
     }, [ref.current]);
 
     useEffect(() => {
+        // TODO: sometimes the last viewbox received becomes zero somehow, and
+        // somehow `canvasSize` is still the real value for <Stage> but an
+        // incorrect one for <Sprite(bg)>. This is a dirty temporal workaround.
+        if (viewBox === null || viewBox.width === 0) return;
+
         let cWidth = viewBox.width - RULER_WIDTH - SCROLL_WIDTH;
         let cHeight = viewBox.height - RULER_WIDTH - SCROLL_WIDTH;
 
         cWidth = Math.min(width * 16, cWidth);
         cHeight = Math.min(height * 16, cHeight);
 
+        console.log("SIZE: " + viewBox.width + ", " + viewBox.height);
         setCanvasSize({width: cWidth, height: cHeight});
     }, [viewBox]);
 
@@ -149,7 +156,12 @@ function _LevelEditor_Content_Canvas ({
                             width={canvasSize.width}
                             height={canvasSize.height}
                         />}
-                        {_temp.map(t => <Sprite x={t.x * 16} y={t.y * 16} texture={texture}/>)}
+                        {_temp.map(t => <Sprite
+                            key={[t.x, t.y]}
+                            x={t.x * 16}
+                            y={t.y * 16}
+                            texture={texture}/>
+                        )}
                     </Stage>
                     <div className="vertical-scroll" />
                     <div className="horizontal-scroll" />
