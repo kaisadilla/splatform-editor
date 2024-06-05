@@ -33,7 +33,12 @@ function _LevelEditor_Content_Canvas ({
     height = width;
     const viewboxRef = useRef<HTMLDivElement | null>(null);
     const scrollareaRef = useRef<HTMLDivElement | null>(null);
-
+    const a = [];
+    for (let x = 0; x < 500; x++) {
+        for (let y = 0; y < 25; y++) {
+            a.push(new Vec2(x, y));
+        }
+    }
     // the position of this component in relation to the whole window.
     const [viewBox, setViewBox] = useState(null as DOMRect | null);
     // the size of the canvas.
@@ -42,19 +47,15 @@ function _LevelEditor_Content_Canvas ({
     const [currentView, setCurrentView] = useState(new Rect(0, 0, 1, 1));
     const [btnDown, setBtnDown] = useState<'left' | 'right' | null>(null);
 
-    const [_temp, _setTemp] = useState<Vec2[]>([]);
+    const [_temp, _setTemp] = useState<Vec2[]>(a);
 
     const [scrollTopLeft, setScrollTopLeft] = useState(new Vec2(0, 0));
-
-
-    const [_inView, _setInView] = useState({xMin: 0, yMin: 0, xMax: 5, yMax: 5});
 
     useEffect(() => {
         if (viewboxRef.current === null) return;
 
         const observer = new ResizeObserver(() => {
             if (viewboxRef.current) {
-                console.log("resize");
                 setViewBox(viewboxRef.current.getBoundingClientRect());
             }
             else {
@@ -81,8 +82,8 @@ function _LevelEditor_Content_Canvas ({
         cWidth = Math.min(width * 16, cWidth);
         cHeight = Math.min(height * 16, cHeight);
 
-        console.log("SIZE: " + viewBox.width + ", " + viewBox.height);
         setCanvasSize({width: cWidth, height: cHeight});
+        recalculateView(currentView.left, currentView.top);
     }, [viewBox]);
 
     const pixelWidth = useMemo(() => {
@@ -131,14 +132,12 @@ function _LevelEditor_Content_Canvas ({
     }
 
     const gridLines = (g: PixiGraphics) => {
-        //const xFirst = 17 - (currentView.left % 16);
-        //const yFirst = 16 - (currentView.top % 16);
-        const xFirst = 1 + currentView.left % 16;
-        const yFirst = currentView.top % 16;
+        const xFirst = 1 - (currentView.left) % 16; // + 1 for line alignment
+        const yFirst = 0 - (currentView.top % 16);
 
         g.clear();
         g.beginFill(0xff3300);
-        g.lineStyle(1, 0xff3300, 0.5, 0.5);
+        g.lineStyle(1, 0xff3300, 0.5);
 
         for (let x = xFirst; x < canvasSize.width; x += 16) {
             g.moveTo(x, 0);
@@ -152,8 +151,22 @@ function _LevelEditor_Content_Canvas ({
         g.endFill();
     };
 
+    const [tilesInView, setTilesInView] = useState<Vec2[]>([]);
     useEffect(() => {
-    }, [viewBox, currentView]);
+        const arr = [];
+
+        for (const t of _temp) {
+            const pos = new Vec2(t.x * 16, t.y * 16);
+
+            if (pos.x >= (currentView.left - 16) && pos.x < currentView.left + currentView.width) {
+                if (pos.y >= (currentView.top - 16) && pos.y < currentView.top + currentView.height) {
+                    arr.push(pos);
+                }
+            }
+        }
+
+        setTilesInView(arr);
+    }, [currentView, _temp]);
 
     return (
         <div ref={viewboxRef} className="level-grid-canvas-viewbox">
@@ -192,10 +205,10 @@ function _LevelEditor_Content_Canvas ({
                             width={canvasSize.width}
                             height={canvasSize.height}
                         />}
-                        {_temp.map(t => <Sprite
-                            key={[t.x, t.y]}
-                            x={(t.x * 16) - currentView.left}
-                            y={(t.y * 16) - currentView.top}
+                        {tilesInView.map(t => <Sprite
+                            //key={[t.x, t.y]}
+                            x={(t.x) - currentView.left}
+                            y={(t.y) - currentView.top}
                             texture={texture}/>
                         )}
                         <Graphics draw={gridLines} />
@@ -244,13 +257,6 @@ function _LevelEditor_Content_Canvas ({
                 ...prevState,
                 tilePos,
             ]);
-            const canvasRect = canvas.getBoundingClientRect();
-            _setInView({
-                xMin: (516 - canvasRect.left) / 16,
-                xMax: (516 - canvasRect.left + 1542) / 16,
-                yMin: (104 - canvasRect.top) / 16,
-                yMax: (104 - canvasRect.top + 605) / 16,
-            })
         }
     }
 
