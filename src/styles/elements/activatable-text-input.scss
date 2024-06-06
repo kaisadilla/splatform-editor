@@ -1,0 +1,13 @@
+.sp-activatable-text-input {
+    width: 100px;
+
+    &.readonly {
+        input {
+            cursor: pointer;
+
+            &:focus {
+                border-color: transparent;
+            }
+        }
+    }
+}

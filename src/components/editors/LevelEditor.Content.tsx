@@ -10,17 +10,22 @@ import Toolbar, { ToolbarButton } from 'elements/Toolbar';
 import { BlurFilter, TextStyle } from 'pixi.js';
 import { Container, Sprite, Stage, Text } from '@pixi/react';
 import { Vec2 } from 'utils';
-import _LevelEditor_Content_Canvas from './LevelEditor.Content.Canvas';
+import LevelEditor_Content_Canvas from './LevelEditor.Content.Canvas';
 import BackgroundImage from 'elements/BackgroundImage';
+import LevelEditor_Features from './LevelEditor.Features';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { SP_ResizeHandle } from 'elements/resizablePanel';
 
 export interface LevelEditor_ContentProps {
     pack: ResourcePack | null;
     level: Level;
+    onChangeField: (field: keyof Level, val: any) => void;
 }
 
 function LevelEditor_Content ({
     pack,
     level,
+    onChangeField,
 }: LevelEditor_ContentProps) {
     if (pack === null) {
         return (
@@ -38,10 +43,8 @@ function LevelEditor_Content ({
                 <_GridCanvas
                     pack={pack}
                     level={level}
+                    onChangeField={onChangeField}
                 />
-            </div>
-            <div className="level-grid-features">
-                (terrain / spawns / events) -&gt; background / main
             </div>
         </div>
     );
@@ -80,7 +83,6 @@ function _GridTools ({
             value: 'eraser',
             label: "Eraser",
             icon: 'eraser',
-            color: "green",
         },
         {
             value: 'bucket',
@@ -122,24 +124,38 @@ function _GridTools ({
 interface _GridCanvasProps {
     pack: ResourcePack;
     level: Level;
+    onChangeField: (field: keyof Level, val: any) => void;
 }
 
 function _GridCanvas ({
     pack,
     level,
+    onChangeField,
 }: _GridCanvasProps) {
     const levelCtx = useLevelEditorContext();
 
     return (
-        <div className="level-grid-canvas-container">
-            <_LevelEditor_Content_Canvas
-                className="level-grid-canvas"
-                pack={pack}
-                background={level.settings.background}
-                width={level.settings.width}
-                height={level.settings.height}
-            />
-        </div>
+        <PanelGroup
+            className="level-grid-canvas-container"
+            direction='vertical'
+        >
+            <Panel defaultSize={10}>
+                <LevelEditor_Content_Canvas
+                    className="level-grid-canvas"
+                    pack={pack}
+                    level={level}
+                    onChangeField={onChangeField}
+                />
+            </Panel>
+            <SP_ResizeHandle direction='vertical' />
+            <Panel defaultSize={4}>
+                <LevelEditor_Features
+                    pack={pack}
+                    level={level}
+                    onChangeField={onChangeField}
+                />
+            </Panel>
+        </PanelGroup>
     );
 }
 

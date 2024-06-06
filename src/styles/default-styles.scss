@@ -1,3 +1,109 @@
+.sp-tab-root.sp-tab-root {
+    flex: 1;
+    min-height: 0;
+    @include vertical-gallery-stretch;
+
+    .sp-tab-ribbon-root {
+        flex-shrink: 0;
+    }
+
+    .sp-tab-ribbon-list {
+        @include horizontal-list;
+        @include thin-scrollbar;
+
+        background: $color-component-1;
+        border-top: 1px solid $color-component-3;
+        margin-left: -1px;
+
+        &::before {
+            border-color: $color-component-3;
+        }
+    }
+
+    .sp-tab-ribbon-tab {
+        background: $color-component-1;
+        border-radius: 0;
+        border-left: 1px solid $color-component-3;
+        border-bottom: 1px solid $color-component-3;
+        height: 32px;
+        padding-right: 8px;
+
+        &:last-child {
+            border-right: 1px solid $color-component-3;
+        }
+
+        &:hover {
+            background-color: $color-background;
+            border-left: 1px solid $color-component-3;
+            border-bottom: 1px solid $color-component-3;
+        }
+
+        &[data-active=true] {
+            background-color: $color-background;
+            border-top: 1px solid $color-highlight;
+            //border-top-left-radius: 3px;
+            //border-top-right-radius: 3px;
+            border-bottom: 1px solid transparent;
+        }
+
+        .sp-tab-ribbon-tab-label {
+            @include horizontal-gallery;
+            gap: 6px;
+        }
+    }
+
+    .sp-tab-ribbon-new-tab {
+        @include center-content;
+        width: 38px;
+        font-size: 15pt;
+    }
+
+    .sp-tab-panel-container {
+        @include vertical-gallery-stretch;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .sp-tab-panel {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+    }
+}
+
+.sp-section-tab-root.sp-section-tab-root {
+    .sp-section-tab-ribbon-list {
+        height: 32px;
+        align-items: end;
+        padding: 0 8px;
+
+        &::before {
+            border-color: transparent;
+        }
+    }
+    .sp-section-tab-ribbon-tab {
+        &[data-active=true] {
+            border-color: $color-highlight;
+        }
+
+        &:hover .sp-section-tab-ribbon-tab-label {
+            color: $color-highlight;
+        }
+
+        .sp-section-tab-ribbon-tab-label {
+            text-transform: uppercase;
+        }
+    }
+
+    .sp-section-tab-panel-container {
+        @include vertical-gallery-stretch;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+}
+
 .sp-close-button.sp-close-button {
     &:hover {
         background-color: $color-danger;

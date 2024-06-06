@@ -34,7 +34,7 @@
         }
     
         .level-content-container {
-            
+            @include center-content;
         }
     
         .properties-panel-container {
@@ -124,11 +124,41 @@
             }
         }
 
-        .level-grid-canvas-container {
+        .level-grid-canvas-container > div {
             flex: 1;
             min-width: 0;
             background: $color-component-1;
-            @include horizontal-gallery;
+            @include vertical-gallery-stretch;
+        }
+    }
+}
+
+.level-grid-features {
+    background: $color-background;
+    border-top: 1px solid $color-component-2;
+    @include vertical-gallery-stretch;
+    height: 100%;
+
+    .sp-section-tab-root {
+        @include fill-container;
+        @include vertical-gallery-stretch;
+
+        .sp-section-tab-panel-container {
+            flex: 1;
+
+            .sp-section-tab-panel {
+                @include fill-container;
+            }
+        }
+    }
+
+    .level-grid-feature-options {
+        flex: 1;
+        @include fill-container;
+
+        .terrain-panel {
+            @include fill-container;
+            @include vertical-gallery-stretch;
         }
     }
 }
@@ -137,12 +167,13 @@
     @include fill-container;
     @include horizontal-gallery;
     position: relative;
-    margin-right: 4px;
+    padding-right: 4px;
+    padding-bottom: 4px;
 
     .level-grid-canvas-scrollarea {
         @include fill-container;
         @include horizontal-list;
-        overflow: auto;
+        overflow: scroll;
         scrollbar-width: 30px;
         align-items: start;
             

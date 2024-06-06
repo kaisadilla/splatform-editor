@@ -12,7 +12,8 @@ export function SP_ResizeHandle ({
     ...props
 }: SPResizeHandleProps) {
     const classStr = getClassString(
-        "sp-resize-handle-horiz",
+        direction === 'horizontal' && "sp-resize-handle-horiz",
+        direction === 'vertical' && "sp-resize-handle-vert",
         className,
     );
 

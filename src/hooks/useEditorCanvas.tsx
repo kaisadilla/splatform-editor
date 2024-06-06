@@ -1,22 +1,30 @@
 import { CSS_VARIABLES } from "_constants";
 import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { getTileImagePath } from "elements/TileImage";
-import { LevelTile } from "models/Level";
+import { Level, LevelTile } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
 import { Tile } from "models/Tile";
 import { Rectangle, Texture, Graphics as PixiGraphics, Renderer, Sprite, RenderTexture, BaseTexture, ICanvas } from "pixi.js";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Rect, Vec2, getCssVariableValue } from "utils";
+import { Rect, Vec2, getCssVariableValue, vec2equals } from "utils";
 
 export const RULER_WIDTH = 16;
 export const SCROLL_WIDTH = 10;
+export const SCROLL_HEIGHT = 10;
+const VIEW_PADDING = 4;
 
 export interface CanvasTileInfo {
     position: Vec2;
     texture: Texture;
 }
 
-export function useEditorCanvas (pack: ResourcePack, width: number, height: number) {
+export function useEditorCanvas (
+    pack: ResourcePack,
+    level: Level,
+    onChangeField: (field: keyof Level, val: any) => void,
+) {
+    const { width, height } = level.settings;
+
     const levelCtx = useLevelEditorContext();
 
     const viewboxRef = useRef<HTMLDivElement | null>(null);
@@ -34,8 +42,14 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     const [tilesInCurrentStroke, setTilesInCurrentStroke] = useState([] as Vec2[]);
 
     useEffect(() => {
-        addEventListeners();
-    }, []);
+        const f = (evt: PointerEvent) => handlePointerUp(evt);
+        // 'mouseup' is added to the entire window because the user may release
+        // the mouse while outside the canvas.
+        document.addEventListener('pointerup', f);
+        return () => {
+            document.removeEventListener('pointerup', f);
+        };
+    }, [btnDown, tilesInCurrentStroke, levelCtx]);
 
     // Respond to changes in the container's size.
     useEffect(() => {
@@ -57,20 +71,47 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     if (levelCtx.selectedPaint) {
         for (const t of tilesInCurrentStroke) {
             const tex = tileTextures[levelCtx.selectedPaint.id];
-            
+
             if (!tex) {
                 console.warn(`Couldn't find texture for '${levelCtx.selectedPaint.id}'`, tileTextures);
                 continue;
             }
 
             visibleTiles.push({
-                position: new Vec2(
-                    (t.x * 16) - currentView.left,
-                    (t.y * 16) - currentView.top,
-                ),
+                position: {
+                    x: (t.x * 16) - currentView.left,
+                    y: (t.y * 16) - currentView.top,
+                },
                 texture: tex,
             });
         }
+    }
+    try {
+        let layerTiles = layerTilesExceptPositions(
+            level.layers[0].tiles,
+            tilesInCurrentStroke
+        );
+        
+        for (const t of layerTiles) {
+            const tex = tileTextures[t.tile];
+    
+            if (!tex) {
+                console.warn(`Couldn't find texture for '${t.tile}'`, tileTextures);
+                continue;
+            }
+    
+            visibleTiles.push({
+                position: {
+                    x: (t.position.x * 16) - currentView.left,
+                    y: (t.position.y * 16) - currentView.top,
+                },
+                texture: tex,
+            });
+        }
+    }
+    catch (err) {
+        console.log(level);
+        throw err;
     }
 
     return {
@@ -129,14 +170,6 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     };
 
     // #region handlers
-    function addEventListeners () {
-        // 'mouseup' is added to the entire window because the user may release
-        // the mouse while outside the canvas.
-        document.addEventListener('pointerup', handlePointerUp);
-        return () => {
-            document.removeEventListener('pointerup', handlePointerUp);
-        };
-    }
 
     function handleScroll (evt: React.UIEvent<HTMLDivElement, UIEvent>) {
         const div = evt.currentTarget;
@@ -151,7 +184,10 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     function handlePointerDown (evt: React.PointerEvent<HTMLCanvasElement>) {
         if (evt.buttons === 1) {
             setBtnDown('left');
-            registerPlaceTileClickAt(new Vec2(evt.clientX, evt.clientY));
+            registerPlaceTileClickAt({
+                x: evt.clientX,
+                y: evt.clientY,
+            });
         }
         else if (evt.buttons === 2) {
             setBtnDown('right');
@@ -165,7 +201,10 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
 
         for (const evt of coalescedEvts) {
             if (btnDown === 'left') {
-                newPoints.push(new Vec2(evt.clientX, evt.clientY));
+                newPoints.push({
+                    x: evt.clientX,
+                    y: evt.clientY,
+                });
             }
         }
         
@@ -173,6 +212,10 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     }
 
     function handlePointerUp (evt: PointerEvent) {
+        if (btnDown === 'left') {
+            addDrawnTilesToTileLayer();
+        }
+
         setBtnDown(null);
     }
 
@@ -214,8 +257,8 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
         // incorrect one for <Sprite(bg)>. This is a dirty temporal workaround.
         if (viewBox === null || viewBox.width === 0) return;
 
-        let cWidth = viewBox.width - RULER_WIDTH - SCROLL_WIDTH;
-        let cHeight = viewBox.height - RULER_WIDTH - SCROLL_WIDTH;
+        let cWidth = viewBox.width - RULER_WIDTH - SCROLL_WIDTH - VIEW_PADDING;
+        let cHeight = viewBox.height - RULER_WIDTH - SCROLL_HEIGHT - VIEW_PADDING;
 
         cWidth = Math.min(width * 16, cWidth);
         cHeight = Math.min(height * 16, cHeight);
@@ -305,15 +348,15 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
         const placedTiles = [] as Vec2[];
 
         for (const pixelPos of positions) {
-            const tilePos = new Vec2(
-                Math.floor((pixelPos.x - rect.left + currentView.left) / 16),
-                Math.floor((pixelPos.y - rect.top + currentView.top) / 16),
-            );
+            const tilePos = {
+                x: Math.floor((pixelPos.x - rect.left + currentView.left) / 16),
+                y: Math.floor((pixelPos.y - rect.top + currentView.top) / 16),
+            };
 
-            if (tilesInCurrentStroke.find(lt => lt.equals(tilePos))) {
+            if (tilesInCurrentStroke.find(lt => vec2equals(lt, tilePos))) {
                 continue;
             }
-            if (placedTiles.find(pt => pt.equals(tilePos))) {
+            if (placedTiles.find(pt => vec2equals(pt, tilePos))) {
                 continue;
             }
 
@@ -325,5 +368,46 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
             ...placedTiles,
         ]);
     }
+
+    function addDrawnTilesToTileLayer () {
+        if (levelCtx.selectedPaint === null) return;
+
+        let layerTiles = layerTilesExceptPositions(
+            level.layers[0].tiles,
+            tilesInCurrentStroke
+        );
+
+        for (const t of tilesInCurrentStroke) {
+            layerTiles.push({
+                position: t,
+                tile: levelCtx.selectedPaint.id,
+            })
+        }
+
+        onChangeField('layers', [{
+            ...level.layers[0],
+            tiles: layerTiles,
+        }]);
+
+        setTilesInCurrentStroke([]);
+    }
+
+    /**
+     * Given the contents of a level's layer, and a list of positions, returns
+     * an array containing the elements in the level's layer that are NOT in
+     * the positions given. This can be used, for example, to remove tiles that
+     * are in the positions given.
+     * @param layerTiles The tiles of a layer in the level.
+     * @param positions The positions to remove.
+     * @returns 
+     */
+    function layerTilesExceptPositions (layerTiles: LevelTile[], positions: Vec2[]) {
+        return layerTiles.filter(
+            lt => tilesInCurrentStroke.findIndex(
+                tcs => vec2equals(lt.position, tcs),
+            ) === -1
+        )
+    }
+
     // #endregion
 }

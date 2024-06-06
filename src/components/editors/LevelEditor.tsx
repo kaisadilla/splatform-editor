@@ -47,6 +47,7 @@ function LevelEditor ({
                     <LevelEditor_Content
                         pack={pack}
                         level={level}
+                        onChangeField={handleFieldChange}
                     />
                 </Panel>
                 <SP_ResizeHandle direction='horizontal' />

@@ -34,7 +34,7 @@ function FileTabBar ({}: FileTabBarProps) {
             scrollbars='x'
             type='hover'
             classNames={{
-                root: "tab-ribbon-root"
+                root: "sp-tab-ribbon-root"
             }}
             //scrollbarSize={8}
             //onWheel={(evt) => console.log(evt)} // TODO: Add horizontal wheel scroll.
@@ -57,7 +57,7 @@ function FileTabBar ({}: FileTabBarProps) {
                     </Tabs.Tab>
                 ))}
                 <button
-                    className="tab-ribbon-tab tab-ribbon-new-tab"
+                    className="sp-tab-ribbon-tab sp-tab-ribbon-new-tab"
                     onClick={handleCreateDocument}
                 >
                     <MaterialSymbol icon="add" />

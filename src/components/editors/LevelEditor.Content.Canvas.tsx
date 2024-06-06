@@ -9,26 +9,27 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Rect, Vec2, getClassString, getCssVariableValue } from 'utils';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
+import { Level } from 'models/Level';
 
 // note: 'canvas' refers to the <Stage> element, and 'content canvas' refers
 // to this entire component.
 
-export interface _LevelEditor_Content_CanvasProps {
+export interface LevelEditor_Content_CanvasProps {
     pack: ResourcePack;
-    width: number;
-    height: number;
-    background: string | null | undefined;
+    level: Level;
+    onChangeField: (field: keyof Level, val: any) => void;
     className?: string;
 }
 
-function _LevelEditor_Content_Canvas ({
+function LevelEditor_Content_Canvas ({
     pack,
-    width,
-    height,
-    background,
+    level,
+    onChangeField,
     className,
-}: _LevelEditor_Content_CanvasProps) {
+}: LevelEditor_Content_CanvasProps) {
     const levelCtx = useLevelEditorContext();
+
+    const { background } = level.settings;
 
     const {
         viewboxRef,
@@ -43,7 +44,7 @@ function _LevelEditor_Content_Canvas ({
         handlePointerDown,
         handlePointerMove,
         handleScroll,
-    } = useEditorCanvas(pack, width, height);
+    } = useEditorCanvas(pack, level, onChangeField);
 
     // Retrieve the color value to use as background when no image background has been chosen.
     const backgroundColor = getCssVariableValue(CSS_VARIABLES.ComponentColorTheme0);
@@ -153,4 +154,4 @@ function loadImage (path: string) : Promise<HTMLImageElement> {
     });
 }
 
-export default _LevelEditor_Content_Canvas;
+export default LevelEditor_Content_Canvas;

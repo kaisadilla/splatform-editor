@@ -116,7 +116,6 @@ const UserContextProvider = ({ children }: any) => {
          * and the user canceled the operation.
          */
         async function saveDocument (doc: SPDocument) {
-            debugger;
             // TODO: Mark document as without changes.
             const filePath = await _saveDocument(doc);
             if (filePath !== null) {
@@ -129,6 +128,9 @@ const UserContextProvider = ({ children }: any) => {
             // TODO: Mark document as without changes and change its full path
             // to the newly selected path.
             const path = await _saveNewDocument(doc);
+            if (path !== null) {
+                _setDocAsUnsaved(doc.id, false);
+            }
             return path;
         }
 
@@ -351,12 +353,31 @@ const UserContextProvider = ({ children }: any) => {
     }
 
     async function _saveNewDocument (document: SPDocument) : Promise<string | null> {
-        let path = null as string | null;
         const json = JSON.stringify(document.content, null, 4);
 
-        path = await Ipc.saveNewDocument(document.content.type, json);
+        const metadata = await Ipc.saveNewDocument(document.content.type, json);
+        if (metadata === null) return null;
+        const index = state.documents.findIndex(d => d.id === document.id);
+        if (index === -1) return null;
 
-        return path;
+        const update = [...state.documents];
+        update[index] = {
+            ...state.documents[index],
+            id: metadata.id,
+            fullPath: metadata.fullPath,
+            fileName: metadata.fileName,
+            baseName: metadata.baseName,
+        };
+
+        setState(prevState => ({
+            ...prevState,
+            documents: update,
+            activeTab: prevState.activeTab === document.id
+                ? metadata.id
+                : prevState.activeTab,
+        }));
+
+        return metadata.fullPath;
     }
 
     /**

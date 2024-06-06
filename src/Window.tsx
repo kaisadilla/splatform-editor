@@ -38,11 +38,11 @@ function Window (props: WindowProps) {
                 // @ts-ignore - false syntax error.
                 onChange={userCtx.setActiveTab}
                 classNames={{
-                    root: "tab-root",
-                    list: "tab-ribbon-list",
-                    tab: "tab-ribbon-tab",
-                    tabLabel: "tab-ribbon-tab-label",
-                    panel: "tab-panel",
+                    root: "sp-tab-root",
+                    list: "sp-tab-ribbon-list",
+                    tab: "sp-tab-ribbon-tab",
+                    tabLabel: "sp-tab-ribbon-tab-label",
+                    panel: "sp-tab-panel",
                 }}
             >
                 <FileTabBar />

@@ -55,7 +55,7 @@ function LevelEditor_TilesPalette ({
                 multiple
                 defaultValue={Object.keys(tilesByGroup)}
             >
-                {Object.keys(tilesByGroup).map(gr => (<Accordion.Item
+                {Object.keys(tilesByGroup).sort().map(gr => (<Accordion.Item
                     key={gr}
                     value={gr}
                 >

@@ -1,4 +1,4 @@
-import { ResourcePack } from "models/ResourcePack";
+import { MediaAssetMetadata, ResourcePack } from "models/ResourcePack";
 import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT } from "./ipcNames";
 import { FileInfo } from "main/files/documentFiles";
 import { SPDocumentType } from "models/sp_documents";
@@ -56,7 +56,7 @@ const Ipc = {
 
     async saveNewDocument (
         type: SPDocumentType, content: string,
-    ) : Promise<string> {
+    ) : Promise<MediaAssetMetadata | null> {
         return await getIpcRenderer().invoke(HANDLER_SAVE_NEW_DOCUMENT, {
             type, content,
         });

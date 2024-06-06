@@ -14,22 +14,17 @@ export interface WithId<T> {
     object: T;
 }
 
-export class Vec2 {
-    public x: number = 0;
-    public y: number = 0;
+export interface Vec2 {
+    x: number;
+    y: number;
+}
 
-    public constructor (x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
+export function vec2toString (v: Vec2) : string {
+    return `(${v.x}, ${v.y})`;
+}
 
-    public toString () : string {
-        return `(${this.x}, ${this.y})`;
-    }
-
-    public equals (other: Vec2) : boolean {
-        return this.x === other.x && this.y === other.y;
-    }
+export function vec2equals (a: Vec2, b: Vec2) : boolean {
+    return a.x === b.x && a.y === b.y;
 }
 
 export class Rect {

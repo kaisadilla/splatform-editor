@@ -12,7 +12,7 @@ export interface FilePanelContainerProps {
 function FilePanelContainer (props: FilePanelContainerProps) {
     const { documents: openDocuments } = useUserContext();
 
-    return (<div className="tab-panel-container">
+    return (<div className="sp-tab-panel-container">
         <Tabs.Panel value={NO_DOCUMENT_ID}>
             <h1>TODO: Welcome panel.</h1>
         </Tabs.Panel>

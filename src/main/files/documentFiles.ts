@@ -3,6 +3,7 @@ import fsAsync from "fs/promises";
 import fs from "fs";
 import Path from "path";
 import { SPDocumentType } from "models/sp_documents";
+import { MediaAssetMetadata } from "models/ResourcePack";
 
 export interface FileInfo<T> {
     fileName: string;
@@ -41,7 +42,7 @@ export function saveNewTextFile (
     title: string,
     content: string,
     filters: Electron.FileFilter[]
-) : string |null {
+) : string | null {
     const filePath = dialog.showSaveDialogSync({
         title: title,
         filters: filters,
@@ -73,7 +74,7 @@ export function saveDocument (fullPath: string, content: string) {
 export function saveNewDocument (
     type: SPDocumentType,
     content: string,
-) : string | null {
+) : MediaAssetMetadata | null {
     let filePath = null as string | null;
 
     if (type == 'level') {
@@ -110,7 +111,17 @@ export function saveNewDocument (
         console.error("Unknown file type: ", type);
     }
 
-    return filePath;
+    if (filePath === null) return null;
+
+    const path = Path.parse(filePath);
+
+    return {
+        id: filePath,
+        baseName: path.base,
+        fileName: path.name,
+        extension: path.ext,
+        fullPath: filePath
+    };
 }
 
 export function confirmDocumentClose (
