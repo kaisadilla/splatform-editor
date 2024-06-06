@@ -80,6 +80,7 @@ function _GridTools ({
             value: 'eraser',
             label: "Eraser",
             icon: 'eraser',
+            color: "green",
         },
         {
             value: 'bucket',

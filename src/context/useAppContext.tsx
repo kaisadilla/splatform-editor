@@ -8,6 +8,10 @@ export enum AppStatus {
      */
     LoadingData = 0,
     /**
+     * SPlatform is generating new data to use within the app.
+     */
+    BuildingCache,
+    /**
      * The app is ready to be used.
      */
     Ready

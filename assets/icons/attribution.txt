@@ -1,5 +1,10 @@
 from https://icons8.com:
 
-_d_play.png : icons8-play-48.png "Play"
-json.png : icons8-brackets-48.png "Brackets"
-play.png : icons8-play-48.png "Play"
+_d_play.png : "Play"
+image.png
+json.png : "Brackets"
+play.png : "Play"
+grid.png: "Grid"
+save.png: "Save"
+save-all.png: "Save all"
+save-as.png

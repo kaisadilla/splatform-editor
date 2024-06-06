@@ -24,9 +24,7 @@ function TileImage ({
     let imgSrc;
 
     if (tile) {
-        const imgPath = pack.fullPath + "\\" + RESOURCE_FOLDERS.sprites.tiles
-            + "\\" + tile.sprite + ".png";
-        imgSrc = "asset://" + imgPath;
+        imgSrc = getTileImagePath(pack, tile);
     }
     else {
         imgSrc = undefined;
@@ -50,6 +48,13 @@ function TileImage ({
             {...imgProps}
         />
     );
+}
+
+export function getTileImagePath (pack: ResourcePack, tile: Tile) {
+    const imgPath = pack.fullPath + "\\" + RESOURCE_FOLDERS.sprites.tiles
+        + "\\" + tile.sprite + ".png";
+
+    return "asset://" + imgPath;
 }
 
 export default TileImage;

@@ -1,7 +1,7 @@
 import { SPDocument } from 'models/sp_documents';
 import React from 'react';
 import Editor from '@monaco-editor/react';
-import { ToolIcons } from 'icons';
+import { ToolIcons1x } from 'icons';
 import { Level } from 'models/Level';
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { SP_ResizeHandle } from 'elements/resizablePanel';
@@ -29,8 +29,11 @@ function LevelEditor ({
     return (
         <div className="editor level-editor">
             <div className="level-toolbar">
-                <button><img src={ToolIcons.playGreen} alt="" /></button>
-                <button><img src={ToolIcons.json} alt="" /></button>
+                <button><img src={ToolIcons1x.save} alt="" /></button>
+                <button><img src={ToolIcons1x.play} alt="" /></button>
+                <button><img src={ToolIcons1x.image} alt="" /></button>
+                <button><img src={ToolIcons1x.json} alt="" /></button>
+                <button><img src={ToolIcons1x.grid} alt="" /></button>
             </div>
 
             <PanelGroup className="level-edition-container" direction='horizontal'>

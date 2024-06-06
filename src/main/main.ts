@@ -108,6 +108,7 @@ const createWindow = async () => {
 
     mainWindow.setMenu(null);
 
+    mainWindow.webContents.setFrameRate(120);
     mainWindow.webContents.setWindowOpenHandler((args) => {
         if (args.frameName === WindowType.ResizableBlockingPopup) {
             return {
@@ -177,6 +178,7 @@ const createWindow = async () => {
     new AppUpdater();
 };
 
+//app.commandLine.appendSwitch('disable-frame-rate-limit'); // disable vsync, not recommended.
 /**
  * Add event listeners...
  */
