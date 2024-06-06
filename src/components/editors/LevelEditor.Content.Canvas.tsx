@@ -4,7 +4,7 @@ import { CSS_VARIABLES, RESOURCE_FOLDERS } from '_constants';
 import { getBackgroundImagePath } from 'elements/BackgroundImage';
 import { useEditorCanvas } from 'hooks/useEditorCanvas';
 import { ResourcePack } from 'models/ResourcePack';
-import { Texture } from 'pixi.js';
+import { Application, ICanvas, Texture } from 'pixi.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Rect, Vec2, getClassString, getCssVariableValue } from 'utils';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
@@ -35,12 +35,13 @@ function _LevelEditor_Content_Canvas ({
         scrollareaRef,
         canvasSize,
         currentView,
-        _temp,
         $horizRule,
         $vertRule,
         tileTextures,
-        handleMouseDown,
-        handleMouseMove,
+        visibleTiles,
+        setCanvas,
+        handlePointerDown,
+        handlePointerMove,
         handleScroll,
     } = useEditorCanvas(pack, width, height);
 
@@ -81,25 +82,6 @@ function _LevelEditor_Content_Canvas ({
         g.endFill();
     };
 
-    const [tilesInView, setTilesInView] = useState<Vec2[]>([]);
-    useEffect(() => {
-        const arr = [];
-
-        for (const t of _temp) {
-            const pos = new Vec2(t.x * 16, t.y * 16);
-
-            if (pos.x >= (currentView.left - 16) && pos.x < currentView.left + currentView.width) {
-                if (pos.y >= (currentView.top - 16) && pos.y < currentView.top + currentView.height) {
-                    arr.push(pos);
-                }
-            }
-        }
-
-        setTilesInView(arr);
-    }, [currentView, _temp.length]);
-
-    const texture = tileTextures[levelCtx.selectedPaint?.id ?? ""];
-
     return (
         <div ref={viewboxRef} className="level-grid-canvas-viewbox">
             <div
@@ -127,8 +109,9 @@ function _LevelEditor_Content_Canvas ({
                         width={canvasSize.width}
                         height={canvasSize.height}
                         options={{background: backgroundColor}}
-                        onPointerDown={handleMouseDown}
-                        onPointerMove={handleMouseMove}
+                        onPointerDown={handlePointerDown}
+                        onPointerMove={handlePointerMove}
+                        onMount={registerCanvas}
                     >
                         {texBg && <Sprite
                             texture={texBg}
@@ -137,11 +120,11 @@ function _LevelEditor_Content_Canvas ({
                             width={canvasSize.width}
                             height={canvasSize.height}
                         />}
-                        {tilesInView.map(t => <Sprite
+                        {visibleTiles.map(t => <Sprite
                             //key={[t.x, t.y]}
-                            x={(t.x) - currentView.left}
-                            y={(t.y) - currentView.top}
-                            texture={texture}/>
+                            x={t.position.x}
+                            y={t.position.y}
+                            texture={t.texture}/>
                         )}
                         <Graphics draw={gridLines} />
                     </Stage>
@@ -151,6 +134,15 @@ function _LevelEditor_Content_Canvas ({
             </div>
         </div>
     )
+
+    function registerCanvas (app: Application<ICanvas>) {
+        if (app.view instanceof HTMLCanvasElement) {
+            setCanvas(app.view);
+        }
+        else {
+            console.error("app.view is not an HTMLCanvasElement");
+        }
+    }
 }
 
 function loadImage (path: string) : Promise<HTMLImageElement> {

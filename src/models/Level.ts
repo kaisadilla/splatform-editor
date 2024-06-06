@@ -1,3 +1,4 @@
+import { Vec2 } from "utils";
 import { SPDocumentType, Version } from "./sp_documents";
 
 export interface Level {
@@ -30,14 +31,14 @@ export interface TileLayerSettings {
 }
 
 export interface LevelTile {
-    position: [number, number];
+    position: Vec2;
     tile: string;
     behaviorProperties?: {[prop: string]: any};
 }
 
 export interface EntitySpawn {
     id?: number;
-    position: [number, number];
+    position: Vec2;
     entity: string,
     behaviorProperties?: {[prop: string]: any};
 }

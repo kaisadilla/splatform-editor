@@ -1,14 +1,20 @@
 import { CSS_VARIABLES } from "_constants";
 import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { getTileImagePath } from "elements/TileImage";
+import { LevelTile } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
 import { Tile } from "models/Tile";
-import { Rectangle, Texture, Graphics as PixiGraphics, Renderer, Sprite, RenderTexture, BaseTexture } from "pixi.js";
+import { Rectangle, Texture, Graphics as PixiGraphics, Renderer, Sprite, RenderTexture, BaseTexture, ICanvas } from "pixi.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Rect, Vec2, getCssVariableValue } from "utils";
 
 export const RULER_WIDTH = 16;
 export const SCROLL_WIDTH = 10;
+
+export interface CanvasTileInfo {
+    position: Vec2;
+    texture: Texture;
+}
 
 export function useEditorCanvas (pack: ResourcePack, width: number, height: number) {
     const levelCtx = useLevelEditorContext();
@@ -17,15 +23,15 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     const scrollareaRef = useRef<HTMLDivElement | null>(null);
 
     const [viewBox, setViewBox] = useState(null as DOMRect | null);
+    // currently unused
+    const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
     const [canvasSize, setCanvasSize] = useState({width: 1, height: 1});
     const [currentView, setCurrentView] = useState(new Rect(0, 0, 1, 1));
     const [btnDown, setBtnDown] = useState<'left' | 'right' | null>(null);
 
     // the tiles being placed by this stroke, that will be added to the level
     // once the stroke is finished.
-    const [tilesInCurrentStroke, setTilesInCurrentStroke] = useState([] as Tile[]);
-
-    const [_temp, _setTemp] = useState<Vec2[]>([]);
+    const [tilesInCurrentStroke, setTilesInCurrentStroke] = useState([] as Vec2[]);
 
     useEffect(() => {
         addEventListeners();
@@ -46,6 +52,26 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     const $vertRule = useMemo(buildVerticalRuler, [height]);
 
     const tileTextures = useMemo(buildTileTextures, [pack.folderName, pack.tiles]);
+
+    const visibleTiles = [] as CanvasTileInfo[];
+    if (levelCtx.selectedPaint) {
+        for (const t of tilesInCurrentStroke) {
+            const tex = tileTextures[levelCtx.selectedPaint.id];
+            
+            if (!tex) {
+                console.warn(`Couldn't find texture for '${levelCtx.selectedPaint.id}'`, tileTextures);
+                continue;
+            }
+
+            visibleTiles.push({
+                position: new Vec2(
+                    (t.x * 16) - currentView.left,
+                    (t.y * 16) - currentView.top,
+                ),
+                texture: tex,
+            });
+        }
+    }
 
     return {
         /**
@@ -70,7 +96,6 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
          * pixels) that can be viewed from there.
          */
         currentView,
-        _temp,
         /**
          * Contains all the elements that form the horizontal ruler.
          */
@@ -85,13 +110,18 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
          */
         tileTextures,
         /**
+         * The tiles that are currently visible in the canvas.
+         */
+        visibleTiles,
+        setCanvas,
+        /**
          * Handles interaction when the user clicks down into the canvas.
          */
-        handleMouseDown: handlePointerDown,
+        handlePointerDown,
         /**
          * Handles interaction when the user drags his mouse around the canvas.
          */
-        handleMouseMove: handlePointerMove,
+        handlePointerMove,
         /**
          * Handles interaction when the user scrolls the canvas scrollable object.
          */
@@ -121,16 +151,7 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     function handlePointerDown (evt: React.PointerEvent<HTMLCanvasElement>) {
         if (evt.buttons === 1) {
             setBtnDown('left');
-
-            const canvas = evt.currentTarget;
-            const tilePos = getClickedTile(canvas, evt.nativeEvent);
-
-            if (!_temp.find(p => p.x === tilePos.x && p.y === tilePos.y)) {
-                _setTemp(prevState => [
-                    ...prevState,
-                    tilePos,
-                ]);
-            }
+            registerPlaceTileClickAt(new Vec2(evt.clientX, evt.clientY));
         }
         else if (evt.buttons === 2) {
             setBtnDown('right');
@@ -139,24 +160,16 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
 
     function handlePointerMove (masterEvt: React.PointerEvent<HTMLCanvasElement>) {
         const coalescedEvts = masterEvt.nativeEvent.getCoalescedEvents();
-        const canvas = masterEvt.currentTarget;
 
-        const newPoints = [] as Vec2[];
+        const newPoints = [] as Vec2[]; // raw click pixel coords.
 
         for (const evt of coalescedEvts) {
             if (btnDown === 'left') {
-                const tilePos = getClickedTile(canvas, evt);
-    
-                if (_temp.find(p => p.x === tilePos.x && p.y === tilePos.y)) continue;
-
-                newPoints.push(tilePos);
+                newPoints.push(new Vec2(evt.clientX, evt.clientY));
             }
         }
-
-        _setTemp(prevState => [
-            ...prevState,
-            ...newPoints,
-        ]);
+        
+        registerPlaceTileClickAt(...newPoints);
     }
 
     function handlePointerUp (evt: PointerEvent) {
@@ -285,23 +298,32 @@ export function useEditorCanvas (pack: ResourcePack, width: number, height: numb
     }
 
     // #region Canvas interactions
-    function registerPlaceTileClickAt () {
+    function registerPlaceTileClickAt (...positions : Vec2[]) {
+        if (canvas === null) return [];
 
+        const rect = canvas.getBoundingClientRect();
+        const placedTiles = [] as Vec2[];
+
+        for (const pixelPos of positions) {
+            const tilePos = new Vec2(
+                Math.floor((pixelPos.x - rect.left + currentView.left) / 16),
+                Math.floor((pixelPos.y - rect.top + currentView.top) / 16),
+            );
+
+            if (tilesInCurrentStroke.find(lt => lt.equals(tilePos))) {
+                continue;
+            }
+            if (placedTiles.find(pt => pt.equals(tilePos))) {
+                continue;
+            }
+
+            placedTiles.push(tilePos);
+        }
+
+        setTilesInCurrentStroke(prevState => [
+            ...prevState,
+            ...placedTiles,
+        ]);
     }
     // #endregion
-
-    function getClickedTile (canvas: HTMLCanvasElement, evt: PointerEvent) {
-        const rect = canvas.getBoundingClientRect();
-        console.log(rect);
-
-        const pos = {
-            x: evt.clientX - rect.left + currentView.left,
-            y: evt.clientY - rect.top + currentView.top,
-        }
-        
-        return {
-            x: Math.floor(pos.x / 16),
-            y: Math.floor(pos.y / 16)
-        };
-    }
 }

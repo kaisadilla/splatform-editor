@@ -23,8 +23,12 @@ export class Vec2 {
         this.y = y;
     }
 
-    public toString () {
+    public toString () : string {
         return `(${this.x}, ${this.y})`;
+    }
+
+    public equals (other: Vec2) : boolean {
+        return this.x === other.x && this.y === other.y;
     }
 }
 
@@ -41,8 +45,15 @@ export class Rect {
         this.height = height;
     }
 
-    public toString () {
+    public toString () : string {
         return `(${this.left}, ${this.top}, ${this.width}, ${this.height})`;
+    }
+
+    public equals (other: Rect) : boolean {
+        return this.left === other.left
+            && this.top === other.top
+            && this.width === other.width
+            && this.height === other.height;
     }
 }
 

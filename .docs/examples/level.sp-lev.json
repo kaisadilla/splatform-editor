@@ -19,7 +19,10 @@
             },
             "tiles": [
                 {
-                    "position": [154, 0],
+                    "position": {
+                        "x": 154,
+                        "y": 0
+                    },
                     "tile": "level_end_border"
                 }
             ]
@@ -31,7 +34,10 @@
             },
             "tiles": [
                 {
-                    "position": [14, 19],
+                    "position": {
+                        "x": 14,
+                        "y": 19
+                    },
                     "tile": "question_block",
                     "behaviorProperties": {
                         "contentType": "Entity",
@@ -44,7 +50,10 @@
     "spawns": [
         {
             "id": 0,
-            "position": [30.0, 24.0],
+            "position": {
+                "x": 30.0,
+                "y": 24.0
+            },
             "entity": "red_goomba",
             "behaviorProperties": {
                 "startingDirectionRight": false
