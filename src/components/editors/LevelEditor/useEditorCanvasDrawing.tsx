@@ -1,10 +1,10 @@
-import { Sprite } from "@pixi/react";
+import { Graphics, Sprite } from "@pixi/react";
 import { removePositionsFromTileList } from "components/editors/LevelEditor/calculations";
 import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { getTileImagePath } from "elements/TileImage";
 import { Level } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
-import { BaseTexture, Rectangle, SCALE_MODES, Texture } from "pixi.js";
+import { BaseTexture, Rectangle, SCALE_MODES, Texture, Graphics as PixiGraphics } from "pixi.js";
 import { useMemo } from "react";
 import { Rect, Vec2, vec2toString } from "utils";
 
@@ -18,14 +18,16 @@ export default function useEditorCanvasDrawing (
     level: Level,
     tilesInCurrentStroke: Vec2[],
     currentView: Rect,
+    canvasSize: Vec2,
 ) {
+    const { width, height } = level.settings;
     const levelCtx = useLevelEditorContext();
 
     const tileTextures = useMemo(buildTileTextures, [pack.folderName, pack.tiles]);
 
     const tiles = buildVisibleTileArray();
 
-    const [$activeTiles, $backgroundTiles] = useMemo(() => {
+    const [$activeTiles, $tilesBehind, $tilesInfront] = useMemo(() => {
         const active = tiles.active.map(t => <Sprite
             key={t.key}
             x={t.position.x}
@@ -35,7 +37,7 @@ export default function useEditorCanvasDrawing (
             scale={1}
         />);
 
-        const background = tiles.background.map(t => <Sprite
+        const behind = tiles.behind.map(t => <Sprite
             key={t.key}
             x={t.position.x}
             y={t.position.y}
@@ -44,7 +46,16 @@ export default function useEditorCanvasDrawing (
             scale={1}
         />);
 
-        return [active, background];
+        const infront = tiles.infront.map(t => <Sprite
+            key={t.key}
+            x={t.position.x}
+            y={t.position.y}
+            texture={t.texture}
+            alpha={0.5}
+            scale={1}
+        />);
+
+        return [active, behind, infront];
     }, [
         tilesInCurrentStroke,
         currentView,
@@ -52,6 +63,8 @@ export default function useEditorCanvasDrawing (
         levelCtx.selectedGridTool,
         level.layers.length,
     ]);
+
+    const $gridLines = <Graphics draw={drawGridLines} alpha={0.4} />
 
     return {
         /**
@@ -63,7 +76,9 @@ export default function useEditorCanvasDrawing (
          * They render as semi-transparent tiles and sohuld ideally be rendered
          * below the $tiles sprites.
          */
-        $backgroundTiles,
+        $tilesBehind,
+        $tilesInfront,
+        $gridLines,
     };
 
     // #region Generating resources
@@ -100,7 +115,7 @@ export default function useEditorCanvasDrawing (
     // #endregion
 
     function buildVisibleTileArray () {
-        if (true) {
+        if (true) { // todo: only for terrain view
             return generateTilesForTerrainView();
         }
     }
@@ -110,16 +125,18 @@ export default function useEditorCanvasDrawing (
      * the "terrain" section, when the selected tool is the brush.
      */
     function generateTilesForTerrainView () {
-
         const tilesArr = [] as CanvasTileInfo[];
-        const backgroundTilesArr = [] as CanvasTileInfo[];
+        const behindArr = [] as CanvasTileInfo[];
+        const infrontArr = [] as CanvasTileInfo[];
 
         for (let i = 0; i < level.layers.length; i++) {
             const layer = level.layers[i];
             const isActiveLayer = i === levelCtx.selectedTileLayer;
 
             // reference to the array tiles in this layer will be added to.
-            const currentArr = isActiveLayer ? tilesArr : backgroundTilesArr;
+            let currentArr = tilesArr;
+            if (i < levelCtx.selectedTileLayer) currentArr = behindArr;
+            if (i > levelCtx.selectedTileLayer) currentArr = infrontArr;
 
             let layerTiles;
 
@@ -184,7 +201,7 @@ export default function useEditorCanvasDrawing (
             }
         }
 
-        return {active: tilesArr, background: backgroundTilesArr};
+        return {active: tilesArr, behind: behindArr, infront: infrontArr};
     }
 
     /**
@@ -199,4 +216,25 @@ export default function useEditorCanvasDrawing (
             || levelCtx.selectedGridTool === 'rectangle'
             || levelCtx.selectedGridTool === 'eraser';
     }
+
+    function drawGridLines (g: PixiGraphics) {
+        const xFirst = 1 - (currentView.left) % 16; // + 1 for line alignment
+        const yFirst = 0 - (currentView.top % 16);
+
+        g.clear();
+        g.beginFill(0xff3300);
+        //g.lineStyle(1, 0xff3300, 0.5);
+        g.lineStyle(1, 0x000000, 1);
+
+        for (let x = xFirst; x < canvasSize.x; x += 16) {
+            g.moveTo(x, 0);
+            g.lineTo(x, canvasSize.y);
+        }
+        for (let y = yFirst; y < canvasSize.y; y += 16) {
+            g.moveTo(0, y);
+            g.lineTo(canvasSize.x, y);
+        }
+
+        g.endFill();
+    };
 }

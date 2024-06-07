@@ -35,11 +35,12 @@ function LevelEditor_Content_Canvas ({
         viewboxRef,
         scrollareaRef,
         canvasSize,
-        currentView,
         $horizRule,
         $vertRule,
-        $backgroundTiles,
+        $tilesBehind,
+        $tilesInfront,
         $activeTiles,
+        $gridLines,
         setCanvas,
         handlePointerDown,
         handlePointerMove,
@@ -65,27 +66,6 @@ function LevelEditor_Content_Canvas ({
         className,
     );
 
-    const gridLines = (g: PixiGraphics) => {
-        const xFirst = 1 - (currentView.left) % 16; // + 1 for line alignment
-        const yFirst = 0 - (currentView.top % 16);
-
-        g.clear();
-        g.beginFill(0xff3300);
-        //g.lineStyle(1, 0xff3300, 0.5);
-        g.lineStyle(1, 0x000000, 1);
-
-        for (let x = xFirst; x < canvasSize.width; x += 16) {
-            g.moveTo(x, 0);
-            g.lineTo(x, canvasSize.height);
-        }
-        for (let y = yFirst; y < canvasSize.height; y += 16) {
-            g.moveTo(0, y);
-            g.lineTo(canvasSize.width, y);
-        }
-
-        g.endFill();
-    };
-
     return (
         <div ref={viewboxRef} className="level-grid-canvas-viewbox">
             <div
@@ -110,8 +90,8 @@ function LevelEditor_Content_Canvas ({
                     </div>
                     <Stage
                         className="canvas-element"
-                        width={canvasSize.width}
-                        height={canvasSize.height}
+                        width={canvasSize.x}
+                        height={canvasSize.y}
                         options={{
                             background: backgroundColor
                         }}
@@ -123,12 +103,13 @@ function LevelEditor_Content_Canvas ({
                             texture={texBg}
                             x={0}
                             y={0}
-                            width={canvasSize.width}
-                            height={canvasSize.height}
+                            width={canvasSize.x}
+                            height={canvasSize.y}
                         />}
-                        {$backgroundTiles}
+                        {$tilesBehind}
                         {$activeTiles}
-                        {levelCtx.showGrid && <Graphics draw={gridLines} alpha={0.4} />}
+                        {$tilesInfront}
+                        {levelCtx.showGrid && $gridLines}
                     </Stage>
                     <div className="vertical-scroll" />
                     <div className="horizontal-scroll" />

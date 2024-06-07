@@ -147,7 +147,7 @@ function _TerrainTab ({
                         classNames={{panel: "terrain-settings-form"}}
                         value={i.toString()}
                     >
-                        <Tooltip label="Whether entities (including the player) can collide with the tiles in this layer.">
+                        <Tooltip refProp="rootRef" label="Whether entities (including the player) can collide with the tiles in this layer.">
                             <Checkbox
                                 label="Active collisions"
                                 checked={level.layers[i].settings.checksCollisions ?? false}
