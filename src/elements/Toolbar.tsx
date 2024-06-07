@@ -12,6 +12,7 @@ export interface ToolbarButton<T> {
     icon?: IconProp;
     imgSrc?: keyof ToolIcons;
     color?: string;
+    disabled?: boolean;
     onClick?: (evt: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
@@ -52,6 +53,7 @@ function Toolbar<T> ({
                                 onSelectButton(b.value)
                                 b.onClick?.(evt);
                             }}
+                            disabled={b.disabled ?? false}
                         >
                             {b.icon && <FontAwesomeIcon
                                 icon={b.icon}

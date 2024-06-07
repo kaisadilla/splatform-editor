@@ -17,6 +17,7 @@ import { resolveHtmlPath } from "./util";
 import { fileURLToPath } from "url";
 import { WindowType } from "./WindowType";
 import { createIpcHandlers } from "./ipc/ipcMain";
+import { setDialogParentWindow } from "./files/documentFiles";
 
 const OPEN_DEVTOOLS_IN_DEBUG_MODE = false;
 
@@ -163,6 +164,8 @@ const createWindow = async () => {
     mainWindow.on("closed", () => {
         mainWindow = null;
     });
+
+    setDialogParentWindow(mainWindow);
 
     //const menuBuilder = new MenuBuilder(mainWindow);
     //menuBuilder.buildMenu();

@@ -1,9 +1,11 @@
-import { dialog } from "electron";
+import { BrowserWindow, dialog } from "electron";
 import fsAsync from "fs/promises";
 import fs from "fs";
 import Path from "path";
 import { SPDocumentType } from "models/sp_documents";
 import { MediaAssetMetadata } from "models/ResourcePack";
+
+let parentWindow: BrowserWindow | null = null;
 
 export interface FileInfo<T> {
     fileName: string;
@@ -13,11 +15,15 @@ export interface FileInfo<T> {
     content: T;
 }
 
+export function setDialogParentWindow (window: BrowserWindow) {
+    parentWindow = window;
+}
+
 export function openTextFile (
     title: string,
     filters: Electron.FileFilter[],
 ) : FileInfo<string> | null {
-    const filePath = dialog.showOpenDialogSync({
+    const filePath = dialog.showOpenDialogSync(parentWindow!, {
         title: title,
         filters: filters,
     });
@@ -43,7 +49,7 @@ export function saveNewTextFile (
     content: string,
     filters: Electron.FileFilter[]
 ) : string | null {
-    const filePath = dialog.showSaveDialogSync({
+    const filePath = dialog.showSaveDialogSync(parentWindow!, {
         title: title,
         filters: filters,
     });
@@ -135,7 +141,7 @@ export function confirmDocumentClose (
     const DISCARD_ID = 1;
     const CANCEL_ID = 2;
 
-    const resp = dialog.showMessageBoxSync({
+    const resp = dialog.showMessageBoxSync(parentWindow!, {
         title: "Closing document",
         type: 'warning',
         message: `Do you want to save the changes you made to '${tabName}'?`,

@@ -301,6 +301,12 @@ export function valueNullOrEmpty<T> (value: T | null | undefined) {
     return value === null || value === undefined || value === "";
 }
 
+/**
+ * Removes the item in the array at the index given. This MUTATES the array
+ * given, and doesn't return anything.
+ * @param arr The array to remove an item from.
+ * @param index The index of the item to remove.
+ */
 export function deleteArrayItemAt<T> (arr: T[], index: number) {
     arr.splice(index, 1);
 }

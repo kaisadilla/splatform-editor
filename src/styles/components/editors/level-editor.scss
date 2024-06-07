@@ -159,6 +159,14 @@
         .terrain-panel {
             @include fill-container;
             @include vertical-gallery-stretch;
+
+            .terrain-tabs-tab {
+                padding-left: 10px;
+            }
+
+            .terrain-settings-form {
+                padding: 8px;
+            }
         }
     }
 }

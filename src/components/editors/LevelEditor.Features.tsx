@@ -1,9 +1,11 @@
-import { CloseButton, ScrollArea, Tabs, Text } from '@mantine/core';
+import { Checkbox, CloseButton, ScrollArea, Tabs, Text, Tooltip } from '@mantine/core';
+import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import ActivatableTextInput from 'elements/ActivatableTextInput';
 import { Level } from 'models/Level';
 import { ResourcePack } from 'models/ResourcePack';
 import React from 'react';
 import { MaterialSymbol } from 'react-material-symbols';
+import { deleteArrayItemAt } from 'utils';
 
 export interface LevelEditor_FeaturesProps {
     pack: ResourcePack | null;
@@ -88,17 +90,19 @@ function _TerrainTab ({
     level,
     onChangeField,
 }: _TerrainTabProps) {
+    const levelCtx = useLevelEditorContext();
 
     return (
         <div className="terrain-panel">
             <Tabs
-                defaultValue={"0"}
+                value={levelCtx.selectedTileLayer.toString()}
+                onChange={v => levelCtx.setSelectedTileLayer(Number(v))}
                 // @ts-ignore - false syntax error.
                 //onChange={userCtx.setActiveTab}
                 classNames={{
                     root: "sp-tab-root",
                     list: "sp-tab-ribbon-list",
-                    tab: "sp-tab-ribbon-tab",
+                    tab: "sp-tab-ribbon-tab terrain-tabs-tab",
                     tabLabel: "sp-tab-ribbon-tab-label",
                     panel: "sp-tab-panel",
                 }}
@@ -112,14 +116,18 @@ function _TerrainTab ({
                                     root: "sp-close-button",
                                 }}
                                 size='sm'
+                                onClick={() => handleRemoveLayer(i)}
+                                disabled={level.layers.length < 2}
                             />}
                         >
                             <ActivatableTextInput
-                                defaultValue={l.name}
+                                value={l.name}
+                                onChange={evt => handleRenameLayer(evt, i)}
                             />
                         </Tabs.Tab>)}
                         <button
                             className="sp-tab-ribbon-tab sp-tab-ribbon-new-tab"
+                            onClick={handleAddLayer}
                         >
                             <MaterialSymbol icon="add" />
                         </button>
@@ -127,16 +135,50 @@ function _TerrainTab ({
                 </ScrollArea>
 
                 <div className="sp-section-tab-panel-container level-grid-feature-options">
-                    <Tabs.Panel value='terrain'>
-                        aaa
-                    </Tabs.Panel>
-                    <Tabs.Panel value='entity-tiles'>
-                        entity-tiles
-                    </Tabs.Panel>
+                    {level.layers.map((l, i) => <Tabs.Panel
+                        classNames={{panel: "terrain-settings-form"}}
+                        value={i.toString()}
+                    >
+                        <Tooltip label="Whether entities (including the player) can collide with the tiles in this layer.">
+                            <Checkbox
+                                label="Active collisions"
+                                checked={level.layers[i].settings.checksCollisions ?? false}
+                            />
+                        </Tooltip>
+                    </Tabs.Panel>)}
                 </div>
             </Tabs>
         </div>
     );
+
+    function handleAddLayer () {
+        const layers = [...level.layers];
+        layers.push({
+            name: "Unnamed layer",
+            settings: {},
+            tiles: []
+        });
+
+        onChangeField('layers', layers);
+    }
+
+    function handleRenameLayer (
+        evt: React.ChangeEvent<HTMLInputElement>, index: number
+    ) {
+        const layers = [...level.layers];
+        layers[index] = {
+            ...layers[index],
+            name: evt.currentTarget.value
+        };
+
+        onChangeField('layers', layers);
+    }
+
+    function handleRemoveLayer (index: number) {
+        const layers = [...level.layers];
+        deleteArrayItemAt(layers, index)
+        onChangeField('layers', layers);
+    }
 }
 
 

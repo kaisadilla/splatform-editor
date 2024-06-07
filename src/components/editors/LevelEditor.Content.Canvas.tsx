@@ -6,7 +6,7 @@ import { useEditorCanvas } from 'hooks/useEditorCanvas';
 import { ResourcePack } from 'models/ResourcePack';
 import { Application, ICanvas, Texture } from 'pixi.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Rect, Vec2, getClassString, getCssVariableValue } from 'utils';
+import { Rect, Vec2, getClassString, getCssVariableValue, vec2toString } from 'utils';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import { Level } from 'models/Level';
@@ -122,7 +122,7 @@ function LevelEditor_Content_Canvas ({
                             height={canvasSize.height}
                         />}
                         {visibleTiles.map(t => <Sprite
-                            //key={[t.x, t.y]}
+                            key={vec2toString(t.position)}
                             x={t.position.x}
                             y={t.position.y}
                             texture={t.texture}/>

@@ -6,7 +6,7 @@ import { ResourcePack } from "models/ResourcePack";
 import { Tile } from "models/Tile";
 import { Rectangle, Texture, Graphics as PixiGraphics, Renderer, Sprite, RenderTexture, BaseTexture, ICanvas } from "pixi.js";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Rect, Vec2, getCssVariableValue, vec2equals } from "utils";
+import { Rect, Vec2, getCssVariableValue, vec2equals, vec2toString } from "utils";
 
 export const RULER_WIDTH = 16;
 export const SCROLL_WIDTH = 10;
@@ -184,10 +184,27 @@ export function useEditorCanvas (
     function handlePointerDown (evt: React.PointerEvent<HTMLCanvasElement>) {
         if (evt.buttons === 1) {
             setBtnDown('left');
-            registerPlaceTileClickAt({
-                x: evt.clientX,
-                y: evt.clientY,
-            });
+            if (levelCtx.selectedGridTool === 'select') {
+
+            }
+            else if (levelCtx.selectedGridTool === 'brush') {
+                registerPlaceTileClickAt({
+                    x: evt.clientX,
+                    y: evt.clientY,
+                });
+            }
+            else if (levelCtx.selectedGridTool === 'rectangle') {
+
+            }
+            else if (levelCtx.selectedGridTool === 'eraser') {
+
+            }
+            else if (levelCtx.selectedGridTool === 'bucket') {
+
+            }
+            else if (levelCtx.selectedGridTool === 'picker') {
+
+            }
         }
         else if (evt.buttons === 2) {
             setBtnDown('right');
@@ -197,23 +214,30 @@ export function useEditorCanvas (
     function handlePointerMove (masterEvt: React.PointerEvent<HTMLCanvasElement>) {
         const coalescedEvts = masterEvt.nativeEvent.getCoalescedEvents();
 
-        const newPoints = [] as Vec2[]; // raw click pixel coords.
-
-        for (const evt of coalescedEvts) {
-            if (btnDown === 'left') {
-                newPoints.push({
-                    x: evt.clientX,
-                    y: evt.clientY,
-                });
+        if (btnDown === 'left') {
+            if (levelCtx.selectedGridTool === 'brush') {
+                const newPoints = [] as Vec2[]; // raw click pixel coords.
+        
+                for (const evt of coalescedEvts) {
+                    if (btnDown === 'left') {
+                        newPoints.push({
+                            x: evt.clientX,
+                            y: evt.clientY,
+                        });
+                    }
+                }
+                
+                registerPlaceTileClickAt(...newPoints);
             }
         }
-        
-        registerPlaceTileClickAt(...newPoints);
     }
 
     function handlePointerUp (evt: PointerEvent) {
         if (btnDown === 'left') {
-            addDrawnTilesToTileLayer();
+                    
+            if (levelCtx.selectedGridTool === 'brush') {
+                addDrawnTilesToTileLayer();
+            }
         }
 
         setBtnDown(null);
@@ -343,6 +367,7 @@ export function useEditorCanvas (
     // #region Canvas interactions
     function registerPlaceTileClickAt (...positions : Vec2[]) {
         if (canvas === null) return [];
+        if (levelCtx.selectedPaint === null) return;
 
         const rect = canvas.getBoundingClientRect();
         const placedTiles = [] as Vec2[];
@@ -371,13 +396,22 @@ export function useEditorCanvas (
 
     function addDrawnTilesToTileLayer () {
         if (levelCtx.selectedPaint === null) return;
+        // TODO: Fix multiple tiles in same location.
 
         let layerTiles = layerTilesExceptPositions(
             level.layers[0].tiles,
             tilesInCurrentStroke
         );
 
+        const addedPositions = new Set<string>();
         for (const t of tilesInCurrentStroke) {
+            if (addedPositions.has(vec2toString(t))) {
+                continue;
+            }
+            else {
+                addedPositions.add(vec2toString(t));
+            }
+
             layerTiles.push({
                 position: t,
                 tile: levelCtx.selectedPaint.id,
@@ -406,7 +440,7 @@ export function useEditorCanvas (
             lt => tilesInCurrentStroke.findIndex(
                 tcs => vec2equals(lt.position, tcs),
             ) === -1
-        )
+        );
     }
 
     // #endregion

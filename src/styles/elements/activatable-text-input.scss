@@ -4,6 +4,7 @@
     &.readonly {
         input {
             cursor: pointer;
+            background: transparent;
 
             &:focus {
                 border-color: transparent;

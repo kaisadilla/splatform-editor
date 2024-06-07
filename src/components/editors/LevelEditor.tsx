@@ -1,5 +1,5 @@
 import { SPDocument } from 'models/sp_documents';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { ToolIcons1x } from 'icons';
 import { Level } from 'models/Level';
@@ -11,6 +11,7 @@ import LevelEditor_TilesPalette from './LevelEditor.TilesPalette';
 import { useAppContext } from 'context/useAppContext';
 import { useUserContext } from 'context/useUserContext';
 import LevelEditor_Content from './LevelEditor.Content';
+import { useLevelEditorContext } from 'context/useLevelEditorContext';
 
 export interface LevelEditorProps {
     doc: SPDocument;
@@ -20,14 +21,24 @@ function LevelEditor ({
     doc
 }: LevelEditorProps) {
     const { getResourcePack } = useAppContext();
-    const { updateDocument } = useUserContext();
+    const { activeTab, updateDocument } = useUserContext();
+    const levelCtx = useLevelEditorContext();
+
+    const ref = useRef<HTMLDivElement>(null);
 
     const level = doc.content as Level;
-
     const pack = getResourcePack(level.resourcePack);
 
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [activeTab, doc.id]);
+
     return (
-        <div className="editor level-editor">
+        <div ref={ref} className="editor level-editor" tabIndex={-1}>
             <div className="level-toolbar">
                 <button><img src={ToolIcons1x.save} alt="" /></button>
                 <button><img src={ToolIcons1x.play} alt="" /></button>
@@ -77,6 +88,31 @@ function LevelEditor ({
         const update = {...level};
         update.resourcePack = value;
         updateDocument(doc.id, update);
+    }
+
+    function handleKeyDown (evt: KeyboardEvent) {
+        // if the current document is not the active tab, return.
+        if (activeTab !== doc.id) return;
+        // if the user hasn't clicked inside the editor, return.
+        //if (ref.current?.contains(document.activeElement) === false) return;
+        if (evt.key.toLowerCase() === 'm') {
+            levelCtx.setSelectedGridTool('select');
+        }
+        if (evt.key.toLowerCase() === 'b') {
+            levelCtx.setSelectedGridTool('brush');
+        }
+        if (evt.key.toLowerCase() === 'r') {
+            levelCtx.setSelectedGridTool('rectangle');
+        }
+        if (evt.key.toLowerCase() === 'e') {
+            levelCtx.setSelectedGridTool('eraser');
+        }
+        if (evt.key.toLowerCase() === 'g') {
+            levelCtx.setSelectedGridTool('bucket');
+        }
+        if (evt.key.toLowerCase() === 'i') {
+            levelCtx.setSelectedGridTool('picker');
+        }
     }
 }
 

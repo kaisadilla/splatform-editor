@@ -66,38 +66,39 @@ function _GridTools ({
     const buttons: ToolbarButton<GridTool>[] = [
         {
             value: 'select',
-            label: "Select",
+            label: "Select (M)",
             icon: 'arrow-pointer',
+            disabled: levelCtx.getSelectableGridTools().includes('select') === false,
         },
         {
             value: 'brush',
-            label: "Brush",
+            label: "Brush (B)",
             icon: 'paintbrush',
+            disabled: levelCtx.getSelectableGridTools().includes('brush') === false,
         },
         {
             value: 'rectangle',
-            label: "Rectangle",
+            label: "Rectangle (R)",
             icon: 'expand',
+            disabled: levelCtx.getSelectableGridTools().includes('rectangle') === false,
         },
         {
             value: 'eraser',
-            label: "Eraser",
+            label: "Eraser (E)",
             icon: 'eraser',
+            disabled: levelCtx.getSelectableGridTools().includes('eraser') === false,
         },
         {
             value: 'bucket',
-            label: "Paint bucket",
+            label: "Paint bucket (G)",
             icon: 'fill-drip',
-        },
-        {
-            value: 'move',
-            label: "Move",
-            icon: 'up-down-left-right',
+            disabled: levelCtx.getSelectableGridTools().includes('bucket') === false,
         },
         {
             value: 'picker',
-            label: "Picker",
+            label: "Picker (I)",
             icon: 'eye-dropper-empty',
+            disabled: levelCtx.getSelectableGridTools().includes('picker') === false,
         },
     ];
 
