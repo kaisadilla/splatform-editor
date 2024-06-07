@@ -2,14 +2,14 @@ import { ScrollArea, filterProps } from '@mantine/core';
 import { Graphics, Sprite, Stage, Text } from '@pixi/react';
 import { CSS_VARIABLES, RESOURCE_FOLDERS } from '_constants';
 import { getBackgroundImagePath } from 'elements/BackgroundImage';
-import { useEditorCanvas } from 'hooks/useEditorCanvas';
 import { ResourcePack } from 'models/ResourcePack';
-import { Application, ICanvas, Texture } from 'pixi.js';
+import { Application, ICanvas, SCALE_MODES, Texture } from 'pixi.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Rect, Vec2, getClassString, getCssVariableValue, vec2toString } from 'utils';
 import { Graphics as PixiGraphics } from '@pixi/graphics';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import { Level } from 'models/Level';
+import useEditorCanvas from './useEditorCanvas';
 
 // note: 'canvas' refers to the <Stage> element, and 'content canvas' refers
 // to this entire component.
@@ -38,8 +38,8 @@ function LevelEditor_Content_Canvas ({
         currentView,
         $horizRule,
         $vertRule,
-        tileTextures,
-        visibleTiles,
+        $backgroundTiles,
+        $activeTiles,
         setCanvas,
         handlePointerDown,
         handlePointerMove,
@@ -51,7 +51,9 @@ function LevelEditor_Content_Canvas ({
 
     const texBg = useMemo(() => {
         if (background) {
-            return Texture.from(getBackgroundImagePath(pack, background));
+            const tex = Texture.from(getBackgroundImagePath(pack, background));
+            //tex.baseTexture.scaleMode = SCALE_MODES.NEAREST;
+            return tex;
         }
         else {
             return null;
@@ -69,7 +71,8 @@ function LevelEditor_Content_Canvas ({
 
         g.clear();
         g.beginFill(0xff3300);
-        g.lineStyle(1, 0xff3300, 0.5);
+        //g.lineStyle(1, 0xff3300, 0.5);
+        g.lineStyle(1, 0x000000, 1);
 
         for (let x = xFirst; x < canvasSize.width; x += 16) {
             g.moveTo(x, 0);
@@ -109,7 +112,9 @@ function LevelEditor_Content_Canvas ({
                         className="canvas-element"
                         width={canvasSize.width}
                         height={canvasSize.height}
-                        options={{background: backgroundColor}}
+                        options={{
+                            background: backgroundColor
+                        }}
                         onPointerDown={handlePointerDown}
                         onPointerMove={handlePointerMove}
                         onMount={registerCanvas}
@@ -121,13 +126,9 @@ function LevelEditor_Content_Canvas ({
                             width={canvasSize.width}
                             height={canvasSize.height}
                         />}
-                        {visibleTiles.map(t => <Sprite
-                            key={vec2toString(t.position)}
-                            x={t.position.x}
-                            y={t.position.y}
-                            texture={t.texture}/>
-                        )}
-                        <Graphics draw={gridLines} />
+                        {$backgroundTiles}
+                        {$activeTiles}
+                        {levelCtx.showGrid && <Graphics draw={gridLines} alpha={0.4} />}
                     </Stage>
                     <div className="vertical-scroll" />
                     <div className="horizontal-scroll" />

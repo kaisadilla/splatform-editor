@@ -6,12 +6,13 @@ import { Level } from 'models/Level';
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { SP_ResizeHandle } from 'elements/resizablePanel';
 import LocalStorage from 'localStorage';
-import LevelEditor_PropertiesPanel from './LevelEditor.PropertiesPanel';
-import LevelEditor_TilesPalette from './LevelEditor.TilesPalette';
+import LevelEditor_PropertiesPanel from './PropertiesPanel';
+import LevelEditor_TilesPalette from './TilesPalette';
 import { useAppContext } from 'context/useAppContext';
 import { useUserContext } from 'context/useUserContext';
-import LevelEditor_Content from './LevelEditor.Content';
+import LevelEditor_Content from './Content';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
+import ActionBar, { ActionBarButton, ActionBarElement, ActionBarToggle } from 'elements/ActionBar';
 
 export interface LevelEditorProps {
     doc: SPDocument;
@@ -35,17 +36,58 @@ function LevelEditor ({
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         }
-    }, [activeTab, doc.id]);
+    }, [activeTab, doc.id, levelCtx]);
+
+    const actionBarElements: ActionBarElement[] = [
+        {
+            type: 'button',
+            label: 'Save this file',
+            icon: 'save',
+            onClick: () => console.log("save!!!"),
+        } as ActionBarButton,
+        {
+            type: 'separator',
+        },
+        {
+            type: 'button',
+            label: 'Test level',
+            icon: 'play',
+            onClick: () => console.log("test level!!!"),
+        } as ActionBarButton,
+        {
+            type: 'separator',
+        },
+        {
+            type: 'button',
+            label: 'Generate map (.png)',
+            icon: 'image',
+            onClick: () => console.log("generate map!!!"),
+        } as ActionBarButton,
+        {
+            type: 'toggle',
+            label: 'Show file JSON',
+            icon: 'json',
+            value: false,
+            onToggle: () => console.log("json!!!"),
+        } as ActionBarToggle,
+        {
+            type: 'separator',
+        },
+        {
+            type: 'toggle',
+            label: 'Display grid (Ctrl + G)',
+            icon: 'grid',
+            value: levelCtx.showGrid,
+            onToggle: levelCtx.setShowGrid,
+        } as ActionBarToggle,
+    ]
 
     return (
         <div ref={ref} className="editor level-editor" tabIndex={-1}>
-            <div className="level-toolbar">
-                <button><img src={ToolIcons1x.save} alt="" /></button>
-                <button><img src={ToolIcons1x.play} alt="" /></button>
-                <button><img src={ToolIcons1x.image} alt="" /></button>
-                <button><img src={ToolIcons1x.json} alt="" /></button>
-                <button><img src={ToolIcons1x.grid} alt="" /></button>
-            </div>
+            <ActionBar
+                className="level-toolbar"
+                elements={actionBarElements}
+            />
 
             <PanelGroup className="level-edition-container" direction='horizontal'>
                 <Panel className="palette-container" defaultSize={6} minSize={4}>
@@ -95,23 +137,42 @@ function LevelEditor ({
         if (activeTab !== doc.id) return;
         // if the user hasn't clicked inside the editor, return.
         //if (ref.current?.contains(document.activeElement) === false) return;
-        if (evt.key.toLowerCase() === 'm') {
+
+        if (evt.ctrlKey === false) {
+            handleSingleShortcut(evt);
+        }
+        else {
+            handleCtrlShortcut(evt);
+        }
+    }
+
+    function handleSingleShortcut (evt: KeyboardEvent) {
+        const selectable = levelCtx.getSelectableGridTools();
+
+        if (evt.key.toLowerCase() === 'm' && selectable.includes('select')) {
             levelCtx.setSelectedGridTool('select');
         }
-        if (evt.key.toLowerCase() === 'b') {
+        if (evt.key.toLowerCase() === 'b' && selectable.includes('brush')) {
             levelCtx.setSelectedGridTool('brush');
         }
-        if (evt.key.toLowerCase() === 'r') {
+        if (evt.key.toLowerCase() === 'r' && selectable.includes('rectangle')) {
             levelCtx.setSelectedGridTool('rectangle');
         }
-        if (evt.key.toLowerCase() === 'e') {
+        if (evt.key.toLowerCase() === 'e' && selectable.includes('eraser')) {
             levelCtx.setSelectedGridTool('eraser');
         }
-        if (evt.key.toLowerCase() === 'g') {
+        if (evt.key.toLowerCase() === 'g' && selectable.includes('bucket')) {
             levelCtx.setSelectedGridTool('bucket');
         }
-        if (evt.key.toLowerCase() === 'i') {
+        if (evt.key.toLowerCase() === 'i' && selectable.includes('picker')) {
             levelCtx.setSelectedGridTool('picker');
+        }
+
+    }
+
+    function handleCtrlShortcut (evt: KeyboardEvent) {
+        if (evt.key.toLowerCase() === 'g') {
+            levelCtx.setShowGrid(!levelCtx.showGrid);
         }
     }
 }

@@ -31,11 +31,11 @@ function FileTabBar ({}: FileTabBarProps) {
 
     return (<>
         <ScrollArea
-            scrollbars='x'
-            type='hover'
             classNames={{
                 root: "sp-tab-ribbon-root"
             }}
+            scrollbars='x'
+            type='hover'
             //scrollbarSize={8}
             //onWheel={(evt) => console.log(evt)} // TODO: Add horizontal wheel scroll.
         >

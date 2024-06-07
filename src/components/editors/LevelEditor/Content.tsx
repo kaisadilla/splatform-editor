@@ -10,9 +10,9 @@ import Toolbar, { ToolbarButton } from 'elements/Toolbar';
 import { BlurFilter, TextStyle } from 'pixi.js';
 import { Container, Sprite, Stage, Text } from '@pixi/react';
 import { Vec2 } from 'utils';
-import LevelEditor_Content_Canvas from './LevelEditor.Content.Canvas';
+import LevelEditor_Content_Canvas from './Content.Canvas';
 import BackgroundImage from 'elements/BackgroundImage';
-import LevelEditor_Features from './LevelEditor.Features';
+import LevelEditor_Features from './Features';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { SP_ResizeHandle } from 'elements/resizablePanel';
 

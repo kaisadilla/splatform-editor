@@ -1,7 +1,7 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip } from '@mantine/core';
-import { ToolIcons } from 'icons';
+import { ImageIconCollection } from 'icons';
 import React from 'react';
 import { DivProps } from 'types';
 import { getClassString } from 'utils';
@@ -10,7 +10,7 @@ export interface ToolbarButton<T> {
     value: T;
     label: string;
     icon?: IconProp;
-    imgSrc?: keyof ToolIcons;
+    imgSrc?: keyof ImageIconCollection;
     color?: string;
     disabled?: boolean;
     onClick?: (evt: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;

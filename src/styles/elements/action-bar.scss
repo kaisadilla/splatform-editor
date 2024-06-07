@@ -1,0 +1,38 @@
+.sp-action-bar {
+    .sp-action-bar-container {
+        height: 36px;
+        @include horizontal-list;
+        
+        > .sp-button {
+            @include center-content;
+            padding: 2px;
+            border: 1px solid transparent;
+
+            &:not(:disabled):hover {
+                background: $color-component-1;
+                border-color: $color-component-3;
+            }
+            &:not(:disabled):active {
+                background: $color-component-2;
+                border-color: $color-component-3;
+            }
+
+            &.toggled {
+                background-color: $color-highlight-l1;
+                border-color: $color-highlight;
+            }
+
+            > img {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        > .sp-separator {
+            width: 1px;
+            height: 20px;
+            background-color: $color-component-3;
+            margin: 0 6px;
+        }
+    }
+}

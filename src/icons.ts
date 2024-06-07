@@ -14,7 +14,7 @@ export const FileIcons = {
     tile: tileIcon,
 };
 
-export interface ToolIcons {
+export interface ImageIconCollection {
     grid: string;
     image: string;
     json: string;
@@ -25,7 +25,7 @@ export interface ToolIcons {
     saveAs: string;
 }
 
-export const ToolIcons1x: ToolIcons = {
+export const ToolIcons1x: ImageIconCollection = {
     grid: require("@assets/icons/grid.20.png"),
     image: require("@assets/icons/image.20.png"),
     json: require("@assets/icons/json.png"),
@@ -36,7 +36,7 @@ export const ToolIcons1x: ToolIcons = {
     saveAs: require("@assets/icons/save-as.20.png"),
 }
 
-export const ToolIcons1_5x: ToolIcons = {
+export const ToolIcons1_5x: ImageIconCollection = {
     grid: require("@assets/icons/grid.30.png"),
     image: require("@assets/icons/image.30.png"),
     json: require("@assets/icons/json.png"),
@@ -47,7 +47,7 @@ export const ToolIcons1_5x: ToolIcons = {
     saveAs: require("@assets/icons/save-as.30.png"),
 }
 
-export const ToolIcons2x: ToolIcons = {
+export const ToolIcons2x: ImageIconCollection = {
     grid: require("@assets/icons/grid.40.png"),
     image: require("@assets/icons/image.40.png"),
     json: require("@assets/icons/json.png"),
@@ -59,7 +59,7 @@ export const ToolIcons2x: ToolIcons = {
 }
 
 
-export const ToolIconsBig: ToolIcons = {
+export const ToolIconsBig: ImageIconCollection = {
     grid: require("@assets/icons/grid.png"),
     image: require("@assets/icons/image.png"),
     json: require("@assets/icons/json.png"),

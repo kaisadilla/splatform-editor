@@ -45,6 +45,11 @@ function LevelEditor_Features ({
                         Entity tiles
                     </Tabs.Tab>
                     <Tabs.Tab
+                        value='circuits'
+                    >
+                        Circuits
+                    </Tabs.Tab>
+                    <Tabs.Tab
                         value='spawns'
                     >
                         Spawns
@@ -66,6 +71,9 @@ function LevelEditor_Features ({
                     </Tabs.Panel>
                     <Tabs.Panel value='entity-tiles'>
                         entity-tiles
+                    </Tabs.Panel>
+                    <Tabs.Panel value='circuits'>
+                        circuits, by tiles for tiles
                     </Tabs.Panel>
                     <Tabs.Panel value='spawns'>
                         spawns
@@ -116,7 +124,7 @@ function _TerrainTab ({
                                     root: "sp-close-button",
                                 }}
                                 size='sm'
-                                onClick={() => handleRemoveLayer(i)}
+                                onClick={evt => handleRemoveLayer(evt, i)}
                                 disabled={level.layers.length < 2}
                             />}
                         >
@@ -143,6 +151,7 @@ function _TerrainTab ({
                             <Checkbox
                                 label="Active collisions"
                                 checked={level.layers[i].settings.checksCollisions ?? false}
+                                onChange={() => {}}
                             />
                         </Tooltip>
                     </Tabs.Panel>)}
@@ -160,6 +169,7 @@ function _TerrainTab ({
         });
 
         onChangeField('layers', layers);
+        levelCtx.setSelectedTileLayer(layers.length - 1);
     }
 
     function handleRenameLayer (
@@ -174,10 +184,19 @@ function _TerrainTab ({
         onChangeField('layers', layers);
     }
 
-    function handleRemoveLayer (index: number) {
+    function handleRemoveLayer (
+        evt: React.MouseEvent<HTMLButtonElement, MouseEvent>, index: number
+    ) {
+        evt.stopPropagation();
         const layers = [...level.layers];
+
+        let newActiveLayer = levelCtx.selectedTileLayer;
+        if (newActiveLayer >= index) newActiveLayer--;
+        newActiveLayer = Math.max(0, newActiveLayer);
+
         deleteArrayItemAt(layers, index)
         onChangeField('layers', layers);
+        levelCtx.setSelectedTileLayer(newActiveLayer);
     }
 }
 

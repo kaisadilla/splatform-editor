@@ -6,19 +6,8 @@
     justify-content: stretch;
 
     .level-toolbar {
-        @include horizontal-toolbar;
         border-bottom: 1px solid $color-component-3;
-        height: 32px;
-
-        button {
-            @include center-content;
-            padding: 2px;
-
-            img {
-                width: 20px;
-                height: 20px;
-            }
-        }
+        padding: 0 8px;
     }
 
     .level-edition-container {

@@ -125,8 +125,6 @@ const UserContextProvider = ({ children }: any) => {
         }
 
         async function saveDocumentCopy (doc: SPDocument) {
-            // TODO: Mark document as without changes and change its full path
-            // to the newly selected path.
             const path = await _saveNewDocument(doc);
             if (path !== null) {
                 _setDocAsUnsaved(doc.id, false);
@@ -417,16 +415,18 @@ const UserContextProvider = ({ children }: any) => {
         const index = _getDocumentIndexById(docId);
         if (index === null) return;
 
-        const newArr = [...state.documents];
-        newArr[index] = {
-            ...newArr[index],
-            hasUnsavedChanges: unsaved,
-        };
+        setState(prevState => {
+            const newArr = [...prevState.documents];
+            newArr[index] = {
+                ...newArr[index],
+                hasUnsavedChanges: unsaved,
+            };
 
-        setState(prevState => ({
-            ...prevState,
-            documents: newArr,
-        }));
+            return {
+                ...prevState,
+                documents: newArr,
+            };
+        });
     }
 
     /**

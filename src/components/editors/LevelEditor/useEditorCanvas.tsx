@@ -1,12 +1,14 @@
 import { CSS_VARIABLES } from "_constants";
 import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { getTileImagePath } from "elements/TileImage";
-import { Level, LevelTile } from "models/Level";
+import { Level, LevelTile, TileLayer } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
 import { Tile } from "models/Tile";
-import { Rectangle, Texture, Graphics as PixiGraphics, Renderer, Sprite, RenderTexture, BaseTexture, ICanvas } from "pixi.js";
+import { Rectangle, Texture, Graphics as PixiGraphics, Renderer, Sprite, RenderTexture, BaseTexture, ICanvas, SCALE_MODES } from "pixi.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Rect, Vec2, getCssVariableValue, vec2equals, vec2toString } from "utils";
+import { removePositionsFromTileList } from "components/editors/LevelEditor/calculations";
+import useEditorCanvasDrawing from "./useEditorCanvasDrawing";
 
 export const RULER_WIDTH = 16;
 export const SCROLL_WIDTH = 10;
@@ -14,11 +16,12 @@ export const SCROLL_HEIGHT = 10;
 const VIEW_PADDING = 4;
 
 export interface CanvasTileInfo {
+    key: string;
     position: Vec2;
     texture: Texture;
 }
 
-export function useEditorCanvas (
+export default function useEditorCanvas (
     pack: ResourcePack,
     level: Level,
     onChangeField: (field: keyof Level, val: any) => void,
@@ -40,6 +43,10 @@ export function useEditorCanvas (
     // the tiles being placed by this stroke, that will be added to the level
     // once the stroke is finished.
     const [tilesInCurrentStroke, setTilesInCurrentStroke] = useState([] as Vec2[]);
+
+    const drawing = useEditorCanvasDrawing(
+        pack, level, tilesInCurrentStroke, currentView
+    );
 
     useEffect(() => {
         const f = (evt: PointerEvent) => handlePointerUp(evt);
@@ -64,55 +71,6 @@ export function useEditorCanvas (
 
     const $horizRule = useMemo(buildHorizontalRuler, [width]);
     const $vertRule = useMemo(buildVerticalRuler, [height]);
-
-    const tileTextures = useMemo(buildTileTextures, [pack.folderName, pack.tiles]);
-
-    const visibleTiles = [] as CanvasTileInfo[];
-    if (levelCtx.selectedPaint) {
-        for (const t of tilesInCurrentStroke) {
-            const tex = tileTextures[levelCtx.selectedPaint.id];
-
-            if (!tex) {
-                console.warn(`Couldn't find texture for '${levelCtx.selectedPaint.id}'`, tileTextures);
-                continue;
-            }
-
-            visibleTiles.push({
-                position: {
-                    x: (t.x * 16) - currentView.left,
-                    y: (t.y * 16) - currentView.top,
-                },
-                texture: tex,
-            });
-        }
-    }
-    try {
-        let layerTiles = layerTilesExceptPositions(
-            level.layers[0].tiles,
-            tilesInCurrentStroke
-        );
-        
-        for (const t of layerTiles) {
-            const tex = tileTextures[t.tile];
-    
-            if (!tex) {
-                console.warn(`Couldn't find texture for '${t.tile}'`, tileTextures);
-                continue;
-            }
-    
-            visibleTiles.push({
-                position: {
-                    x: (t.position.x * 16) - currentView.left,
-                    y: (t.position.y * 16) - currentView.top,
-                },
-                texture: tex,
-            });
-        }
-    }
-    catch (err) {
-        console.log(level);
-        throw err;
-    }
 
     return {
         /**
@@ -145,15 +103,8 @@ export function useEditorCanvas (
          * Contains all the elements that form the vertical ruler.
          */
         $vertRule,
-        /**
-         * A dictionary of tile textures. Each key contains the id of a tile and
-         * its value contains the texture for that tile.
-         */
-        tileTextures,
-        /**
-         * The tiles that are currently visible in the canvas.
-         */
-        visibleTiles,
+        $activeTiles: drawing.$activeTiles,
+        $backgroundTiles: drawing.$backgroundTiles,
         setCanvas,
         /**
          * Handles interaction when the user clicks down into the canvas.
@@ -335,71 +286,44 @@ export function useEditorCanvas (
     }
     // #endregion
 
-    function buildTileTextures () {
-        const dict = {} as {[key: string]: Texture};
-
-        for (const tile of pack.tiles) {
-          const anim = tile.data.animation;
-          // a tile needs slicing if its sprite has more than one frame.
-          const needsSlicing = anim.slices[0] !== 1
-              || anim.slices[1] !== 1;
-              
-            if (needsSlicing) {
-                // select the first frame available
-                const frame = anim.frame ?? anim.frames?.[0] ?? 0;
-                const xFrame = frame % anim.slices[0];
-                const yFrame = Math.floor(frame / anim.slices[0]);
-                
-                const baseTex = new BaseTexture(getTileImagePath(pack, tile.data));
-                const tex = new Texture(baseTex, new Rectangle(xFrame * 16, yFrame * 16, 16, 16));
-
-                dict[tile.id] = tex;
-            }
-            else {
-                const tex = Texture.from(getTileImagePath(pack, tile.data));
-                dict[tile.id] = tex;
-            }
-        }
-
-        return dict;
-    }
-
     // #region Canvas interactions
     function registerPlaceTileClickAt (...positions : Vec2[]) {
         if (canvas === null) return [];
         if (levelCtx.selectedPaint === null) return;
 
-        const rect = canvas.getBoundingClientRect();
-        const placedTiles = [] as Vec2[];
+        setTilesInCurrentStroke(prevState => {
+            const rect = canvas.getBoundingClientRect();
+            const placedTiles = [] as Vec2[];
 
-        for (const pixelPos of positions) {
-            const tilePos = {
-                x: Math.floor((pixelPos.x - rect.left + currentView.left) / 16),
-                y: Math.floor((pixelPos.y - rect.top + currentView.top) / 16),
-            };
-
-            if (tilesInCurrentStroke.find(lt => vec2equals(lt, tilePos))) {
-                continue;
+            for (const pixelPos of positions) {
+                const tilePos = {
+                    x: Math.floor((pixelPos.x - rect.left + currentView.left) / 16),
+                    y: Math.floor((pixelPos.y - rect.top + currentView.top) / 16),
+                };
+    
+                if (prevState.find(lt => vec2equals(lt, tilePos))) {
+                    continue;
+                }
+                if (placedTiles.find(pt => vec2equals(pt, tilePos))) {
+                    continue;
+                }
+    
+                placedTiles.push(tilePos);
             }
-            if (placedTiles.find(pt => vec2equals(pt, tilePos))) {
-                continue;
-            }
 
-            placedTiles.push(tilePos);
-        }
-
-        setTilesInCurrentStroke(prevState => [
-            ...prevState,
-            ...placedTiles,
-        ]);
+            return [
+                ...prevState,
+                ...placedTiles,
+            ];
+        });
     }
 
     function addDrawnTilesToTileLayer () {
         if (levelCtx.selectedPaint === null) return;
-        // TODO: Fix multiple tiles in same location.
+        // TODO: IMPORTANT! Fix multiple tiles in same location.
 
-        let layerTiles = layerTilesExceptPositions(
-            level.layers[0].tiles,
+        let layerTiles = removePositionsFromTileList(
+            level.layers[levelCtx.selectedTileLayer].tiles,
             tilesInCurrentStroke
         );
 
@@ -418,29 +342,15 @@ export function useEditorCanvas (
             })
         }
 
-        onChangeField('layers', [{
-            ...level.layers[0],
-            tiles: layerTiles,
-        }]);
+        const update: TileLayer[] = [...level.layers];
+        update[levelCtx.selectedTileLayer] = {
+            ...update[levelCtx.selectedTileLayer],
+            tiles: layerTiles
+        }
+
+        onChangeField('layers', update);
 
         setTilesInCurrentStroke([]);
-    }
-
-    /**
-     * Given the contents of a level's layer, and a list of positions, returns
-     * an array containing the elements in the level's layer that are NOT in
-     * the positions given. This can be used, for example, to remove tiles that
-     * are in the positions given.
-     * @param layerTiles The tiles of a layer in the level.
-     * @param positions The positions to remove.
-     * @returns 
-     */
-    function layerTilesExceptPositions (layerTiles: LevelTile[], positions: Vec2[]) {
-        return layerTiles.filter(
-            lt => tilesInCurrentStroke.findIndex(
-                tcs => vec2equals(lt.position, tcs),
-            ) === -1
-        );
     }
 
     // #endregion

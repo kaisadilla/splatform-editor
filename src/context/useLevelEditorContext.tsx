@@ -14,9 +14,11 @@ interface LevelEditorContextState {
     selectedPaint: WithId<TilePaint> | null;
     selectedGridTool: GridTool;
     selectedTileLayer: number;
+    showGrid: boolean;
     setSelectedPaint: (paint: WithId<TilePaint> | null) => void;
     setSelectedGridTool: (tool: GridTool) => void;
     setSelectedTileLayer: (index: number) => void;
+    setShowGrid: (show: boolean) => void;
     getSelectableGridTools: () => GridTool[];
 }
 
@@ -28,6 +30,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
         selectedPaint: null,
         selectedGridTool: 'select',
         selectedTileLayer: 0,
+        showGrid: false,
     } as LevelEditorContextState);
 
     const value = useMemo(() => {
@@ -52,6 +55,13 @@ const LevelEditorContextProvider = ({ children }: any) => {
             }));
         }
 
+        function setShowGrid (show: boolean) {
+            setState(prevState => ({
+                ...prevState,
+                showGrid: show,
+            }));
+        }
+
         /**
          * Returns a list of grid tools that can be selected right now.
          */
@@ -72,6 +82,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
             setSelectedPaint,
             setSelectedGridTool,
             setSelectedTileLayer,
+            setShowGrid,
             getSelectableGridTools,
         }
     }, [state]);
