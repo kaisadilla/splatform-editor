@@ -18,6 +18,7 @@ import 'react-material-symbols/sharp'; // 'rounded' | 'sharp' | 'outlined'.
 import darkTheme from 'styles/main.scss';
 
 import "@pixi/unsafe-eval";
+import { SettingsContextProvider } from 'context/useSettings';
 
 export default function App () {
     // TODO: Themes!
@@ -59,6 +60,7 @@ export default function App () {
         <ThemeProvider theme={muiTheme}>
         <MantineProvider theme={mantineTheme}>
 
+        <SettingsContextProvider>
         <AppContextProvider>
         <UserContextProvider>
 
@@ -72,6 +74,7 @@ export default function App () {
 
         </UserContextProvider>
         </AppContextProvider>
+        </SettingsContextProvider>
 
         </MantineProvider>
         </ThemeProvider>

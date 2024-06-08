@@ -1,6 +1,6 @@
 import { TilePaint } from "models/sp_documents";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { WithId } from "utils";
+import { Vec2, WithId } from "utils";
 
 export type ZoomLevel = '0.25' | '0.5' | '1' | '2' | '3' | '4' | '6' | '8';
 
@@ -14,18 +14,42 @@ export type GridTool =
 ;
 
 interface LevelEditorContextState {
+    /**
+     * The zoom applied to the editor canvas.
+     */
     zoom: ZoomLevel;
-    paint: WithId<TilePaint> | null;
-    terrainGridTool: GridTool;
-    selectedTileLayer: number;
+    /**
+     * The position of the tile(s) that are currently selected (in the active layer).
+     */
+    tileSelection: Vec2[];
+    /**
+     * Whether to paint the grid over the editor canvas.
+     */
     showGrid: boolean;
+    /**
+     * The tile (or tile composite) currently used to paint new tiles.
+     */
+    paint: WithId<TilePaint> | null;
+    /**
+     * The selected tool for the terrain editor.
+     */
+    terrainTool: GridTool;
+    /**
+     * The terrain layer that is currently selected.
+     */
+    activeTerrainLayer: number;
     setZoom: (zoom: ZoomLevel) => void;
+    setTileSelection: (positions: Vec2[]) => void;
     setPaint: (paint: WithId<TilePaint> | null) => void;
     setTerrainGridTool: (tool: GridTool) => void;
-    setSelectedTileLayer: (index: number) => void;
+    setActiveTerrainLayer: (index: number) => void;
     setShowGrid: (show: boolean) => void;
-    getSelectableGridTools: () => GridTool[];
     getZoomMultiplier: () => number;
+    /**
+     * Removes all tiles from the current selection. 
+     */
+    cancelSelection: () => void;
+    getSelectableGridTools: () => GridTool[];
 }
 
 const LevelEditorContext = createContext<LevelEditorContextState>({} as LevelEditorContextState);
@@ -33,11 +57,12 @@ const useLevelEditorContext = () => useContext(LevelEditorContext);
 
 const LevelEditorContextProvider = ({ children }: any) => {
     const [state, setState] = useState<LevelEditorContextState>({
-        zoom: '1',
-        paint: null,
-        terrainGridTool: 'select',
-        selectedTileLayer: 0,
+        zoom: '2',
+        tileSelection: [] as Vec2[],
         showGrid: true,
+        paint: null,
+        terrainTool: 'select',
+        activeTerrainLayer: 0,
     } as LevelEditorContextState);
 
     const value = useMemo(() => {
@@ -48,6 +73,13 @@ const LevelEditorContextProvider = ({ children }: any) => {
             }));
         }
 
+        function setTileSelection (tileSelection: Vec2[]) {
+            setState(prevState => ({
+                ...prevState,
+                tileSelection,
+            }));
+        }
+
         function setPaint (paint: WithId<TilePaint> | null) {
             setState(prevState => ({
                 ...prevState,
@@ -55,24 +87,17 @@ const LevelEditorContextProvider = ({ children }: any) => {
             }));
         }
 
-        function setTerrainGridTool (tool: GridTool) {
+        function setTerrainTool (tool: GridTool) {
             setState(prevState => ({
                 ...prevState,
-                terrainGridTool: tool,
+                terrainTool: tool,
             }));
         }
 
-        function setSelectedTileLayer (index: number) {
+        function setActiveTerrainLayer (index: number) {
             setState(prevState => ({
                 ...prevState,
-                selectedTileLayer: index,
-            }));
-        }
-
-        function setShowGrid (show: boolean) {
-            setState(prevState => ({
-                ...prevState,
-                showGrid: show,
+                activeTerrainLayer: index,
             }));
         }
 
@@ -88,6 +113,20 @@ const LevelEditorContextProvider = ({ children }: any) => {
                 case '8': return 8;
                 default: return 1;
             }
+        }
+
+        function setShowGrid (show: boolean) {
+            setState(prevState => ({
+                ...prevState,
+                showGrid: show,
+            }));
+        }
+
+        function cancelSelection () {
+            setState(prevState => ({
+                ...prevState,
+                tileSelection: [],
+            }));
         }
 
         /**
@@ -108,12 +147,14 @@ const LevelEditorContextProvider = ({ children }: any) => {
         return {
             ...state,
             setZoom,
+            setTileSelection,
             setPaint,
-            setTerrainGridTool,
-            setSelectedTileLayer,
+            setTerrainGridTool: setTerrainTool,
+            setActiveTerrainLayer,
             setShowGrid,
-            getSelectableGridTools,
             getZoomMultiplier,
+            cancelSelection,
+            getSelectableGridTools,
         }
     }, [state]);
 

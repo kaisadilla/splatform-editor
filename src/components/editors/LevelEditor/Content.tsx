@@ -114,7 +114,7 @@ function _GridTools ({
             </div>
             <Toolbar<GridTool>
                 direction='vertical'
-                selectedValue={levelCtx.terrainGridTool}
+                selectedValue={levelCtx.terrainTool}
                 onSelectButton={levelCtx.setTerrainGridTool}
                 buttons={buttons}
             />

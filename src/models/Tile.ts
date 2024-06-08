@@ -1,18 +1,30 @@
+import { TileTraitId } from "data/TileTraits";
+
 export interface Tile {
     type: 'tile';
     name: string;
     category: string | null;
-    behavior: string;
-    behaviorProperties: {[prop: string]: any};
-    configurableProperties: string[];
-    sprite: string;
+    traits: TileTraitDefinition[];
+    presets?: TileTraitPreset[];
+    spritesheet: string;
     animation: {
-        type: string;
-        slices: [number, number];
+        type: 'static' | 'dynamic';
+        slices?: [number, number];
         frame?: number;
         frames?: number[];
         frameTimes?: number | number[];
-    };
+    }
+}
+
+export interface TileTraitDefinition {
+    name: TileTraitId;
+    parameters: {[key: string]: any};
+    configurableParameters: string[];
+}
+
+export interface TileTraitPreset {
+    name: string;
+    parameters: {[key: string]: any};
 }
 
 export function getNewTile () : Tile {
@@ -20,14 +32,10 @@ export function getNewTile () : Tile {
         type: 'tile',
         name: "New tile",
         category: null,
-        behavior: "tile",
-        behaviorProperties: {},
-        configurableProperties: [],
-        sprite: "block_empty",
+        traits: [],
+        spritesheet: "block_empty",
         animation: {
             type: "static",
-            slices: [1, 1],
-            frame: 0
-        }
+        },
     }
 }

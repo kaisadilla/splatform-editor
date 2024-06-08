@@ -10,6 +10,7 @@ import { Graphics as PixiGraphics } from '@pixi/graphics';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import { Level } from 'models/Level';
 import useEditorCanvas from './useEditorCanvas';
+import { useSettingsContext } from 'context/useSettings';
 
 // note: 'canvas' refers to the <Stage> element, and 'content canvas' refers
 // to this entire component.
@@ -27,6 +28,7 @@ function LevelEditor_Content_Canvas ({
     onChangeField,
     className,
 }: LevelEditor_Content_CanvasProps) {
+    const settings = useSettingsContext();
     const levelCtx = useLevelEditorContext();
 
     const { background } = level.settings;
@@ -46,9 +48,6 @@ function LevelEditor_Content_Canvas ({
         handlePointerMove,
         handleScroll,
     } = useEditorCanvas(pack, level, onChangeField);
-
-    // Retrieve the color value to use as background when no image background has been chosen.
-    const backgroundColor = getCssVariableValue(CSS_VARIABLES.ComponentColorTheme0);
 
     const texBg = useMemo(() => {
         if (background) {
@@ -93,7 +92,7 @@ function LevelEditor_Content_Canvas ({
                         width={canvasSize.x}
                         height={canvasSize.y}
                         options={{
-                            background: backgroundColor
+                            background: settings.cssVariables.componentColorTheme.shade0,
                         }}
                         onPointerDown={handlePointerDown}
                         onPointerMove={handlePointerMove}

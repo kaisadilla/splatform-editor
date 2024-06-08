@@ -446,5 +446,5 @@ function __buildSmartFilterRegex (filter: string, caseSensitive?: boolean) {
  * @returns 
  */
 export function getCssVariableValue (variable: string) {
-    return window.getComputedStyle(document.body).getPropertyValue(variable);
+    return window.getComputedStyle(document.body).getPropertyValue(variable) ?? "";
 }

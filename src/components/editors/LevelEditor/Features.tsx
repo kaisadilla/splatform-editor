@@ -34,20 +34,31 @@ function LevelEditor_Features ({
                 }}
             >
                 <Tabs.List>
+                    <Tooltip label="Tiles placed in the level">
+                        <Tabs.Tab
+                            value='terrain'
+                        >
+                            Terrain
+                        </Tabs.Tab>
+                    </Tooltip>
+                    <Tooltip label="Moving tiles, tiles with complex behavior or entities that resemble tiles">
+                        <Tabs.Tab
+                            value='entity-tiles'
+                        >
+                            Entity tiles
+                        </Tabs.Tab>
+                    </Tooltip>
+                    <Tooltip label="Tracks where tiles can be placed">
+                        <Tabs.Tab
+                            value='tracks'
+                        >
+                            Tracks
+                        </Tabs.Tab>
+                    </Tooltip>
                     <Tabs.Tab
-                        value='terrain'
+                        value='warps'
                     >
-                        Terrain
-                    </Tabs.Tab>
-                    <Tabs.Tab
-                        value='entity-tiles'
-                    >
-                        Entity tiles
-                    </Tabs.Tab>
-                    <Tabs.Tab
-                        value='circuits'
-                    >
-                        Circuits
+                        Warps
                     </Tabs.Tab>
                     <Tabs.Tab
                         value='spawns'
@@ -72,8 +83,11 @@ function LevelEditor_Features ({
                     <Tabs.Panel value='entity-tiles'>
                         entity-tiles
                     </Tabs.Panel>
-                    <Tabs.Panel value='circuits'>
-                        circuits, by tiles for tiles
+                    <Tabs.Panel value='tracks'>
+                        tracks, by tiles for tiles
+                    </Tabs.Panel>
+                    <Tabs.Panel value='warps'>
+                        warps e &lt;---&gt; e
                     </Tabs.Panel>
                     <Tabs.Panel value='spawns'>
                         spawns
@@ -103,8 +117,8 @@ function _TerrainTab ({
     return (
         <div className="terrain-panel">
             <Tabs
-                value={levelCtx.selectedTileLayer.toString()}
-                onChange={v => levelCtx.setSelectedTileLayer(Number(v))}
+                value={levelCtx.activeTerrainLayer.toString()}
+                onChange={v => levelCtx.setActiveTerrainLayer(Number(v))}
                 // @ts-ignore - false syntax error.
                 //onChange={userCtx.setActiveTab}
                 classNames={{
@@ -169,7 +183,7 @@ function _TerrainTab ({
         });
 
         onChangeField('layers', layers);
-        levelCtx.setSelectedTileLayer(layers.length - 1);
+        levelCtx.setActiveTerrainLayer(layers.length - 1);
     }
 
     function handleRenameLayer (
@@ -190,13 +204,13 @@ function _TerrainTab ({
         evt.stopPropagation();
         const layers = [...level.layers];
 
-        let newActiveLayer = levelCtx.selectedTileLayer;
+        let newActiveLayer = levelCtx.activeTerrainLayer;
         if (newActiveLayer >= index) newActiveLayer--;
         newActiveLayer = Math.max(0, newActiveLayer);
 
         deleteArrayItemAt(layers, index)
         onChangeField('layers', layers);
-        levelCtx.setSelectedTileLayer(newActiveLayer);
+        levelCtx.setActiveTerrainLayer(newActiveLayer);
     }
 }
 

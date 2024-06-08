@@ -1,17 +1,21 @@
 import { Graphics, Sprite } from "@pixi/react";
 import { removePositionsFromTileList } from "components/editors/LevelEditor/calculations";
 import { useLevelEditorContext } from "context/useLevelEditorContext";
+import { useSettingsContext } from "context/useSettings";
 import { getTileImagePath } from "elements/TileImage";
 import { Level } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
 import { BaseTexture, Rectangle, SCALE_MODES, Texture, Graphics as PixiGraphics } from "pixi.js";
 import { useMemo } from "react";
-import { Rect, Vec2, vec2toString } from "utils";
+import { Rect, Vec2, vec2equals, vec2toString } from "utils";
+
+const NO_TINT_COLOR = 0xffffff;
 
 export interface CanvasTileInfo {
     key: string;
     position: Vec2;
     texture: Texture;
+    isSelected: boolean;
 }
 export default function useEditorCanvasDrawing (
     pack: ResourcePack,
@@ -21,6 +25,8 @@ export default function useEditorCanvasDrawing (
     canvasSize: Vec2,
 ) {
     const { width, height } = level.settings;
+
+    const settings = useSettingsContext();
     const levelCtx = useLevelEditorContext();
     const zoom = levelCtx.getZoomMultiplier();
     const tileSize = 16 * zoom;
@@ -37,6 +43,7 @@ export default function useEditorCanvasDrawing (
             texture={t.texture}
             alpha={1}
             scale={zoom}
+            tint={t.isSelected ? settings.cssVariables.highlightColors.default : NO_TINT_COLOR}
         />);
 
         const behind = tiles.behind.map(t => <Sprite
@@ -61,8 +68,9 @@ export default function useEditorCanvasDrawing (
     }, [
         tilesInCurrentStroke,
         currentView,
-        levelCtx.selectedTileLayer,
-        levelCtx.terrainGridTool,
+        levelCtx.activeTerrainLayer,
+        levelCtx.terrainTool,
+        levelCtx.tileSelection,
         level.layers.length,
         zoom,
     ]);
@@ -90,15 +98,15 @@ export default function useEditorCanvasDrawing (
 
         for (const tile of pack.tiles) {
           const anim = tile.data.animation;
+          const slices = anim.slices ?? [1, 1];
           // a tile needs slicing if its sprite has more than one frame.
-          const needsSlicing = anim.slices[0] !== 1
-              || anim.slices[1] !== 1;
+          const needsSlicing = slices[0] !== 1 || slices[1] !== 1;
               
             if (needsSlicing) {
                 // select the first frame available
                 const frame = anim.frame ?? anim.frames?.[0] ?? 0;
-                const xFrame = frame % anim.slices[0];
-                const yFrame = Math.floor(frame / anim.slices[0]);
+                const xFrame = frame % slices[0];
+                const yFrame = Math.floor(frame / slices[0]);
                 
                 const baseTex = new BaseTexture(getTileImagePath(pack, tile.data));
                 const tex = new Texture(baseTex, new Rectangle(xFrame * 16, yFrame * 16, 16, 16));
@@ -134,12 +142,12 @@ export default function useEditorCanvasDrawing (
 
         for (let i = 0; i < level.layers.length; i++) {
             const layer = level.layers[i];
-            const isActiveLayer = i === levelCtx.selectedTileLayer;
+            const isActiveLayer = i === levelCtx.activeTerrainLayer;
 
             // reference to the array tiles in this layer will be added to.
             let currentArr = tilesArr;
-            if (i < levelCtx.selectedTileLayer) currentArr = behindArr;
-            if (i > levelCtx.selectedTileLayer) currentArr = infrontArr;
+            if (i < levelCtx.activeTerrainLayer) currentArr = behindArr;
+            if (i > levelCtx.activeTerrainLayer) currentArr = infrontArr;
 
             let layerTiles;
 
@@ -167,20 +175,29 @@ export default function useEditorCanvasDrawing (
                     continue;
                 }
 
-                currentArr.push({
+                const pos = {
+                    x: (tile.position.x * tileSize) - currentView.left,
+                    y: (tile.position.y * tileSize) - currentView.top,
+                };
+
+                const newTile: CanvasTileInfo = {
                     key: i.toString() + "," + vec2toString(tile.position),
-                    position: {
-                        x: (tile.position.x * tileSize) - currentView.left,
-                        y: (tile.position.y * tileSize) - currentView.top,
-                    },
+                    position: pos,
                     texture: tex,
-                });
+                    // this tile is selected if it's in the active layer and its
+                    // position is in the tile selection array.
+                    isSelected: isActiveLayer && levelCtx.tileSelection.findIndex(
+                        p => vec2equals(p, tile.position)
+                    ) !== -1
+                }
+
+                currentArr.push(newTile);
             }
 
             if (isActiveLayer === false) continue;
             if (levelCtx.paint === null) continue;
 
-            if (levelCtx.terrainGridTool === 'brush') {
+            if (levelCtx.terrainTool === 'brush') {
                 for (const tile of tilesInCurrentStroke) {
                     const tex = tileTextures[levelCtx.paint.id];
 
@@ -199,6 +216,7 @@ export default function useEditorCanvasDrawing (
                             y: (tile.y * tileSize) - currentView.top,
                         },
                         texture: tex,
+                        isSelected: false,
                     });
                 }
             }
@@ -215,9 +233,9 @@ export default function useEditorCanvasDrawing (
      * @returns 
      */
     function _doesTerrainToolOverrideActiveLayer () {
-        return levelCtx.terrainGridTool === 'brush'
-            || levelCtx.terrainGridTool === 'rectangle'
-            || levelCtx.terrainGridTool === 'eraser';
+        return levelCtx.terrainTool === 'brush'
+            || levelCtx.terrainTool === 'rectangle'
+            || levelCtx.terrainTool === 'eraser';
     }
 
     function drawGridLines (g: PixiGraphics) {

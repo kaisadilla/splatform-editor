@@ -124,27 +124,29 @@ export default function useEditorCanvas (
     // #region handlers
 
     function handlePointerDown (evt: React.PointerEvent<HTMLCanvasElement>) {
-        const tool = levelCtx.terrainGridTool;
+        const tool = levelCtx.terrainTool;
 
         if (evt.buttons === 1) {
             setBtnDown('left');
             if (tool === 'select') {
-
+                selectTileAtCanvasPos(evt.clientX, evt.clientY);
             }
             else if (tool === 'brush' || tool == 'eraser') {
                 registerPlaceTileClickAt({
                     x: evt.clientX,
                     y: evt.clientY,
                 });
+                levelCtx.cancelSelection();
             }
             else if (tool === 'rectangle') {
-
+                levelCtx.cancelSelection();
             }
             else if (tool === 'bucket') {
                 fillAreaFrom(evt.clientX, evt.clientY, 'fill');
+                levelCtx.cancelSelection();
             }
             else if (tool === 'picker') {
-
+                levelCtx.cancelSelection();
             }
         }
         else if (evt.buttons === 2) {
@@ -157,7 +159,7 @@ export default function useEditorCanvas (
     }
 
     function handlePointerMove (masterEvt: React.PointerEvent<HTMLCanvasElement>) {
-        const tool = levelCtx.terrainGridTool;
+        const tool = levelCtx.terrainTool;
         const coalescedEvts = masterEvt.nativeEvent.getCoalescedEvents();
 
         if (btnDown === 'left') {
@@ -196,10 +198,10 @@ export default function useEditorCanvas (
     function handlePointerUp (evt: PointerEvent) {
         if (btnDown === 'left') {
                     
-            if (levelCtx.terrainGridTool === 'brush') {
+            if (levelCtx.terrainTool === 'brush') {
                 addDrawnTiles(tilesInCurrentStroke);
             }
-            else if (levelCtx.terrainGridTool === 'eraser') {
+            else if (levelCtx.terrainTool === 'eraser') {
                 removeDrawnTiles(tilesInCurrentStroke);
             }
         }
@@ -209,19 +211,32 @@ export default function useEditorCanvas (
     // #endregion
 
     // #region Canvas interactions
+    /**
+     * Selects the tile at the canvas position given.
+     * @param x The x position in the canvas.
+     * @param y The y position in the canvas.
+     */
+    function selectTileAtCanvasPos (x: number, y: number) {
+        const tilePos = canvasPixelToTileGridPos(x, y);
+        if (tilePos === null) return;
+
+        // tile positions can only be selected when they contain a tile.
+        if (getTileAtPos(levelCtx.activeTerrainLayer, tilePos) === null) {
+            return;
+        }
+
+        levelCtx.setTileSelection([tilePos]);
+    }
+    
     function registerPlaceTileClickAt (...positions : Vec2[]) {
         if (canvas === null) return [];
         if (levelCtx.paint === null) return;
 
         setTilesInCurrentStroke(prevState => {
-            const rect = canvas.getBoundingClientRect();
             const placedTiles = [] as Vec2[];
 
             for (const pixelPos of positions) {
-                const tilePos = {
-                    x: Math.floor((pixelPos.x - rect.left + currentView.left) / tileSize),
-                    y: Math.floor((pixelPos.y - rect.top + currentView.top) / tileSize),
-                };
+                const tilePos = canvasPixelToTileGridPos(pixelPos.x, pixelPos.y)!;
     
                 if (prevState.find(lt => vec2equals(lt, tilePos))) {
                     continue;
@@ -244,7 +259,7 @@ export default function useEditorCanvas (
         if (levelCtx.paint === null) return;
 
         let layerTiles = removePositionsFromTileList(
-            level.layers[levelCtx.selectedTileLayer].tiles,
+            level.layers[levelCtx.activeTerrainLayer].tiles,
             tiles
         );
 
@@ -264,8 +279,8 @@ export default function useEditorCanvas (
         }
 
         const update: TileLayer[] = [...level.layers];
-        update[levelCtx.selectedTileLayer] = {
-            ...update[levelCtx.selectedTileLayer],
+        update[levelCtx.activeTerrainLayer] = {
+            ...update[levelCtx.activeTerrainLayer],
             tiles: layerTiles
         }
 
@@ -276,13 +291,13 @@ export default function useEditorCanvas (
 
     function removeDrawnTiles (tiles: Vec2[]) {
         let layerTiles = removePositionsFromTileList(
-            level.layers[levelCtx.selectedTileLayer].tiles,
+            level.layers[levelCtx.activeTerrainLayer].tiles,
             tiles
         );
 
         const update: TileLayer[] = [...level.layers];
-        update[levelCtx.selectedTileLayer] = {
-            ...update[levelCtx.selectedTileLayer],
+        update[levelCtx.activeTerrainLayer] = {
+            ...update[levelCtx.activeTerrainLayer],
             tiles: layerTiles
         }
 
@@ -303,7 +318,7 @@ export default function useEditorCanvas (
 
         const origin = canvasPixelToTileGridPos(x, y);
         if (origin === null) return;
-        const originTile = getTileAtPos(levelCtx.selectedTileLayer, origin)?.tile;
+        const originTile = getTileAtPos(levelCtx.activeTerrainLayer, origin)?.tile;
 
         const placedTiles = [] as Vec2[];
         const fillStack = [origin];
@@ -316,7 +331,7 @@ export default function useEditorCanvas (
                 continue;
             }
             // the tile in this position is different, so we don't spill into it.
-            if (getTileAtPos(levelCtx.selectedTileLayer, pos)?.tile !== originTile) {
+            if (getTileAtPos(levelCtx.activeTerrainLayer, pos)?.tile !== originTile) {
                 continue;
             }
             // the tile in this position was already iterated over.
@@ -341,6 +356,13 @@ export default function useEditorCanvas (
         }
     }
 
+    /**
+     * Given a pixel position in the canvas, returns the position in the tile
+     * grid to which it corresponds.
+     * @param x The x position in the canvas.
+     * @param y The x position in the canvas.
+     * @returns The position in the tile grid, or null if the canvas is null.
+     */
     function canvasPixelToTileGridPos (x: number, y: number) : Vec2 | null {
         if (canvas === null) return null;
         const rect = canvas.getBoundingClientRect();
@@ -352,7 +374,7 @@ export default function useEditorCanvas (
     }
 
     function getTileAtPos (layerIndex: number, pos: Vec2) : LevelTile | null {
-        return level.layers[levelCtx.selectedTileLayer].tiles.find(
+        return level.layers[levelCtx.activeTerrainLayer].tiles.find(
             t => vec2equals(t.position, pos)
         ) ?? null;
     }
