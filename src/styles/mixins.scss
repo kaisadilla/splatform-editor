@@ -46,8 +46,8 @@
 
 @mixin center-content () {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: safe center;
+    align-items: safe center;
 }
 
 @mixin center-vertically () {

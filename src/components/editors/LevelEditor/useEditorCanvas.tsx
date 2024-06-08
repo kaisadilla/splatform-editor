@@ -139,7 +139,7 @@ export default function useEditorCanvas (
 
             }
             else if (tool === 'bucket') {
-
+                fillAreaFrom(evt.clientX, evt.clientY, 'fill');
             }
             else if (tool === 'picker') {
 
@@ -147,6 +147,10 @@ export default function useEditorCanvas (
         }
         else if (evt.buttons === 2) {
             setBtnDown('right');
+
+            if (tool === 'bucket') {
+                fillAreaFrom(evt.clientX, evt.clientY, 'unfill');
+            }
         }
     }
 
@@ -182,16 +186,19 @@ export default function useEditorCanvas (
 
             }
         }
+        else if (btnDown === 'right') {
+
+        }
     }
 
     function handlePointerUp (evt: PointerEvent) {
         if (btnDown === 'left') {
                     
             if (levelCtx.selectedGridTool === 'brush') {
-                addDrawnTiles();
+                addDrawnTiles(tilesInCurrentStroke);
             }
             else if (levelCtx.selectedGridTool === 'eraser') {
-                removeDrawnTiles();
+                removeDrawnTiles(tilesInCurrentStroke);
             }
         }
 
@@ -231,16 +238,16 @@ export default function useEditorCanvas (
         });
     }
 
-    function addDrawnTiles () {
+    function addDrawnTiles (tiles: Vec2[]) {
         if (levelCtx.selectedPaint === null) return;
 
         let layerTiles = removePositionsFromTileList(
             level.layers[levelCtx.selectedTileLayer].tiles,
-            tilesInCurrentStroke
+            tiles
         );
 
         const addedPositions = new Set<string>();
-        for (const t of tilesInCurrentStroke) {
+        for (const t of tiles) {
             if (addedPositions.has(vec2toString(t))) {
                 continue;
             }
@@ -265,10 +272,10 @@ export default function useEditorCanvas (
         setTilesInCurrentStroke([]);
     }
 
-    function removeDrawnTiles () {
+    function removeDrawnTiles (tiles: Vec2[]) {
         let layerTiles = removePositionsFromTileList(
             level.layers[levelCtx.selectedTileLayer].tiles,
-            tilesInCurrentStroke
+            tiles
         );
 
         const update: TileLayer[] = [...level.layers];
@@ -280,6 +287,72 @@ export default function useEditorCanvas (
         onChangeField('layers', update);
 
         setTilesInCurrentStroke([]);
+    }
+
+    /**
+     * Fills an area with the selected paint. The origin of this fill is calculated
+     * from the point in the canvas given. This is the bucket's functionality.
+     * @param x The x position in the canvas.
+     * @param y The y position in the canvas.
+     */
+    function fillAreaFrom (x: number, y: number, fillMode: 'fill' | 'unfill') {
+        if (canvas === null) return;
+        if (levelCtx.selectedPaint === null) return;
+
+        const origin = canvasPixelToTileGridPos(x, y);
+        if (origin === null) return;
+        const originTile = getTileAtPos(levelCtx.selectedTileLayer, origin)?.tile;
+
+        const placedTiles = [] as Vec2[];
+        const fillStack = [origin];
+
+        while (fillStack.length > 0) {
+            const pos = fillStack.pop()!;
+
+            // these coordinates are outside the level.
+            if (pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) {
+                continue;
+            }
+            // the tile in this position is different, so we don't spill into it.
+            if (getTileAtPos(levelCtx.selectedTileLayer, pos)?.tile !== originTile) {
+                continue;
+            }
+            // the tile in this position was already iterated over.
+            if (placedTiles.find(pt => vec2equals(pt, pos))) {
+                continue;
+            }
+
+            placedTiles.push(pos);
+
+            fillStack.push({x: pos.x + 1, y: pos.y});
+            fillStack.push({x: pos.x - 1, y: pos.y});
+            fillStack.push({x: pos.x, y: pos.y + 1});
+            fillStack.push({x: pos.x, y: pos.y - 1});
+        }
+
+        // replacing tiles
+        if (fillMode === 'fill') {
+            addDrawnTiles(placedTiles);
+        }
+        else if (fillMode === 'unfill') {
+            removeDrawnTiles(placedTiles);
+        }
+    }
+
+    function canvasPixelToTileGridPos (x: number, y: number) : Vec2 | null {
+        if (canvas === null) return null;
+        const rect = canvas.getBoundingClientRect();
+
+        return {
+            x: Math.floor((x - rect.left + currentView.left) / 16),
+            y: Math.floor((y - rect.top + currentView.top) / 16),
+        };
+    }
+
+    function getTileAtPos (layerIndex: number, pos: Vec2) : LevelTile | null {
+        return level.layers[levelCtx.selectedTileLayer].tiles.find(
+            t => vec2equals(t.position, pos)
+        ) ?? null;
     }
 
     // #endregion

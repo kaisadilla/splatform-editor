@@ -6,6 +6,7 @@
 @import "elements/action-bar";
 @import "elements/activatable-text-input";
 @import "elements/asset-image";
+@import "elements/asset-input";
 @import "elements/drag-region";
 @import "elements/resizable-panel";
 @import "elements/tab-ribbon";
@@ -42,3 +43,10 @@
 .invert-color {
     filter: invert(1);
 }
+
+$rhap_theme-color: $color-highlight;       // Color of all buttons and volume/progress indicators
+$rhap_background-color: $color-background; // Color of the player background
+$rhap_bar-color: $color-component-2;       // Color of volume and progress bar
+$rhap_time-color: $color-text;             // Font color of current time and duration
+$rhap_font-family: inherit !default;       // Font family of current time and duration
+@import 'react-h5-audio-player/src/styles.scss';

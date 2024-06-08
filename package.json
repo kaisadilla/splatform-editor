@@ -123,6 +123,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
+    "react-h5-audio-player": "^3.9.1",
     "react-headless-tabs": "^6.0.4",
     "react-material-symbols": "^4.4.0",
     "react-resizable-panels": "^2.0.19",

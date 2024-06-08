@@ -10,7 +10,7 @@ import { UserContextProvider } from 'context/useUserContext';
 import loader from '@monaco-editor/loader';
 import * as monaco from 'monaco-editor';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowPointer, faBrush, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowPointer, faBrush, faCirclePlay, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
 
 import '@mantine/core/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -37,6 +37,10 @@ export default function App () {
         shadows: new Array(25).fill("none") as Shadows
     })
 
+    const mantineTheme = createMantineTheme({
+
+    })
+
     loader.config({ monaco });
     loader.init().then(monacoInstance => { /* ... */ });
 
@@ -44,7 +48,7 @@ export default function App () {
     
     return (
         <ThemeProvider theme={muiTheme}>
-        <MantineProvider>
+        <MantineProvider theme={mantineTheme}>
 
         <AppContextProvider>
         <UserContextProvider>
@@ -75,5 +79,6 @@ function initFontAwesome () {
         faFillDrip,
         faPaintbrush,
         faUpDownLeftRight,
+        faCirclePlay,
     );
 }

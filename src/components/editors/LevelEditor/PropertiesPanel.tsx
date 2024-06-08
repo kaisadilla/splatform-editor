@@ -1,5 +1,7 @@
 import { Accordion, CloseButton, Input, NumberInput, Select, TextInput, Tooltip } from '@mantine/core';
 import { useAppContext } from 'context/useAppContext';
+import BackgroundAssetInput from 'elements/BackgroundAssetInput';
+import MusicAssetInput from 'elements/MusicAssetInput';
 import { Level, LevelSettings } from 'models/Level';
 import React, { useState } from 'react';
 import CSS_CLASSES from 'sp_css_classes';
@@ -88,21 +90,17 @@ function LevelEditor_PropertiesPanel ({
                             allowNegative={false}
                             onChange={handleHeightChange}
                         />
-                        <TextInput
-                            size='sm'
+                        <BackgroundAssetInput
                             label="Background"
+                            pack={level.resourcePack}
                             value={level.settings.background}
-                            onChange={evt => handleSettingsValue(
-                                'background', evt.currentTarget.value
-                            )}
+                            onSelectValue={v => handleSettingsValue('background', v)}
                         />
-                        <TextInput
-                            size='sm'
+                        <MusicAssetInput
                             label="Music"
+                            pack={level.resourcePack}
                             value={level.settings.music}
-                            onChange={evt => handleSettingsValue(
-                                'music', evt.currentTarget.value
-                            )}
+                            onSelectValue={v => handleSettingsValue('music', v)}
                         />
                         <NumberInput
                             size='sm'
