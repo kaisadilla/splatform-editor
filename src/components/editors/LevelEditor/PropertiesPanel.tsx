@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion, CloseButton, Input, NumberInput, Select, TextInput, Tooltip } from '@mantine/core';
 import { useAppContext } from 'context/useAppContext';
 import BackgroundAssetInput from 'elements/BackgroundAssetInput';
@@ -58,9 +59,7 @@ function LevelEditor_PropertiesPanel ({
                             value={level.resourcePack}
                             onChange={v => onChangeResourcePack(v)}
                             allowDeselect={false}
-                            comboboxProps={{
-                                offset: -1,
-                            }}
+                            rightSection={<FontAwesomeIcon icon='chevron-down' />}
                         />
                         <TextInput
                             size='sm'

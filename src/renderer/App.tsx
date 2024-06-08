@@ -10,7 +10,7 @@ import { UserContextProvider } from 'context/useUserContext';
 import loader from '@monaco-editor/loader';
 import * as monaco from 'monaco-editor';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowPointer, faBrush, faCirclePlay, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowPointer, faBrush, faChevronDown, faCirclePlay, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
 
 import '@mantine/core/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -38,7 +38,16 @@ export default function App () {
     })
 
     const mantineTheme = createMantineTheme({
-
+        components: {
+            Select: {
+                defaultProps: {
+                    comboboxProps: {
+                        // Remove space between select control and dropdown.
+                        offset: -1,
+                    }
+                }
+            }
+        }
     })
 
     loader.config({ monaco });
@@ -72,6 +81,8 @@ export default function App () {
 function initFontAwesome () {
     library.add(
         faArrowPointer,
+        faChevronDown,
+        faCirclePlay,
         faEraser,
         faExpand,
         faEyeDropper,
@@ -79,6 +90,5 @@ function initFontAwesome () {
         faFillDrip,
         faPaintbrush,
         faUpDownLeftRight,
-        faCirclePlay,
     );
 }

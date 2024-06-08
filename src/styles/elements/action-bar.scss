@@ -34,5 +34,25 @@
             background-color: $color-component-3;
             margin: 0 6px;
         }
+
+        > .sp-input {
+            .sp-action-bar-input-root {
+                @include horizontal-gallery;
+                gap: 6px;
+                padding: 8px;
+
+                .sp-action-bar-input-label {
+                    font-size: 9pt;
+                }
+
+                .sp-action-bar-input-wrapper {
+                    width: 72px;
+                    
+                    .sp-action-bar-input-input {
+                        font-size: 10pt;
+                    }
+                }
+            }
+        }
     }
 }

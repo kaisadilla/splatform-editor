@@ -61,7 +61,7 @@ function _GridTools ({
 }: _GridToolsProps) {
     const levelCtx = useLevelEditorContext();
 
-    const { selectedPaint } = useLevelEditorContext();
+    const { paint: selectedPaint } = useLevelEditorContext();
 
     const buttons: ToolbarButton<GridTool>[] = [
         {
@@ -114,8 +114,8 @@ function _GridTools ({
             </div>
             <Toolbar<GridTool>
                 direction='vertical'
-                selectedValue={levelCtx.selectedGridTool}
-                onSelectButton={levelCtx.setSelectedGridTool}
+                selectedValue={levelCtx.terrainGridTool}
+                onSelectButton={levelCtx.setTerrainGridTool}
                 buttons={buttons}
             />
         </div>

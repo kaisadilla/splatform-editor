@@ -22,6 +22,8 @@ export default function useEditorCanvasDrawing (
 ) {
     const { width, height } = level.settings;
     const levelCtx = useLevelEditorContext();
+    const zoom = levelCtx.getZoomMultiplier();
+    const tileSize = 16 * zoom;
 
     const tileTextures = useMemo(buildTileTextures, [pack.folderName, pack.tiles]);
 
@@ -34,7 +36,7 @@ export default function useEditorCanvasDrawing (
             y={t.position.y}
             texture={t.texture}
             alpha={1}
-            scale={1}
+            scale={zoom}
         />);
 
         const behind = tiles.behind.map(t => <Sprite
@@ -43,7 +45,7 @@ export default function useEditorCanvasDrawing (
             y={t.position.y}
             texture={t.texture}
             alpha={0.5}
-            scale={1}
+            scale={zoom}
         />);
 
         const infront = tiles.infront.map(t => <Sprite
@@ -52,7 +54,7 @@ export default function useEditorCanvasDrawing (
             y={t.position.y}
             texture={t.texture}
             alpha={0.5}
-            scale={1}
+            scale={zoom}
         />);
 
         return [active, behind, infront];
@@ -60,8 +62,9 @@ export default function useEditorCanvasDrawing (
         tilesInCurrentStroke,
         currentView,
         levelCtx.selectedTileLayer,
-        levelCtx.selectedGridTool,
+        levelCtx.terrainGridTool,
         level.layers.length,
+        zoom,
     ]);
 
     const $gridLines = <Graphics draw={drawGridLines} alpha={0.4} />
@@ -167,23 +170,23 @@ export default function useEditorCanvasDrawing (
                 currentArr.push({
                     key: i.toString() + "," + vec2toString(tile.position),
                     position: {
-                        x: (tile.position.x * 16) - currentView.left,
-                        y: (tile.position.y * 16) - currentView.top,
+                        x: (tile.position.x * tileSize) - currentView.left,
+                        y: (tile.position.y * tileSize) - currentView.top,
                     },
                     texture: tex,
                 });
             }
 
             if (isActiveLayer === false) continue;
-            if (levelCtx.selectedPaint === null) continue;
+            if (levelCtx.paint === null) continue;
 
-            if (levelCtx.selectedGridTool === 'brush') {
+            if (levelCtx.terrainGridTool === 'brush') {
                 for (const tile of tilesInCurrentStroke) {
-                    const tex = tileTextures[levelCtx.selectedPaint.id];
+                    const tex = tileTextures[levelCtx.paint.id];
 
                     if (!tex) {
                         console.warn(
-                            `Couldn't find texture for '${levelCtx.selectedPaint.id}'`,
+                            `Couldn't find texture for '${levelCtx.paint.id}'`,
                             tileTextures
                         );
                         continue;
@@ -192,8 +195,8 @@ export default function useEditorCanvasDrawing (
                     currentArr.push({
                         key: vec2toString(tile),
                         position: {
-                            x: (tile.x * 16) - currentView.left,
-                            y: (tile.y * 16) - currentView.top,
+                            x: (tile.x * tileSize) - currentView.left,
+                            y: (tile.y * tileSize) - currentView.top,
                         },
                         texture: tex,
                     });
@@ -212,25 +215,25 @@ export default function useEditorCanvasDrawing (
      * @returns 
      */
     function _doesTerrainToolOverrideActiveLayer () {
-        return levelCtx.selectedGridTool === 'brush'
-            || levelCtx.selectedGridTool === 'rectangle'
-            || levelCtx.selectedGridTool === 'eraser';
+        return levelCtx.terrainGridTool === 'brush'
+            || levelCtx.terrainGridTool === 'rectangle'
+            || levelCtx.terrainGridTool === 'eraser';
     }
 
     function drawGridLines (g: PixiGraphics) {
-        const xFirst = 1 - (currentView.left) % 16; // + 1 for line alignment
-        const yFirst = 0 - (currentView.top % 16);
+        const xFirst = 1 - (currentView.left) % tileSize; // + 1 for line alignment
+        const yFirst = 0 - (currentView.top % tileSize);
 
         g.clear();
         g.beginFill(0xff3300);
         //g.lineStyle(1, 0xff3300, 0.5);
         g.lineStyle(1, 0x000000, 1);
 
-        for (let x = xFirst; x < canvasSize.x; x += 16) {
+        for (let x = xFirst; x < canvasSize.x; x += tileSize) {
             g.moveTo(x, 0);
             g.lineTo(x, canvasSize.y);
         }
-        for (let y = yFirst; y < canvasSize.y; y += 16) {
+        for (let y = yFirst; y < canvasSize.y; y += tileSize) {
             g.moveTo(0, y);
             g.lineTo(canvasSize.x, y);
         }

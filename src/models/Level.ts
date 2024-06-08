@@ -59,7 +59,7 @@ export function getNewLevel () : Level {
         },
         settings: {
             width: 128,
-            height: 32,
+            height: 16,
             background: 'default_0',
             music: 'overworld',
             time: 300,

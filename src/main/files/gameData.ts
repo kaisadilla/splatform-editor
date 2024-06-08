@@ -64,8 +64,8 @@ async function _readResourcePackFolder (path: string, folderName: string)
     const spriteTileFiles = await _scandirForFileType(path + "/sprites/tiles", ".png");
     const spriteUiFiles = await _scandirForFileType(path + "/sprites/ui", ".png");
 
-    const entityFiles = await _scandirForFileType(path + "/entities", ".spr-ent");
-    const tileFiles = await _scandirForFileType(path + "/tiles", ".spr-til");
+    const entityFiles = await _scandirForFileType(path + "/data/entities", ".spr-ent");
+    const tileFiles = await _scandirForFileType(path + "/data/tiles", ".spr-til");
 
     const entityMetadata = [] as DataAssetMetadata<Entity>[];
     const tileMetadata = [] as DataAssetMetadata<Tile>[];

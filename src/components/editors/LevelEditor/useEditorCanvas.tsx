@@ -25,6 +25,8 @@ export default function useEditorCanvas (
     const { width, height } = level.settings;
 
     const levelCtx = useLevelEditorContext();
+    const zoom = levelCtx.getZoomMultiplier();
+    const tileSize = 16 * zoom;
 
     const [btnDown, setBtnDown] = useState<'left' | 'right' | null>(null);
 
@@ -122,7 +124,7 @@ export default function useEditorCanvas (
     // #region handlers
 
     function handlePointerDown (evt: React.PointerEvent<HTMLCanvasElement>) {
-        const tool = levelCtx.selectedGridTool;
+        const tool = levelCtx.terrainGridTool;
 
         if (evt.buttons === 1) {
             setBtnDown('left');
@@ -155,7 +157,7 @@ export default function useEditorCanvas (
     }
 
     function handlePointerMove (masterEvt: React.PointerEvent<HTMLCanvasElement>) {
-        const tool = levelCtx.selectedGridTool;
+        const tool = levelCtx.terrainGridTool;
         const coalescedEvts = masterEvt.nativeEvent.getCoalescedEvents();
 
         if (btnDown === 'left') {
@@ -194,10 +196,10 @@ export default function useEditorCanvas (
     function handlePointerUp (evt: PointerEvent) {
         if (btnDown === 'left') {
                     
-            if (levelCtx.selectedGridTool === 'brush') {
+            if (levelCtx.terrainGridTool === 'brush') {
                 addDrawnTiles(tilesInCurrentStroke);
             }
-            else if (levelCtx.selectedGridTool === 'eraser') {
+            else if (levelCtx.terrainGridTool === 'eraser') {
                 removeDrawnTiles(tilesInCurrentStroke);
             }
         }
@@ -209,7 +211,7 @@ export default function useEditorCanvas (
     // #region Canvas interactions
     function registerPlaceTileClickAt (...positions : Vec2[]) {
         if (canvas === null) return [];
-        if (levelCtx.selectedPaint === null) return;
+        if (levelCtx.paint === null) return;
 
         setTilesInCurrentStroke(prevState => {
             const rect = canvas.getBoundingClientRect();
@@ -217,8 +219,8 @@ export default function useEditorCanvas (
 
             for (const pixelPos of positions) {
                 const tilePos = {
-                    x: Math.floor((pixelPos.x - rect.left + currentView.left) / 16),
-                    y: Math.floor((pixelPos.y - rect.top + currentView.top) / 16),
+                    x: Math.floor((pixelPos.x - rect.left + currentView.left) / tileSize),
+                    y: Math.floor((pixelPos.y - rect.top + currentView.top) / tileSize),
                 };
     
                 if (prevState.find(lt => vec2equals(lt, tilePos))) {
@@ -239,7 +241,7 @@ export default function useEditorCanvas (
     }
 
     function addDrawnTiles (tiles: Vec2[]) {
-        if (levelCtx.selectedPaint === null) return;
+        if (levelCtx.paint === null) return;
 
         let layerTiles = removePositionsFromTileList(
             level.layers[levelCtx.selectedTileLayer].tiles,
@@ -257,7 +259,7 @@ export default function useEditorCanvas (
 
             layerTiles.push({
                 position: t,
-                tile: levelCtx.selectedPaint.id,
+                tile: levelCtx.paint.id,
             })
         }
 
@@ -297,7 +299,7 @@ export default function useEditorCanvas (
      */
     function fillAreaFrom (x: number, y: number, fillMode: 'fill' | 'unfill') {
         if (canvas === null) return;
-        if (levelCtx.selectedPaint === null) return;
+        if (levelCtx.paint === null) return;
 
         const origin = canvasPixelToTileGridPos(x, y);
         if (origin === null) return;
@@ -344,8 +346,8 @@ export default function useEditorCanvas (
         const rect = canvas.getBoundingClientRect();
 
         return {
-            x: Math.floor((x - rect.left + currentView.left) / 16),
-            y: Math.floor((y - rect.top + currentView.top) / 16),
+            x: Math.floor((x - rect.left + currentView.left) / tileSize),
+            y: Math.floor((y - rect.top + currentView.top) / tileSize),
         };
     }
 

@@ -1,11 +1,12 @@
-import { ScrollArea, Tooltip } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { NumberInput, NumberInputProps, ScrollArea, Select, SelectProps, Tooltip, useProps } from '@mantine/core';
 import { ImageIconCollection, ToolIcons1_5x, ToolIcons1x, ToolIcons2x, ToolIconsBig } from 'icons';
 import React from 'react';
 import { DivProps } from 'types';
 import { getClassString } from 'utils';
 
 export interface ActionBarElement {
-    type: 'button' | 'toggle' | 'separator',
+    type: 'button' | 'toggle' | 'separator' | 'number' | 'custom' | 'select',
 }
 
 export interface ActionBarButton extends ActionBarElement {
@@ -23,8 +24,31 @@ export interface ActionBarToggle extends ActionBarElement {
     onToggle: (val: boolean) => void;
 }
 
+export interface ActionBarNumberInput extends ActionBarElement {
+    type: 'number';
+    label: string;
+    tooltipLabel?: string;
+    value: string | number;
+    onChange: (val: string | number) => void;
+    numberInputProps?: NumberInputProps;
+}
+
+export interface ActionBarSelectInput extends ActionBarElement {
+    type: 'select';
+    label: string;
+    tooltipLabel?: string;
+    value: string;
+    onChange: (val: string) => void;
+    selectProps?: SelectProps;
+}
+
 export interface ActionBarSeparator extends ActionBarElement {
     type: 'separator';
+}
+
+export interface ActionBarCustomElement extends ActionBarElement {
+    type: 'custom';
+    element: React.ReactNode;
 }
 
 export interface ActionBarProps extends DivProps {
@@ -58,6 +82,15 @@ function ActionBar ({
                     if (el.type === 'toggle') return <_Toggle
                         {...el as ActionBarToggle}
                     />
+                    if (el.type === 'number') return <_NumberInput
+                        {...el as ActionBarNumberInput}
+                    />
+                    if (el.type === 'select') return <_SelectInput
+                        {...el as ActionBarSelectInput}
+                    />
+                    if (el.type === 'custom') return (
+                        (el as ActionBarCustomElement).element
+                    )
                 })}
             </div>
         </ScrollArea>
@@ -122,5 +155,92 @@ function _Toggle ({
     );
 }
 
+function _NumberInput ({
+    label,
+    tooltipLabel,
+    value,
+    onChange,
+    numberInputProps = {},
+}: ActionBarNumberInput) {
+    const className = getClassString(
+        "sp-input",
+    );
+
+    const $input = (
+        <div className={className}>
+            <NumberInput
+                classNames={{
+                    root: "sp-action-bar-input-root",
+                    wrapper: "sp-action-bar-input-wrapper",
+                    input: "sp-action-bar-input-input",
+                    label: "sp-action-bar-input-label",
+                }}
+                label={label}
+                value={value}
+                onChange={onChange}
+                size='xs'
+                {...numberInputProps}
+            />
+        </div>
+    )
+
+    if (tooltipLabel) {
+        return (
+            <Tooltip label={tooltipLabel}>
+                {$input}
+            </Tooltip>
+        );
+    }
+    else {
+        return $input;
+    }
+}
+
+function _SelectInput ({
+    label,
+    tooltipLabel,
+    value,
+    onChange,
+    selectProps = {},
+}: ActionBarSelectInput) {
+    const className = getClassString(
+        "sp-input",
+    );
+
+    const $input = (
+        <div className={className}>
+            <Select
+                classNames={{
+                    root: "sp-action-bar-input-root",
+                    wrapper: "sp-action-bar-input-wrapper",
+                    input: "sp-action-bar-input-input",
+                    label: "sp-action-bar-input-label",
+                }}
+                label={label}
+                value={value}
+                onChange={v => {if (v) onChange(v)}}
+                allowDeselect={false}
+                size='xs'
+                maxDropdownHeight={"70vh"}
+                comboboxProps={{
+                    size: 'sm',
+                    offset: -1,
+                }}
+                {...selectProps}
+            />
+        </div>
+    )
+
+    if (tooltipLabel) {
+        return (
+            <Tooltip label={tooltipLabel}>
+                {$input}
+            </Tooltip>
+        );
+    }
+    else {
+        return $input;
+    }
+}
 
 export default ActionBar;

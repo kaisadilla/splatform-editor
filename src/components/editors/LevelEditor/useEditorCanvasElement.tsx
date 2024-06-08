@@ -1,3 +1,4 @@
+import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { Level } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -14,6 +15,10 @@ export default function useEditorCanvasElement (
 ) {
     const { width, height } = level.settings;
 
+    const levelCtx = useLevelEditorContext();
+    const zoom = levelCtx.getZoomMultiplier();
+    const tileSize = 16 * zoom;
+
     const viewboxRef = useRef<HTMLDivElement | null>(null);
     const scrollareaRef = useRef<HTMLDivElement | null>(null);
 
@@ -26,15 +31,15 @@ export default function useEditorCanvasElement (
     useEffect(() => {
         const observer = handleContainerResize();
         return () => observer?.disconnect();
-    }, [viewboxRef.current]);
+    }, [viewboxRef.current, zoom]);
 
     // respond to changes in the dimensions of the viewbox, or the map itself.
     useEffect(() => {
         recalculateCanvasInfo();
-    }, [viewBox, width, height]);
+    }, [viewBox, width, height, zoom]);
 
-    const $horizRule = useMemo(buildHorizontalRuler, [width]);
-    const $vertRule = useMemo(buildVerticalRuler, [height]);
+    const $horizRule = useMemo(buildHorizontalRuler, [width, zoom]);
+    const $vertRule = useMemo(buildVerticalRuler, [height, zoom]);
 
 
     return {
@@ -92,8 +97,8 @@ export default function useEditorCanvasElement (
         let cWidth = viewBox.width - RULER_WIDTH - SCROLL_WIDTH - VIEW_PADDING;
         let cHeight = viewBox.height - RULER_WIDTH - SCROLL_HEIGHT - VIEW_PADDING;
 
-        cWidth = Math.min(width * 16, cWidth);
-        cHeight = Math.min(height * 16, cHeight);
+        cWidth = Math.min(width * tileSize, cWidth);
+        cHeight = Math.min(height * tileSize, cHeight);
 
         setCanvasSize({x: cWidth, y: cHeight});
         recalculateView(currentView.left, currentView.top);
@@ -132,7 +137,15 @@ export default function useEditorCanvasElement (
         const arr = [];
 
         for (let x = 0; x < width; x++) {
-            arr.push(<div key={x} className="ruler-item">{x}</div>);
+            arr.push(<div
+                key={x}
+                className="ruler-item"
+                style={{
+                    width: tileSize,
+                }}
+            >
+                {x}
+            </div>);
         }
 
         return arr;
@@ -146,7 +159,15 @@ export default function useEditorCanvasElement (
         const arr = [];
 
         for (let y = 0; y < height; y++) {
-            arr.push(<div key={y} className="ruler-item">{y}</div>);
+            arr.push(<div
+                key={y}
+                className="ruler-item"
+                style={{
+                    height: tileSize,
+                }}
+            >
+                {y}
+            </div>);
         }
 
         return arr;

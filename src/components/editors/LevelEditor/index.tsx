@@ -11,8 +11,9 @@ import LevelEditor_TilesPalette from './TilesPalette';
 import { useAppContext } from 'context/useAppContext';
 import { useUserContext } from 'context/useUserContext';
 import LevelEditor_Content from './Content';
-import { useLevelEditorContext } from 'context/useLevelEditorContext';
-import ActionBar, { ActionBarButton, ActionBarElement, ActionBarToggle } from 'elements/ActionBar';
+import { ZoomLevel, useLevelEditorContext } from 'context/useLevelEditorContext';
+import ActionBar, { ActionBarButton, ActionBarCustomElement, ActionBarElement, ActionBarNumberInput, ActionBarSelectInput, ActionBarToggle } from 'elements/ActionBar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export interface LevelEditorProps {
     doc: SPDocument;
@@ -80,6 +81,25 @@ function LevelEditor ({
             value: levelCtx.showGrid,
             onToggle: levelCtx.setShowGrid,
         } as ActionBarToggle,
+        {
+            type: 'select',
+            label: "Zoom",
+            value: levelCtx.zoom,
+            onChange: v => levelCtx.setZoom(v as ZoomLevel),
+            selectProps: {
+                data: [
+                    { value: '0.25', label: "0.25x"},
+                    { value: '0.5', label: "0.5x"},
+                    { value: '1', label: "1x"},
+                    { value: '2', label: "2x"},
+                    { value: '3', label: "3x"},
+                    { value: '4', label: "4x"},
+                    { value: '6', label: "6x"},
+                    { value: '8', label: "8x"},
+                ] as {value: ZoomLevel, label: string}[],
+                rightSection: <FontAwesomeIcon icon='chevron-down' />
+            }
+        } as ActionBarSelectInput,
     ]
 
     return (
@@ -150,22 +170,22 @@ function LevelEditor ({
         const selectable = levelCtx.getSelectableGridTools();
 
         if (evt.key.toLowerCase() === 'm' && selectable.includes('select')) {
-            levelCtx.setSelectedGridTool('select');
+            levelCtx.setTerrainGridTool('select');
         }
         if (evt.key.toLowerCase() === 'b' && selectable.includes('brush')) {
-            levelCtx.setSelectedGridTool('brush');
+            levelCtx.setTerrainGridTool('brush');
         }
         if (evt.key.toLowerCase() === 'r' && selectable.includes('rectangle')) {
-            levelCtx.setSelectedGridTool('rectangle');
+            levelCtx.setTerrainGridTool('rectangle');
         }
         if (evt.key.toLowerCase() === 'e' && selectable.includes('eraser')) {
-            levelCtx.setSelectedGridTool('eraser');
+            levelCtx.setTerrainGridTool('eraser');
         }
         if (evt.key.toLowerCase() === 'g' && selectable.includes('bucket')) {
-            levelCtx.setSelectedGridTool('bucket');
+            levelCtx.setTerrainGridTool('bucket');
         }
         if (evt.key.toLowerCase() === 'i' && selectable.includes('picker')) {
-            levelCtx.setSelectedGridTool('picker');
+            levelCtx.setTerrainGridTool('picker');
         }
 
     }

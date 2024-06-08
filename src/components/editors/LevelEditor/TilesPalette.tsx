@@ -14,7 +14,7 @@ export interface LevelEditor_TilesPaletteProps {
 function LevelEditor_TilesPalette ({
     pack,
 }: LevelEditor_TilesPaletteProps) {
-    const { selectedPaint, setSelectedPaint } = useLevelEditorContext();
+    const { paint: selectedPaint, setPaint: setSelectedPaint } = useLevelEditorContext();
     const { getResourcePack } = useAppContext();
 
     if (pack === null) {
