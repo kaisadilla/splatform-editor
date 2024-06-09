@@ -256,7 +256,7 @@
         .header {
             font-weight: $w-semibold;
             font-style: italic;
-            padding: 0 1rem;
+            padding: 0 0.75rem;
             color: $color-text-2;
 
             &::before {
@@ -274,7 +274,7 @@
             flex: 1;
 
             .property-container {
-                padding: 5px 1rem;
+                padding: 5px 1.5rem;
 
                 &:hover {
                     background-color: $color-component-1;

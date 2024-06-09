@@ -1,4 +1,4 @@
-import { BlockRegenerationMode, Parameter, PlayerDamageType, RewardTypeParameterValue, Trait } from "models/SPlatform";
+import { BlockRegenerationMode, Parameter, PlayerDamageType, RewardTypeParameter, Trait } from "models/SPlatform";
 
 const TileTraits: TileTraitCollection = {
     background: {
@@ -87,44 +87,6 @@ const TileTraits: TileTraitCollection = {
                 nullable: true,
                 type: 'tileOrEntityReference',
                 defaultValue: null
-            },
-        }
-    },
-    cloudBlock: {
-        id: 'cloudBlock',
-        displayName: "Cloud block",
-        parameters: {
-            collideFromTop: {
-                id: 'collideFromTop',
-                displayName: "Collide from top",
-                description: "Entities can stand in this tile.",
-                nullable: false,
-                type: 'boolean',
-                defaultValue: true
-            },
-            collideFromBottom: {
-                id: 'collideFromBottom',
-                displayName: "Collide from bottom",
-                description: "Entities collide with this tile's bottom side.",
-                nullable: false,
-                type: 'boolean',
-                defaultValue: true
-            },
-            collideFromLeft: {
-                id: 'collideFromLeft',
-                displayName: "Collide from left",
-                description: "Entities collide with this tile's left side.",
-                nullable: false,
-                type: 'boolean',
-                defaultValue: true
-            },
-            collideFromRight: {
-                id: 'collideFromRight',
-                displayName: "Collide from right",
-                description: "Entities collide with this tile's right side.",
-                nullable: false,
-                type: 'boolean',
-                defaultValue: true
             },
         }
     },
@@ -222,6 +184,44 @@ const TileTraits: TileTraitCollection = {
             },
         }
     },
+    platform: {
+        id: 'platform',
+        displayName: "Platform",
+        parameters: {
+            collideFromTop: {
+                id: 'collideFromTop',
+                displayName: "Collide from top",
+                description: "Entities can stand in this tile.",
+                nullable: false,
+                type: 'boolean',
+                defaultValue: true
+            },
+            collideFromBottom: {
+                id: 'collideFromBottom',
+                displayName: "Collide from bottom",
+                description: "Entities collide with this tile's bottom side.",
+                nullable: false,
+                type: 'boolean',
+                defaultValue: true
+            },
+            collideFromLeft: {
+                id: 'collideFromLeft',
+                displayName: "Collide from left",
+                description: "Entities collide with this tile's left side.",
+                nullable: false,
+                type: 'boolean',
+                defaultValue: true
+            },
+            collideFromRight: {
+                id: 'collideFromRight',
+                displayName: "Collide from right",
+                description: "Entities collide with this tile's right side.",
+                nullable: false,
+                type: 'boolean',
+                defaultValue: true
+            },
+        }
+    },
     rewardBlock: {
         id: 'block',
         displayName: "Reward block",
@@ -271,7 +271,7 @@ const TileTraits: TileTraitCollection = {
                 displayName: "Time active (s)",
                 description: "The time it takes this tile to become empty after being hit for the first time.",
                 nullable: false,
-                type: 'integer',
+                type: 'float',
                 defaultValue: 1
             },
             waitForFinalHitBeforeBecomingEmpty: {
@@ -383,8 +383,8 @@ export type TileTraitCollection = {
     background: Trait<BackgroundTileTraitParameterCollection>
     block: Trait<BlockTileTraitParameterCollection>;
     breakable: Trait<BreakableTileTraitParameterCollection>;
-    cloudBlock: Trait<CloudBlockTileTraitParameterCollection>;
     fall: Trait<FallTileTraitParameterCollection>;
+    platform: Trait<PlatformTileTraitParameterCollection>;
     rewardBlock: Trait<RewardBlockTileTraitParameterCollection>;
     terrain: Trait<TerrainTileTraitParameterCollection>
 }
@@ -415,7 +415,7 @@ export interface BreakableTileTraitParameterCollection extends TraitParameterCol
 }
 
 export interface RewardBlockTileTraitParameterCollection extends TraitParameterCollection {
-    rewardType: Parameter<RewardTypeParameterValue>;
+    rewardType: Parameter<RewardTypeParameter>;
     reward: Parameter<string | null>;
     smallPlayerHasDifferentReward: Parameter<boolean>;
     smallPlayerReward: Parameter<string | null>;
@@ -435,13 +435,6 @@ export interface RewardBlockTileTraitParameterCollection extends TraitParameterC
     triggerWhenHitByEnemyFireball: Parameter<boolean>;
 }
 
-export interface CloudBlockTileTraitParameterCollection extends TraitParameterCollection {
-    collideFromTop: Parameter<boolean>;
-    collideFromBottom: Parameter<boolean>;
-    collideFromLeft: Parameter<boolean>;
-    collideFromRight: Parameter<boolean>;
-}
-
 export interface FallTileTraitParameterCollection extends TraitParameterCollection {
     timeUntilFall: Parameter<number>;
     shakeBeforeFall: Parameter<boolean>;
@@ -456,6 +449,13 @@ export interface FallTileTraitParameterCollection extends TraitParameterCollecti
     damageToPlayer: Parameter<PlayerDamageType | null>;
 }
 
+export interface PlatformTileTraitParameterCollection extends TraitParameterCollection {
+    collideFromTop: Parameter<boolean>;
+    collideFromBottom: Parameter<boolean>;
+    collideFromLeft: Parameter<boolean>;
+    collideFromRight: Parameter<boolean>;
+}
+
 export interface TerrainTileTraitParameterCollection extends TraitParameterCollection {
     
 }
@@ -464,7 +464,6 @@ export type BackgroundTileTraitParameter = keyof BackgroundTileTraitParameterCol
 export type BlockTileTraitParameter = keyof BlockTileTraitParameterCollection;
 export type BreakableTileTraitParameter = keyof BreakableTileTraitParameterCollection;
 export type RewardBlockTileTraitParameter = keyof RewardBlockTileTraitParameterCollection;
-export type CloudBlockTileTraitParameter = keyof CloudBlockTileTraitParameterCollection;
 export type FallTileTraitParameter = keyof FallTileTraitParameterCollection;
 export type TerrainTileTraitParameter = keyof TerrainTileTraitParameterCollection;
 

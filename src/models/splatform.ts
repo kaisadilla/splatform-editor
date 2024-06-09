@@ -26,6 +26,11 @@ export interface Parameter<T> {
     validValues?: T[];
 }
 
-export type RewardTypeParameterValue = 'coin' | 'tile' | 'entity';
-export type PlayerDamageType = 'regular' | 'fatal';
-export type BlockRegenerationMode = 'time' | 'offscreen';
+export const PlayerDamageTypeValues = ["regular", "fatal"] as const;
+export type PlayerDamageType = typeof PlayerDamageTypeValues[number];
+
+export const RewardTypeParameterValues = ["coin", "tile", "entity"] as const;
+export type RewardTypeParameter = typeof RewardTypeParameterValues[number];
+
+export const BlockRegenerationModeValues = ["time", "offscreen"] as const;
+export type BlockRegenerationMode = typeof BlockRegenerationModeValues[number];

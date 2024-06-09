@@ -6,7 +6,7 @@ import TileTraits, { TileTraitId, TraitParameterCollection } from 'data/TileTrai
 import BackgroundAssetInput from 'elements/BackgroundAssetInput';
 import MusicAssetInput from 'elements/MusicAssetInput';
 import { Level, LevelSettings, LevelTile, LevelTileParameterCollection } from 'models/Level';
-import { Parameter, Trait } from 'models/SPlatform';
+import { BlockRegenerationMode, Parameter, PlayerDamageType, RewardTypeParameter, Trait } from 'models/SPlatform';
 import { TileTraitDefinition } from 'models/Tile';
 import React, { useState } from 'react';
 import CSS_CLASSES from 'sp_css_classes';
@@ -386,16 +386,66 @@ function _TileParameterField<T> ({
         />
     }
     if (paramDef.type === 'integer') {
-        return <_IntegerProperty
+        return <_NumberProperty
             paramDef={paramDef}
             value={value as number}
             onChange={onChange as (v: number) => void}
+            allowDecimals={false}
+        />
+    }
+    if (paramDef.type === 'float') {
+        return <_NumberProperty
+            paramDef={paramDef}
+            value={value as number}
+            onChange={onChange as (v: number) => void}
+            allowDecimals={true}
+        />
+    }
+    if (paramDef.type === 'string') {
+        return <_StringProperty
+            paramDef={paramDef}
+            value={value as string}
+            onChange={onChange as (v: string) => void}
+        />
+    }
+    if (paramDef.type === 'playerDamageType') {
+        return <_SelectProperty
+            paramDef={paramDef}
+            value={value as PlayerDamageType}
+            options={[
+                { value: 'regular', label: "Regular"},
+                { value: 'fatal', label: "Fatal"},
+            ]}
+            onChange={onChange as (v: string) => void}
+        />
+    }
+    if (paramDef.type === 'rewardType') {
+        return <_SelectProperty
+            paramDef={paramDef}
+            value={value as RewardTypeParameter}
+            options={[
+                { value: 'coin', label: "Coin"},
+                { value: 'tile', label: "Tile"},
+                { value: 'entity', label: "Entity"},
+            ]}
+            onChange={onChange as (v: string) => void}
+        />
+    }
+    if (paramDef.type === 'blockRegenerationMode') {
+        return <_SelectProperty
+            paramDef={paramDef}
+            value={value as BlockRegenerationMode}
+            options={[
+                { value: 'time', label: "Time"},
+                { value: 'offscreen', label: "Offscreen"},
+            ]}
+            onChange={onChange as (v: string) => void}
         />
     }
 
     return (
-        <div>
-            {/*paramDef.displayName*/}-
+        <div className="property-container">
+            {paramDef.displayName}
         </div>
     );
 }
@@ -424,17 +474,19 @@ function _BooleanProperty<T> ({
     );
 }
 
-interface _IntegerPropertyProps {
+interface _NumberPropertyProps {
     paramDef: Parameter<number>;
     value: number;
     onChange: (v: number) => void;
+    allowDecimals: boolean;
 }
 
-function _IntegerProperty ({
+function _NumberProperty ({
     paramDef,
     value,
     onChange,
-}: _IntegerPropertyProps) {
+    allowDecimals,
+}: _NumberPropertyProps) {
 
     return (
         <div className="property-container property-container-number">
@@ -443,7 +495,61 @@ function _IntegerProperty ({
                 description={paramDef.description}
                 value={value}
                 onChange={evt => onChange(Number(evt))}
-                allowDecimal={false}
+                allowDecimal={allowDecimals}
+            />
+        </div>
+    );
+}
+
+interface _StringPropertyProps {
+    paramDef: Parameter<string>;
+    value: string;
+    onChange: (v: string) => void;
+}
+
+function _StringProperty ({
+    paramDef,
+    value,
+    onChange,
+}: _StringPropertyProps) {
+
+    return (
+        <div className="property-container property-container-string">
+            <TextInput
+                label={paramDef.displayName}
+                description={paramDef.description}
+                value={value}
+                onChange={evt => onChange(evt.currentTarget.value)}
+            />
+        </div>
+    );
+}
+
+interface _SelectPropertyProps<T> {
+    paramDef: Parameter<string>;
+    value: T;
+    options: {value: T, label: string}[];
+    onChange: (v: T) => void;
+}
+
+function _SelectProperty<T extends string> ({
+    paramDef,
+    value,
+    options,
+    onChange,
+}: _SelectPropertyProps<T>) {
+
+    return (
+        <div className="property-container property-container-string">
+            <Select
+                size='sm'
+                label={paramDef.displayName}
+                description={paramDef.description}
+                data={options}
+                value={value}
+                onChange={v => { if (v) onChange(v as T)}}
+                allowDeselect={false}
+                rightSection={<FontAwesomeIcon icon='chevron-down' />}
             />
         </div>
     );
