@@ -10,7 +10,7 @@ import { UserContextProvider } from 'context/useUserContext';
 import loader from '@monaco-editor/loader';
 import * as monaco from 'monaco-editor';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowPointer, faBrush, faChevronDown, faCirclePlay, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowPointer, faBrush, faChevronDown, faCirclePlay, faCircleQuestion, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
 
 import '@mantine/core/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -86,6 +86,7 @@ function initFontAwesome () {
         faArrowPointer,
         faChevronDown,
         faCirclePlay,
+        faCircleQuestion,
         faEraser,
         faExpand,
         faEyeDropper,

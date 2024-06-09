@@ -1,7 +1,7 @@
 import { CSS_VARIABLES } from "_constants";
 import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { getTileImagePath } from "elements/TileImage";
-import { Level, LevelTile, TileLayer } from "models/Level";
+import { Level, LevelTile, LevelTileParameterCollection, TileLayer } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
 import { Tile } from "models/Tile";
 import { Rectangle, Texture, Graphics as PixiGraphics, Renderer, Sprite, RenderTexture, BaseTexture, ICanvas, SCALE_MODES } from "pixi.js";
@@ -10,6 +10,8 @@ import { Rect, Vec2, getCssVariableValue, vec2equals, vec2toString } from "utils
 import { removePositionsFromTileList } from "components/editors/LevelEditor/calculations";
 import useEditorCanvasDrawing from "./useEditorCanvasDrawing";
 import useEditorCanvasElement from "./useEditorCanvasElement";
+import { TileTraitId } from "data/TileTraits";
+import { LevelChangeFieldHandler } from ".";
 
 export interface CanvasTileInfo {
     key: string;
@@ -20,7 +22,7 @@ export interface CanvasTileInfo {
 export default function useEditorCanvas (
     pack: ResourcePack,
     level: Level,
-    onChangeField: (field: keyof Level, val: any) => void,
+    onChangeField: LevelChangeFieldHandler,
 ) {
     const { width, height } = level.settings;
 
@@ -220,8 +222,9 @@ export default function useEditorCanvas (
         const tilePos = canvasPixelToTileGridPos(x, y);
         if (tilePos === null) return;
 
-        // tile positions can only be selected when they contain a tile.
+        // if the user clicks in an empty area, cancel the selection.
         if (getTileAtPos(levelCtx.activeTerrainLayer, tilePos) === null) {
+            levelCtx.setTileSelection([]);
             return;
         }
 
@@ -272,10 +275,9 @@ export default function useEditorCanvas (
                 addedPositions.add(vec2toString(t));
             }
 
-            layerTiles.push({
-                position: t,
-                tile: levelCtx.paint.id,
-            })
+            layerTiles.push(createLevelTile(
+                t, levelCtx.paint.id, levelCtx.paint.object
+            ));
         }
 
         const update: TileLayer[] = [...level.layers];
@@ -377,6 +379,26 @@ export default function useEditorCanvas (
         return level.layers[levelCtx.activeTerrainLayer].tiles.find(
             t => vec2equals(t.position, pos)
         ) ?? null;
+    }
+
+    function createLevelTile (position: Vec2, tileId: string, tile: Tile) : LevelTile {
+        const params: LevelTileParameterCollection = {};
+
+        for (const trait of tile.traits) {
+            params[trait.name] = {} as {[key: string]: any};
+
+            for (const configParam of trait.configurableParameters) {
+                const defaultValue = trait.parameters[configParam];
+                //@ts-ignore TODO: Better types for traits.
+                params[trait.name]![configParam] = defaultValue;
+            }
+        }
+        
+        return {
+            position: position,
+            tile: tileId,
+            parameters: params,
+        }
     }
 
     // #endregion

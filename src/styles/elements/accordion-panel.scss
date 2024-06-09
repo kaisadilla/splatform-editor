@@ -1,16 +1,21 @@
-.sp-accordion-panel {
-    .sp-accordion-panel-control {
-        &:hover {
-            background-color: $color-component-1;
+.sp-accordion-panel-root {
+    .sp-accordion-panel-item {
+        .sp-accordion-panel-control {
+            &:hover {
+                background-color: $color-component-1;
+            }
+    
+            &.sp-small .sp-accordion-panel-label {
+                padding: 2px;
+            }
         }
-
-        &.sp-small .sp-accordion-panel-label {
-            padding: 2px;
+    
+        .sp-accordion-panel-panel {
+            @include vertical-gallery;
+    
+            .sp-accordion-panel-content {
+                @include fill-container;
+            }
         }
-    }
-
-    .sp-accordion-panel-panel {
-        @include vertical-gallery;
-        
     }
 }

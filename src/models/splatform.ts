@@ -1,6 +1,5 @@
 export type ParameterType =
-    'null'
-    | 'boolean'
+    'boolean'
     | 'integer'
     | 'float'
     | 'string'
@@ -20,7 +19,7 @@ export interface Trait<T> {
 export interface Parameter<T> {
     id: string;
     displayName: string;
-    description: string;
+    description?: string;
     nullable: boolean;
     type: ParameterType;
     defaultValue: T;

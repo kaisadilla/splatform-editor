@@ -11,6 +11,7 @@ import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import { Level } from 'models/Level';
 import useEditorCanvas from './useEditorCanvas';
 import { useSettingsContext } from 'context/useSettings';
+import { LevelChangeFieldHandler } from '.';
 
 // note: 'canvas' refers to the <Stage> element, and 'content canvas' refers
 // to this entire component.
@@ -18,7 +19,7 @@ import { useSettingsContext } from 'context/useSettings';
 export interface LevelEditor_Content_CanvasProps {
     pack: ResourcePack;
     level: Level;
-    onChangeField: (field: keyof Level, val: any) => void;
+    onChangeField: LevelChangeFieldHandler;
     className?: string;
 }
 

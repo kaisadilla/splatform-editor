@@ -18,11 +18,11 @@ function BackgroundAssetInput ({
     onSelectValue,
     ...assetInputProps
 }: BackgroundAssetInputProps) {
-    const { resourcePacks } = useAppContext();
+    const { getResourcePack } = useAppContext();
     const [opened, {open, close}] = useDisclosure(false);
 
     if (isString(pack)) {
-        pack = resourcePacks.find(p => p.folderName === pack) ?? null;
+        pack = getResourcePack(pack as string);
     }
 
     return (

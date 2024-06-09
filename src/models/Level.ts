@@ -1,5 +1,6 @@
 import { Vec2 } from "utils";
 import { SPDocumentType, Version } from "./sp_documents";
+import { TileTraitId, TraitParameterCollection } from "data/TileTraits";
 
 export interface Level {
     type: 'level';
@@ -33,8 +34,12 @@ export interface TileLayerSettings {
 export interface LevelTile {
     position: Vec2;
     tile: string;
-    behaviorProperties?: {[prop: string]: any};
+    parameters: LevelTileParameterCollection;
 }
+
+export type LevelTileParameterCollection = {
+    [key in TileTraitId]?: TraitParameterCollection
+};
 
 export interface EntitySpawn {
     id?: number;

@@ -2,7 +2,7 @@ import { SPDocument } from 'models/sp_documents';
 import React, { useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { ToolIcons1x } from 'icons';
-import { Level } from 'models/Level';
+import { Level, LevelTile } from 'models/Level';
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { SP_ResizeHandle } from 'elements/resizablePanel';
 import LocalStorage from 'localStorage';
@@ -14,6 +14,14 @@ import LevelEditor_Content from './Content';
 import { ZoomLevel, useLevelEditorContext } from 'context/useLevelEditorContext';
 import ActionBar, { ActionBarButton, ActionBarCustomElement, ActionBarElement, ActionBarNumberInput, ActionBarSelectInput, ActionBarToggle } from 'elements/ActionBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Vec2, vec2equals } from 'utils';
+
+export type LevelChangeFieldHandler
+    = <K extends keyof Level>(field: K, value: Level[K]) => void;
+export type LevelChangeTileHandler
+    = <K extends keyof LevelTile>(
+        layerIndex: number, tilePos: Vec2, field: K, value: LevelTile[K]
+    ) => void;
 
 export interface LevelEditorProps {
     doc: SPDocument;
@@ -130,6 +138,7 @@ function LevelEditor ({
                         onChange={handleChange}
                         onChangeField={handleFieldChange}
                         onChangeResourcePack={handleResourcePackChange}
+                        onChangeTile={handleTileChange}
                     />
                 </Panel>
             </PanelGroup>
@@ -140,7 +149,7 @@ function LevelEditor ({
         updateDocument(doc.id, update);
     }
 
-    function handleFieldChange (field: keyof Level, value: any) {
+    function handleFieldChange<K extends keyof Level> (field: K, value: Level[K]) {
         const update = {...level};
         update[field] = value;
         updateDocument(doc.id, update);
@@ -150,6 +159,24 @@ function LevelEditor ({
         const update = {...level};
         update.resourcePack = value;
         updateDocument(doc.id, update);
+    }
+
+    function handleTileChange<K extends keyof LevelTile> (
+        layerIndex: number, tilePos: Vec2, field: K, value: LevelTile[K]
+    ) {
+        const update = [...level.layers];
+        update[layerIndex] = {...update[layerIndex]};
+        update[layerIndex].tiles = [...update[layerIndex].tiles];
+
+        const tileIndex = update[layerIndex].tiles.findIndex(
+            t => vec2equals(t.position, tilePos)
+        );
+        if (tileIndex === -1) return;
+
+        update[layerIndex].tiles[tileIndex] = {...update[layerIndex].tiles[tileIndex]};
+        update[layerIndex].tiles[tileIndex][field] = value;
+
+        handleFieldChange('layers', update);
     }
 
     function handleKeyDown (evt: KeyboardEvent) {

@@ -6,11 +6,12 @@ import { ResourcePack } from 'models/ResourcePack';
 import React from 'react';
 import { MaterialSymbol } from 'react-material-symbols';
 import { deleteArrayItemAt } from 'utils';
+import { LevelChangeFieldHandler } from '.';
 
 export interface LevelEditor_FeaturesProps {
     pack: ResourcePack | null;
     level: Level;
-    onChangeField: (field: keyof Level, val: any) => void;
+    onChangeField: LevelChangeFieldHandler;
 }
 
 function LevelEditor_Features ({
@@ -104,7 +105,7 @@ function LevelEditor_Features ({
 interface _TerrainTabProps {
     pack: ResourcePack | null;
     level: Level;
-    onChangeField: (field: keyof Level, val: any) => void;
+    onChangeField: LevelChangeFieldHandler;
 }
 
 function _TerrainTab ({
@@ -118,7 +119,7 @@ function _TerrainTab ({
         <div className="terrain-panel">
             <Tabs
                 value={levelCtx.activeTerrainLayer.toString()}
-                onChange={v => levelCtx.setActiveTerrainLayer(Number(v))}
+                onChange={handleChangeLayer}
                 // @ts-ignore - false syntax error.
                 //onChange={userCtx.setActiveTab}
                 classNames={{
@@ -132,6 +133,7 @@ function _TerrainTab ({
                 <ScrollArea scrollbars='x' type='hover'>
                     <Tabs.List>
                         {level.layers.map((l, i) => <Tabs.Tab
+                            key={i}
                             value={i.toString()}
                             rightSection={<CloseButton
                                 classNames={{
@@ -158,6 +160,7 @@ function _TerrainTab ({
 
                 <div className="sp-section-tab-panel-container level-grid-feature-options">
                     {level.layers.map((l, i) => <Tabs.Panel
+                        key={i}
                         classNames={{panel: "terrain-settings-form"}}
                         value={i.toString()}
                     >
@@ -173,6 +176,13 @@ function _TerrainTab ({
             </Tabs>
         </div>
     );
+
+    function handleChangeLayer (index: string | null) {
+        if (index === null) return;
+
+        levelCtx.setTileSelection([]);
+        levelCtx.setActiveTerrainLayer(Number(index));
+    }
 
     function handleAddLayer () {
         const layers = [...level.layers];

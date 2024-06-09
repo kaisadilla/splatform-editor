@@ -72,20 +72,25 @@ function ActionBar ({
             type='hover'
         >
             <div className={className}>
-                {elements.map(el => {
+                {elements.map((el, i) => {
                     if (el.type === 'button') return <_Button
+                        key={i}
                         {...el as ActionBarButton}
                     />
                     if (el.type === 'separator') return <_Separator
+                        key={i}
                         {...el as ActionBarSeparator}
                     />
                     if (el.type === 'toggle') return <_Toggle
+                        key={i}
                         {...el as ActionBarToggle}
                     />
                     if (el.type === 'number') return <_NumberInput
+                        key={i}
                         {...el as ActionBarNumberInput}
                     />
                     if (el.type === 'select') return <_SelectInput
+                        key={i}
                         {...el as ActionBarSelectInput}
                     />
                     if (el.type === 'custom') return (

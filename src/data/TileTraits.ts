@@ -391,15 +391,19 @@ export type TileTraitCollection = {
 
 export type TileTraitId = keyof TileTraitCollection;
 
-export type BackgroundTileTraitParameterCollection = {
+export interface TraitParameterCollection {
     
 }
 
-export type BlockTileTraitParameterCollection = {
+export interface BackgroundTileTraitParameterCollection extends TraitParameterCollection {
+    
+}
+
+export interface BlockTileTraitParameterCollection extends TraitParameterCollection {
     isHidden: Parameter<Boolean>;
 }
 
-export type BreakableTileTraitParameterCollection = {
+export interface BreakableTileTraitParameterCollection extends TraitParameterCollection {
     breakWhenPunched: Parameter<boolean>;
     breakWhenSpin: Parameter<boolean>;
     breakWhenHitByShell: Parameter<boolean>;
@@ -410,7 +414,7 @@ export type BreakableTileTraitParameterCollection = {
     replacementWhenBroken: Parameter<string | null>;
 }
 
-export type RewardBlockTileTraitParameterCollection = {
+export interface RewardBlockTileTraitParameterCollection extends TraitParameterCollection {
     rewardType: Parameter<RewardTypeParameterValue>;
     reward: Parameter<string | null>;
     smallPlayerHasDifferentReward: Parameter<boolean>;
@@ -431,14 +435,14 @@ export type RewardBlockTileTraitParameterCollection = {
     triggerWhenHitByEnemyFireball: Parameter<boolean>;
 }
 
-export type CloudBlockTileTraitParameterCollection = {
+export interface CloudBlockTileTraitParameterCollection extends TraitParameterCollection {
     collideFromTop: Parameter<boolean>;
     collideFromBottom: Parameter<boolean>;
     collideFromLeft: Parameter<boolean>;
     collideFromRight: Parameter<boolean>;
 }
 
-export type FallTileTraitParameterCollection = {
+export interface FallTileTraitParameterCollection extends TraitParameterCollection {
     timeUntilFall: Parameter<number>;
     shakeBeforeFall: Parameter<boolean>;
     shakeAfter: Parameter<number>;
@@ -452,7 +456,7 @@ export type FallTileTraitParameterCollection = {
     damageToPlayer: Parameter<PlayerDamageType | null>;
 }
 
-export type TerrainTileTraitParameterCollection = {
+export interface TerrainTileTraitParameterCollection extends TraitParameterCollection {
     
 }
 

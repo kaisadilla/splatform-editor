@@ -15,11 +15,12 @@ import BackgroundImage from 'elements/BackgroundImage';
 import LevelEditor_Features from './Features';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { SP_ResizeHandle } from 'elements/resizablePanel';
+import { LevelChangeFieldHandler } from '.';
 
 export interface LevelEditor_ContentProps {
     pack: ResourcePack | null;
     level: Level;
-    onChangeField: (field: keyof Level, val: any) => void;
+    onChangeField: LevelChangeFieldHandler;
 }
 
 function LevelEditor_Content ({
@@ -125,7 +126,7 @@ function _GridTools ({
 interface _GridCanvasProps {
     pack: ResourcePack;
     level: Level;
-    onChangeField: (field: keyof Level, val: any) => void;
+    onChangeField: LevelChangeFieldHandler;
 }
 
 function _GridCanvas ({
