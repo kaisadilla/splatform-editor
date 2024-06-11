@@ -49,10 +49,8 @@
 
     .sp-item-picker-tab-root {
         @include fill-container;
-        @include vertical-queue-stretch;
         
         .sp-tab-ribbon-list {
-            margin-bottom: 6px;
             border-top: 0;
 
             &::before {
@@ -70,10 +68,16 @@
             }
         }
 
-        .picker-properties {
+        .picker-parameters {
             width: 300px;
             height: 100%;
             border-left: 1px solid $color-component-3;
+            overflow-y: auto;
+            padding-top: 12px;
+
+            .parameter-form {
+                width: 100%;
+            }
         }
 
         .tile-picker {

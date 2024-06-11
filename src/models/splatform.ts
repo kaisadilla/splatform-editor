@@ -1,4 +1,5 @@
-import { TileTraitId, TraitId } from "data/TileTraits";
+import { TraitId } from "data/TileTraits";
+import { LevelEntity, LevelTile } from "./Level";
 
 /**
  * The type of value a parameter in SPlatform can hold.
@@ -110,16 +111,21 @@ export const ItemReferenceTypeValues = ["tile", "entity"] as const;
 export const ItemReferenceTypeValueArr = ItemReferenceTypeValues as ReadonlyArray<string>;
 export type ItemReferenceType = typeof ItemReferenceTypeValues[number];
 
-/**
- * Represents an item in the game, such as a specific entity or tile.
- */
-export interface ItemReference {
-    /**
-     * The type of item.
-     */
-    type: ItemReferenceType | null;
-    /**
-     * The definition of the item.
-     */
-    id: string | null;
+export type LevelObject = LevelTile | LevelEntity;
+
+interface ReferenceBase<T extends LevelObject> {
+    object: T;
 }
+
+export interface TileReference extends ReferenceBase<LevelTile> {
+    type: 'tile';
+}
+
+export interface EntityReference extends ReferenceBase<LevelEntity> {
+    type: 'entity';
+}
+
+/**
+ * Represents a level object in the game, such as a specific entity or tile.
+ */
+export type Reference = TileReference | EntityReference;

@@ -127,7 +127,7 @@ export default function useEditorCanvasDrawing (
 
     function buildVisibleTileArray () {
         if (true) { // todo: only for terrain view
-            return generateTilesForTerrainView();
+            return generateTileSpritesForTerrainView();
         }
     }
 
@@ -135,7 +135,7 @@ export default function useEditorCanvasDrawing (
      * Generates the sprites that paint the canvas with the visuals fitted for
      * the "terrain" section, when the selected tool is the brush.
      */
-    function generateTilesForTerrainView () {
+    function generateTileSpritesForTerrainView () {
         const tilesArr = [] as CanvasTileInfo[];
         const behindArr = [] as CanvasTileInfo[];
         const infrontArr = [] as CanvasTileInfo[];
@@ -166,11 +166,11 @@ export default function useEditorCanvasDrawing (
             }
 
             for (const tile of layerTiles) {
-                const tex = tileTextures[tile.tile];
+                const tex = tileTextures[tile.tileId];
 
                 if (!tex) {
                     console.warn(
-                        `Couldn't find texture for '${tile.tile}'`, tileTextures
+                        `Couldn't find texture for '${tile.tileId}'`, tileTextures
                     );
                     continue;
                 }

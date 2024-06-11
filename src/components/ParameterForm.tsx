@@ -4,11 +4,12 @@ import TileTraits, { TraitId, TraitParameterCollection } from 'data/TileTraits';
 import TileOrEntityInput from 'elements/TileOrEntityInput';
 import TitledCheckbox from 'elements/TitledCheckbox';
 import { ResourcePack } from 'models/ResourcePack';
-import { BlockRegenerationMode, ItemReference, Parameter, ParameterValueCollection, PlayerDamageType, RewardTypeParameter, TraitValueCollection } from 'models/splatform';
-import { TraitSpecification } from 'models/splatform';
+import { BlockRegenerationMode, EntityReference, LevelObject, Reference, Parameter, ParameterValueCollection, PlayerDamageType, RewardTypeParameter, TileReference, TraitSpecification, TraitValueCollection } from 'models/splatform';
 import React from 'react';
+import { DivProps } from 'types';
+import { getClassString } from 'utils';
 
-export interface ParameterFormProps<T extends TraitId> {
+export interface ParameterFormProps<T extends TraitId> extends DivProps {
     pack: ResourcePack;
     /**
      * The traits to include in the form.
@@ -23,7 +24,7 @@ export interface ParameterFormProps<T extends TraitId> {
      * @param traitId The id of the trait that was changed.
      * @param value The new collection of values for all of its parameters.
      */
-    onChangeTraitValues?: (traitId: T, value: any) => void;
+    onChangeTraitValues?: (traitId: T, value: ParameterValueCollection) => void;
 }
 
 /**
@@ -34,6 +35,7 @@ function ParameterForm<T extends TraitId> ({
     traits,
     traitValues,
     onChangeTraitValues,
+    ...divProps
 }: ParameterFormProps<T>) {
     return (
         <div className="parameter-form">
@@ -44,7 +46,10 @@ function ParameterForm<T extends TraitId> ({
     function getTraitSectionElement (trait: TraitSpecification<T>)
         : React.ReactNode
     {
-        if (trait.configurableParameters.length <= 0) return <></>;
+        // when there's no configurable parameters, we return an empty object.
+        if (trait.configurableParameters.length <= 0) {
+            return <></>;
+        }
         
         const values = traitValues[trait.id];
         if (values === undefined) {
@@ -60,6 +65,7 @@ function ParameterForm<T extends TraitId> ({
             trait={trait}
             paramValues={values}
             onChange={v => handleTraitChange(trait.id, v)}
+            divProps={divProps}
         />
     }
 
@@ -77,6 +83,7 @@ interface _TraitSectionProps<T extends TraitId> {
      * @param paramValues The new values for all of this trait's parameters.
      */
     onChange: (paramValues: ParameterValueCollection) => void;
+    divProps: DivProps;
 }
 
 /**
@@ -90,14 +97,21 @@ function _TraitSection<T extends TraitId> ({
     trait,
     paramValues,
     onChange,
+    divProps,
 }: _TraitSectionProps<T>) {
     const traitDef = TileTraits[trait.id];
 
+    divProps.className = getClassString(
+        "trait-section",
+        divProps.className,
+    )
+
     return (
-        <div className="trait-parameter-section">
+        <div {...divProps}>
             <div className="header">{traitDef.displayName}</div>
             <div className="parameter-list">
                 {trait.configurableParameters.map(cfgParam => <_TileParameterField
+                    key={cfgParam}
                     pack={pack}
                     param={traitDef.parameters[
                         cfgParam as keyof TraitParameterCollection
@@ -176,27 +190,29 @@ function _TileParameterField ({
             pack={pack}
             param={param}
             allowTiles
-            allowEntities
-            value={value as ItemReference}
-            onChange={handleChange as (v: ItemReference) => void}
+            value={value as TileReference}
+            onChange={handleChange as (v: Reference) => void}
         />
     }
     if (param.type === 'entityReference') {
         return <_TileOrEntityProperty
             pack={pack}
             param={param}
+            allowTileEntities
             allowEntities
-            value={value as ItemReference}
-            onChange={handleChange as (v: ItemReference) => void}
+            value={value as EntityReference}
+            onChange={handleChange as (v: Reference) => void}
         />
     }
     if (param.type === 'tileOrEntityReference') {
         return <_TileOrEntityProperty
             pack={pack}
             param={param}
+            allowTiles
+            allowTileEntities
             allowEntities
-            value={value as ItemReference}
-            onChange={handleChange as (v: ItemReference) => void}
+            value={value as Reference}
+            onChange={handleChange as (v: Reference) => void}
         />
     }
     if (param.type === 'playerDamageType') {
@@ -246,17 +262,17 @@ function _TileParameterField ({
 }
 
 
-interface _BooleanPropertyProps<T> {
+interface _BooleanPropertyProps {
     param: Parameter<boolean>;
     value: boolean;
     onChange: (v: boolean) => void;
 }
 
-function _BooleanProperty<T> ({
+function _BooleanProperty ({
     param,
     value,
     onChange,
-}: _BooleanPropertyProps<T>) {
+}: _BooleanPropertyProps) {
 
     return (
         <div className="property-container property-container-boolean">
@@ -351,17 +367,17 @@ function _SelectProperty<T extends string> ({
     );
 }
 
-interface _TileOrEntityPropertyProps {    
+interface _TileOrEntityPropertyProps<T extends Reference> {    
     pack: ResourcePack;
     param: Parameter<string>;
     allowTiles?: Boolean;
     allowTileEntities?: boolean;
     allowEntities?: boolean;
-    value: ItemReference;
-    onChange: (v: ItemReference) => void;
+    value: T;
+    onChange: (v: Reference) => void;
 }
 
-function _TileOrEntityProperty ({
+function _TileOrEntityProperty<T extends Reference> ({
     pack,
     param,
     allowTiles = false,
@@ -369,7 +385,7 @@ function _TileOrEntityProperty ({
     allowEntities = false,
     value,
     onChange,
-}: _TileOrEntityPropertyProps) {
+}: _TileOrEntityPropertyProps<T>) {
     return (
         <div className="property-container property-container-string">
             <TileOrEntityInput
@@ -380,9 +396,14 @@ function _TileOrEntityProperty ({
                 allowTileEntities={allowTileEntities}
                 allowEntities={allowEntities}
                 value={value}
+                onChangeValue={handleChange}
             />
         </div>
     );
+
+    function handleChange (v: Reference) {
+        onChange(v);
+    }
 }
 
 export default ParameterForm;

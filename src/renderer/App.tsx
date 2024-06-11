@@ -46,6 +46,20 @@ export default function App () {
                     }
                 }
             }
+        },
+        colors: {
+            blue: [
+                "#02b68f", // TODO: Not assigned
+                "#02b68f", // TODO: Not assigned
+                "#02b68f", // TODO: Not assigned
+                "#02b68f", // TODO: Not assigned
+                "#a9e7da", 
+                "#8fe0cf", 
+                "#02b68f", 
+                "#008b6d", 
+                "#00644f", 
+                "#02b68f"  // TODO: Not assigned
+            ]
         }
     })
 

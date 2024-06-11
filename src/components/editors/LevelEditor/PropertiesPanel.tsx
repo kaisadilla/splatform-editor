@@ -1,19 +1,14 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Accordion, Checkbox, CloseButton, Input, NumberInput, Select, TextInput, Tooltip } from '@mantine/core';
+import { Accordion, NumberInput, Select, TextInput } from '@mantine/core';
+import ParameterForm from 'components/ParameterForm';
 import { useAppContext } from 'context/useAppContext';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
-import TileTraits, { TileTraitId, TraitParameterCollection } from 'data/TileTraits';
+import { TileTraitId, TraitParameterCollection } from 'data/TileTraits';
 import BackgroundAssetInput from 'elements/BackgroundAssetInput';
 import MusicAssetInput from 'elements/MusicAssetInput';
 import { Level, LevelSettings, PlacedTile } from 'models/Level';
-import { BlockRegenerationMode, ItemReference, Parameter, TraitValueCollection, PlayerDamageType, RewardTypeParameter, Trait, TraitSpecification } from 'models/splatform';
-import React, { useState } from 'react';
-import CSS_CLASSES from 'sp_css_classes';
 import { clampNumber, vec2equals, vec2toString } from 'utils';
 import { LevelChangeFieldHandler, LevelChangeTileHandler } from '.';
-import TitledCheckbox from 'elements/TitledCheckbox';
-import TileOrEntityInput from 'elements/TileOrEntityInput';
-import ParameterForm from 'components/ParameterForm';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -226,7 +221,7 @@ function _TileProperties ({
             </Accordion.Panel>
         </Accordion.Item>
     );
-
+    
     // get the tile in the level currently selected.
     const tilePos = levelCtx.tileSelection[0];
     const levelTile = level.layers[levelCtx.activeTerrainLayer].tiles.find(
@@ -242,10 +237,10 @@ function _TileProperties ({
     }
 
     // the tile info in the resource pack.
-    const tile = pack.tiles.find(t => t.id === levelTile.tile);
+    const tile = pack.tiles.find(t => t.id === levelTile.tileId);
     if (tile === undefined) {
         console.error(
-            `Resource pack doesn't contain tile '${levelTile.tile}'.`
+            `Resource pack doesn't contain tile '${levelTile.tileId}'.`
         );
         return <></>;
     }
@@ -274,7 +269,6 @@ function _TileProperties ({
                         )
                     }
                 />
-                {/*tile.data.traits.map(trait => getTraitSectionElement(levelTile, trait))*/}
             </Accordion.Panel>
         </Accordion.Item>
     );
@@ -289,370 +283,6 @@ function _TileProperties ({
 
        onChangeTile(levelCtx.activeTerrainLayer, tilePos, 'parameters', update);
     }
-
-    /**
-     * Returns the element containing the section of the form for the trait given,
-     * if that trait has any configurable parameter; or an empty element otherwise.
-     * @param levelTile The level tile that contains the trait params to show.
-     * @param trait The configuration of the trait by the respack's tile.
-     * @returns 
-     */
-    function getTraitSectionElement (
-        levelTile: PlacedTile, trait: TraitSpecification<TileTraitId>
-    ) : React.ReactNode {
-        if (trait.configurableParameters.length > 0) {
-            return <_TileTraitSection
-                key={trait.id}
-                trait={trait}
-                traitId={trait.id}
-                traitValues={levelTile.parameters[trait.id]!}
-                onChangeTraitParameters={
-                    v => handleTraitParamsChange(
-                        levelTile,
-                        trait.id,
-                        v,
-                    )
-                }
-            />
-        }
-        else {
-            return <></>
-        }
-    }
 }
-
-interface _TileTraitSectionProps {
-    trait: TraitSpecification<TileTraitId>;
-    traitId: TileTraitId;
-    traitValues: TraitParameterCollection; // TODO: wtf???
-    onChangeTraitParameters: (value: TraitValueCollection<TileTraitId>) => void;
-}
-
-/**
- * The element in the form that contains the information about a specific trait:
- * the title of the section (which is the name of the trait) and all the fields
- * concerning that trait.
- */
-function _TileTraitSection ({
-    trait,
-    traitId,
-    traitValues,
-    onChangeTraitParameters,
-}: _TileTraitSectionProps) {
-    const traitDef = TileTraits[trait.id];
-
-    return (
-        <div className="trait-parameter-section">
-            <div className="header">{traitDef.displayName}</div>
-            <div className="parameters">{
-                trait.configurableParameters.map(cfgParam => <_TileParameterField
-                    key={cfgParam}
-                    traitDef={traitDef}
-                    paramId={cfgParam}
-                    //@ts-ignore
-                    value={traitValues[cfgParam]}
-                    onChange={v => handleChange(cfgParam, v)}
-                />)
-            }</div>
-        </div>
-    );
-
-    function handleChange (paramName: string, value: any) {
-        const update: TraitParameterCollection = {
-            ...traitValues,
-        };
-
-        // @ts-ignore
-        update[paramName] = value,
-
-        onChangeTraitParameters(update);
-    }
-}
-
-interface _TileParameterFieldProps<T> {
-    traitDef: Trait<T>
-    paramId: string;
-    value: T
-    onChange: (v: T) => void;
-}
-
-/**
- * An element that renders a single field containing the value of a specific
- * parameter in a specific trait. This field can be of any type.
- */
-function _TileParameterField<T> ({
-    traitDef,
-    paramId,
-    value,
-    onChange,
-}: _TileParameterFieldProps<T>) {
-    const paramDef = traitDef.parameters[paramId as keyof T] as Parameter<any>;
-
-    if (paramDef.type === 'boolean') {
-        return <_BooleanProperty
-            paramDef={paramDef}
-            value={value as boolean}
-            onChange={onChange as (v: boolean) => void}
-        />
-    }
-    if (paramDef.type === 'integer') {
-        return <_NumberProperty
-            paramDef={paramDef}
-            value={value as number}
-            onChange={onChange as (v: number) => void}
-            allowDecimals={false}
-        />
-    }
-    if (paramDef.type === 'float') {
-        return <_NumberProperty
-            paramDef={paramDef}
-            value={value as number}
-            onChange={onChange as (v: number) => void}
-            allowDecimals={true}
-        />
-    }
-    if (paramDef.type === 'string') {
-        return <_StringProperty
-            paramDef={paramDef}
-            value={value as string}
-            onChange={onChange as (v: string) => void}
-        />
-    }
-    if (paramDef.type === 'tileReference') {
-        return <_TileOrEntityProperty
-            paramDef={paramDef}
-            allowTiles
-            allowEntities
-            value={value as ItemReference}
-            onChange={onChange as (v: ItemReference) => void}
-        />
-    }
-    if (paramDef.type === 'entityReference') {
-        return <_TileOrEntityProperty
-            paramDef={paramDef}
-            allowEntities
-            value={value as ItemReference}
-            onChange={onChange as (v: ItemReference) => void}
-        />
-    }
-    if (paramDef.type === 'tileOrEntityReference') {
-        return <_TileOrEntityProperty
-            paramDef={paramDef}
-            allowEntities
-            value={value as ItemReference}
-            onChange={onChange as (v: ItemReference) => void}
-        />
-    }
-    if (paramDef.type === 'playerDamageType') {
-        return <_SelectProperty
-            paramDef={paramDef}
-            value={value as PlayerDamageType}
-            options={[
-                { value: 'regular', label: "Regular"},
-                { value: 'fatal', label: "Fatal"},
-            ]}
-            onChange={onChange as (v: string) => void}
-        />
-    }
-    if (paramDef.type === 'rewardType') {
-        return <_SelectProperty
-            paramDef={paramDef}
-            value={value as RewardTypeParameter}
-            options={[
-                { value: 'coin', label: "Coin"},
-                { value: 'tile', label: "Tile"},
-                { value: 'entity', label: "Entity"},
-            ]}
-            onChange={onChange as (v: string) => void}
-        />
-    }
-    if (paramDef.type === 'blockRegenerationMode') {
-        return <_SelectProperty
-            paramDef={paramDef}
-            value={value as BlockRegenerationMode}
-            options={[
-                { value: 'time', label: "Time"},
-                { value: 'offscreen', label: "Offscreen"},
-            ]}
-            onChange={onChange as (v: string) => void}
-        />
-    }
-
-    return (
-        <div className="property-container">
-            {paramDef.displayName}
-        </div>
-    );
-}
-
-interface _BooleanPropertyProps<T> {
-    paramDef: Parameter<boolean>;
-    value: boolean;
-    onChange: (v: boolean) => void;
-}
-
-function _BooleanProperty<T> ({
-    paramDef,
-    value,
-    onChange,
-}: _BooleanPropertyProps<T>) {
-
-    return (
-        <div className="property-container property-container-boolean">
-            <TitledCheckbox
-                label={paramDef.displayName}
-                description={paramDef.description}
-                checked={value}
-                onChange={evt => onChange(evt.currentTarget.checked)}
-            />
-        </div>
-    );
-}
-
-interface _NumberPropertyProps {
-    paramDef: Parameter<number>;
-    value: number;
-    onChange: (v: number) => void;
-    allowDecimals: boolean;
-}
-
-function _NumberProperty ({
-    paramDef,
-    value,
-    onChange,
-    allowDecimals,
-}: _NumberPropertyProps) {
-
-    return (
-        <div className="property-container property-container-number">
-            <NumberInput
-                label={paramDef.displayName}
-                description={paramDef.description}
-                value={value}
-                onChange={evt => onChange(Number(evt))}
-                allowDecimal={allowDecimals}
-            />
-        </div>
-    );
-}
-
-interface _StringPropertyProps {
-    paramDef: Parameter<string>;
-    value: string;
-    onChange: (v: string) => void;
-}
-
-function _StringProperty ({
-    paramDef,
-    value,
-    onChange,
-}: _StringPropertyProps) {
-
-    return (
-        <div className="property-container property-container-string">
-            <TextInput
-                label={paramDef.displayName}
-                description={paramDef.description}
-                value={value}
-                onChange={evt => onChange(evt.currentTarget.value)}
-            />
-        </div>
-    );
-}
-
-interface _SelectPropertyProps<T> {
-    paramDef: Parameter<string>;
-    value: T;
-    options: {value: T, label: string}[];
-    onChange: (v: T) => void;
-}
-
-function _SelectProperty<T extends string> ({
-    paramDef,
-    value,
-    options,
-    onChange,
-}: _SelectPropertyProps<T>) {
-
-    return (
-        <div className="property-container property-container-string">
-            <Select
-                size='sm'
-                label={paramDef.displayName}
-                description={paramDef.description}
-                data={options}
-                value={value}
-                onChange={v => { if (v) onChange(v as T)}}
-                allowDeselect={false}
-                rightSection={<FontAwesomeIcon icon='chevron-down' />}
-            />
-        </div>
-    );
-}
-
-interface _TileOrEntityPropertyProps {
-    paramDef: Parameter<string>;
-    allowTiles?: Boolean;
-    allowTileEntities?: boolean;
-    allowEntities?: boolean;
-    value: ItemReference;
-    onChange: (v: ItemReference) => void;
-}
-
-function _TileOrEntityProperty ({
-    paramDef,
-    allowTiles = false,
-    allowTileEntities = false,
-    allowEntities = false,
-    value,
-    onChange,
-}: _TileOrEntityPropertyProps) {
-    const { resourcePack } = useLevelEditorContext();
-
-    if (resourcePack === null) return (
-        <div className="property-container property-container-string">
-            no respack selected
-        </div>
-    );
-
-    return (
-        <div className="property-container property-container-string">
-            <TileOrEntityInput
-                pack={resourcePack}
-                label={paramDef.displayName}
-                description={paramDef.description}
-                allowTiles={allowTiles}
-                allowTileEntities={allowTileEntities}
-                allowEntities={allowEntities}
-                value={value}
-            />
-        </div>
-    );
-}
-
-interface _LabelWithTooltipProps {
-    name: string;
-    description: string | null | undefined;
-}
-
-function _LabelWithTooltip ({
-    name,
-    description,
-}: _LabelWithTooltipProps) {
-    
-    if (description) {
-        return <div className="property-label">
-            <span>{name}</span>
-            <Tooltip label={description}>
-                <FontAwesomeIcon icon='circle-question' />
-            </Tooltip>
-        </div>;
-    }
-    else {
-        return <>{name}</>;
-    }
-}
-
-
 
 export default LevelEditor_PropertiesPanel;

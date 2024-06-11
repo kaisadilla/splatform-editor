@@ -31,9 +31,6 @@ function FileTabBar ({}: FileTabBarProps) {
 
     return (<>
         <ScrollArea
-            classNames={{
-                root: "sp-tab-ribbon-root"
-            }}
             scrollbars='x'
             type='hover'
             //scrollbarSize={8}

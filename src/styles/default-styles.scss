@@ -3,7 +3,8 @@
     min-height: 0;
     @include vertical-queue-stretch;
 
-    .sp-tab-ribbon-root {
+    // tablists inside scrollareas must not be shrunk.
+    > .mantine-ScrollArea-root {
         flex-shrink: 0;
     }
 

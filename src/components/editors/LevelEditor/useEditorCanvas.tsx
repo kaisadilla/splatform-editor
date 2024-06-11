@@ -320,7 +320,7 @@ export default function useEditorCanvas (
 
         const origin = canvasPixelToTileGridPos(x, y);
         if (origin === null) return;
-        const originTile = getTileAtPos(levelCtx.activeTerrainLayer, origin)?.tile;
+        const originTile = getTileAtPos(levelCtx.activeTerrainLayer, origin)?.tileId;
 
         const placedTiles = [] as Vec2[];
         const fillStack = [origin];
@@ -333,7 +333,7 @@ export default function useEditorCanvas (
                 continue;
             }
             // the tile in this position is different, so we don't spill into it.
-            if (getTileAtPos(levelCtx.activeTerrainLayer, pos)?.tile !== originTile) {
+            if (getTileAtPos(levelCtx.activeTerrainLayer, pos)?.tileId !== originTile) {
                 continue;
             }
             // the tile in this position was already iterated over.

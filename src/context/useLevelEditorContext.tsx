@@ -14,6 +14,11 @@ export type GridTool =
     | 'picker'
 ;
 
+export type EditMode =
+    'visual'
+    | 'code'
+;
+
 interface LevelEditorContextState {
     /**
      * The resource pack currently in use by this level, if any.
@@ -43,6 +48,7 @@ interface LevelEditorContextState {
      * The terrain layer that is currently selected.
      */
     activeTerrainLayer: number;
+    editMode: EditMode;
     setResourcePack: (pack: ResourcePack | null) => void;
     setZoom: (zoom: ZoomLevel) => void;
     setTileSelection: (positions: Vec2[]) => void;
@@ -50,6 +56,7 @@ interface LevelEditorContextState {
     setTerrainGridTool: (tool: GridTool) => void;
     setActiveTerrainLayer: (index: number) => void;
     setShowGrid: (show: boolean) => void;
+    setEditMode: (mode: EditMode) => void;
     getZoomMultiplier: () => number;
     /**
      * Removes all tiles from the current selection. 
@@ -70,6 +77,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
         paint: null,
         terrainTool: 'select',
         activeTerrainLayer: 0,
+        editMode: 'visual',
     } as LevelEditorContextState);
 
     const value = useMemo(() => {
@@ -113,6 +121,14 @@ const LevelEditorContextProvider = ({ children }: any) => {
                 ...prevState,
                 activeTerrainLayer: index,
             }));
+        }
+
+        function setEditMode (mode: EditMode) {
+            setState(prevState => ({
+                ...prevState,
+                editMode: mode,
+            }));
+
         }
 
         function getZoomMultiplier () {
@@ -167,6 +183,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
             setTerrainGridTool: setTerrainTool,
             setActiveTerrainLayer,
             setShowGrid,
+            setEditMode,
             getZoomMultiplier,
             cancelSelection,
             getSelectableGridTools,

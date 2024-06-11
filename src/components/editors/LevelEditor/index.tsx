@@ -2,7 +2,7 @@ import { SPDocument } from 'models/sp_documents';
 import React, { useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { ToolIcons1x } from 'icons';
-import { Level, PlacedTile } from 'models/Level';
+import { Level, PlacedTile, TileLayer } from 'models/Level';
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { SP_ResizeHandle } from 'elements/resizablePanel';
 import LocalStorage from 'localStorage';
@@ -15,6 +15,8 @@ import { ZoomLevel, useLevelEditorContext } from 'context/useLevelEditorContext'
 import ActionBar, { ActionBarButton, ActionBarCustomElement, ActionBarElement, ActionBarNumberInput, ActionBarSelectInput, ActionBarToggle } from 'elements/ActionBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Vec2, vec2equals } from 'utils';
+import { removePositionsFromTileList } from './calculations';
+import JsonEditor from 'components/JsonEditor';
 
 export type LevelChangeFieldHandler
     = <K extends keyof Level>(field: K, value: Level[K]) => void;
@@ -44,12 +46,14 @@ function LevelEditor ({
     }, [level.resourcePack]);
 
     useEffect(() => {
-        document.addEventListener('keydown', handleKeyDown);
+        if (levelCtx.editMode === 'visual') {
+            document.addEventListener('keydown', handleKeyDown);
+        }
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         }
-    }, [activeTab, doc.id, levelCtx]);
+    }, [activeTab, doc.id, levelCtx, levelCtx.editMode]);
 
     const actionBarElements: ActionBarElement[] = [
         {
@@ -80,8 +84,8 @@ function LevelEditor ({
             type: 'toggle',
             label: 'Show file JSON',
             icon: 'json',
-            value: false,
-            onToggle: () => console.log("json!!!"),
+            value: levelCtx.editMode === 'code',
+            onToggle: v => levelCtx.setEditMode(v ? 'code' : 'visual'),
         } as ActionBarToggle,
         {
             type: 'separator',
@@ -121,7 +125,14 @@ function LevelEditor ({
                 elements={actionBarElements}
             />
 
-            <PanelGroup className="level-edition-container" direction='horizontal'>
+            {levelCtx.editMode === 'code' && <JsonEditor
+                document={JSON.stringify(level, null, 4)}
+            />}
+
+            {levelCtx.editMode === 'visual' && <PanelGroup
+                className="level-edition-container"
+                direction='horizontal'
+            >
                 <Panel className="palette-container" defaultSize={6} minSize={4}>
                     <LevelEditor_TilesPalette
                         pack={pack}
@@ -145,7 +156,7 @@ function LevelEditor ({
                         onChangeTile={handleTileChange}
                     />
                 </Panel>
-            </PanelGroup>
+            </PanelGroup>}
         </div>
     );
 
@@ -180,6 +191,18 @@ function LevelEditor ({
         update[layerIndex].tiles[tileIndex] = {...update[layerIndex].tiles[tileIndex]};
         update[layerIndex].tiles[tileIndex][field] = value;
 
+        handleFieldChange('layers', update);
+    }
+
+    function handleTileLayerChange<K extends keyof TileLayer> (
+        layerIndex: number, field: K, value: TileLayer[K]
+    ) {
+        const update = [...level.layers];
+        update[layerIndex] = {
+            ...update[layerIndex],
+            [field]: value,
+        };
+        
         handleFieldChange('layers', update);
     }
 
@@ -218,6 +241,11 @@ function LevelEditor ({
         if (evt.key.toLowerCase() === 'i' && selectable.includes('picker')) {
             levelCtx.setTerrainGridTool('picker');
         }
+        if (evt.code === 'Delete') {
+            if (levelCtx.terrainTool === 'select') {
+                removeTilesAt(...levelCtx.tileSelection);
+            }
+        }
 
     }
 
@@ -225,6 +253,13 @@ function LevelEditor ({
         if (evt.key.toLowerCase() === 'g') {
             levelCtx.setShowGrid(!levelCtx.showGrid);
         }
+    }
+
+    function removeTilesAt (...pos: Vec2[]) {
+        let tiles = [...level.layers[levelCtx.activeTerrainLayer].tiles];
+        tiles = removePositionsFromTileList(tiles, pos);
+        handleTileLayerChange(levelCtx.activeTerrainLayer, 'tiles', tiles);
+        levelCtx.setTileSelection([]);
     }
 }
 

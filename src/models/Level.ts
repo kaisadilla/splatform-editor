@@ -2,7 +2,7 @@ import { Vec2 } from "utils";
 import { SPDocumentType, Version } from "./sp_documents";
 import { TileTraitId, TraitId, TraitParameterCollection } from "data/TileTraits";
 import { Tile } from "./Tile";
-import { TraitValueCollection } from "./splatform";
+import { ParameterValueCollection, TraitValueCollection } from "./splatform";
 
 export interface Level {
     type: 'level';
@@ -40,7 +40,7 @@ export interface TileLayerSettings {
  * Represents a tile in a level.
  */
 export interface LevelTile {
-    tile: string;
+    tileId: string;
     parameters: TraitValueCollection<TileTraitId>;
 }
 
@@ -55,7 +55,7 @@ export interface PlacedTile extends LevelTile {
  * Represents an entity in a level.
  */
 export interface LevelEntity {
-    behavior: string,
+    entityId: string,
     behaviorProperties: {[prop: string]: any};
 }
 
@@ -103,20 +103,19 @@ export function getNewLevel () : Level {
 }
 
 export function getNewLevelTile (tile: Tile) : LevelTile {
-    const params: TraitValueCollection = {};
+    const params: TraitValueCollection<TileTraitId> = {};
 
     for (const trait of tile.traits) {
-        params[trait.id] = {} as {[key: string]: any};
+        params[trait.id] = {} as {[key: string]: ParameterValueCollection};
 
         for (const configParam of trait.configurableParameters) {
             const defaultValue = trait.parameters[configParam];
-            //@ts-ignore TODO: Better types for traits.
             params[trait.id]![configParam] = defaultValue;
         }
     }
     
     return {
-        tile: tile.id,
+        tileId: tile.id,
         parameters: params,
     };
 }

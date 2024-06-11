@@ -96,6 +96,7 @@ const createWindow = async () => {
                 : path.join(__dirname, "../../.erb/dll/preload.js"),
             contextIsolation: false,
             nodeIntegration: true,
+            webSecurity: process.env.isProduction !== undefined,
         },
         // TODO: custom title bar
         titleBarStyle: "hidden",

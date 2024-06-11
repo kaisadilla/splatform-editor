@@ -1,22 +1,25 @@
 import { Button, InputWrapper, InputWrapperProps, Modal, ScrollArea, Tabs, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DataAssetMetadata, ResourcePack } from 'models/ResourcePack';
-import { ItemReference, ItemReferenceType, ItemReferenceTypeValueArr } from 'models/splatform';
+import { ItemReferenceType, ItemReferenceTypeValueArr, LevelObject, ParameterValueCollection, Reference, TileReference } from 'models/splatform';
 import React, { useState } from 'react';
 import TileImage from './TileImage';
 import { Tile } from 'models/Tile';
 import { getClassString } from 'utils';
+import { getNewLevelTile } from 'models/Level';
+import ParameterForm from 'components/ParameterForm';
+import { TileTraitId, TraitId } from 'data/TileTraits';
 
 const VALID_TYPES = ['tile', 'entity'];
 
 export interface TileOrEntityInputProps extends InputWrapperProps {
     pack: ResourcePack;
-    value: ItemReference | null | undefined;
+    value: Reference | null | undefined;
     disabled?: boolean;
     allowTiles?: Boolean;
     allowTileEntities?: boolean;
     allowEntities?: boolean;
-    onChangeValue?: (val: ItemReference) => void;
+    onChangeValue?: (val: Reference) => void;
 }
 
 function TileOrEntityInput ({
@@ -29,11 +32,6 @@ function TileOrEntityInput ({
     onChangeValue,
     ...inputWrapperProps
 }: TileOrEntityInputProps) {
-    value = {
-        type: 'tile',
-        id: "question_block",
-    };
-
     const [opened, {open, close}] = useDisclosure(false);
 
     return (
@@ -72,27 +70,26 @@ function TileOrEntityInput ({
                     allowTiles={allowTiles}
                     allowTileEntities={allowTileEntities}
                     allowEntities={allowEntities}
-                    onChangeValue={v => onChangeValue?.(v)}
+                    onChangeValue={handleValueChange}
+                    closeForm={close}
                 />
             </Modal>
         </InputWrapper>
     );
 
-    function handleValueChange (value: ItemReference) {
-        
+    function handleValueChange (value: Reference) {
+        onChangeValue?.(value);
     }
 
     function getValueElement () {
-        if (value === null || value === undefined) {
-            throw "This function can only be called when `value` is not null";
-        }
-
-        if (value.type === null || value.id === null) {
-            return <div className="plain-label">No value</div>;
+        if (!value || value.type === null || value.object === null) {
+            return <div className="plain-label">
+                <Text size='sm' truncate='end'>No value</Text>
+            </div>;
         }
 
         if (value.type === 'tile') {
-            const tile = pack.tilesById[value.id];
+            const tile = pack.tilesById[value.object.tileId];
 
             return <div className="label-with-image">
                 <TileImage
@@ -106,42 +103,19 @@ function TileOrEntityInput ({
             </div>
         }
         else if (value.type === 'entity') {
-            return <div>todo - {value.id}</div>
+            return <div>todo - {value.object.entityId}</div>
         }
-    }
-}
-
-/**
- * Given a string containing the value of an item reference (a string with the
- * format `<type>:<name>`), returns an object describing its value.
- * @param value 
- */
-function getValueData (value: string) : ItemReference {
-    const valueArr = value?.split(":") ?? [];
-
-    if (valueArr.length < 2) return {
-        type: null,
-        id: null,
-    };
-
-    if (ItemReferenceTypeValueArr.includes(valueArr[0]) === false) return {
-        type: null,
-        id: null,
-    };
-    
-    return {
-        type: valueArr[0] as ItemReferenceType,
-        id: valueArr[1],
     }
 }
 
 interface _ItemPickerProps {
     pack: ResourcePack;
-    value: ItemReference;
+    value: Reference | null | undefined;
     allowTiles?: Boolean;
     allowTileEntities?: boolean;
     allowEntities?: boolean;
-    onChangeValue: (val: ItemReference) => void;
+    onChangeValue: (val: Reference) => void;
+    closeForm: () => void;
 }
 
 function _ItemPicker ({
@@ -151,6 +125,7 @@ function _ItemPicker ({
     allowTileEntities = false,
     allowEntities = false,
     onChangeValue,
+    closeForm,
 }: _ItemPickerProps) {
     const [selectedValue, setSelectedValue] = useState(value);
 
@@ -177,11 +152,11 @@ function _ItemPicker ({
             
             <div className="picker-container">
                 <Tabs.Panel value='tiles'>
-                    <_TileItemPicker
+                    <_TilePicker
                         pack={pack}
                         value={selectedValue}
                         onChange={setSelectedValue}
-                        onSubmit={v => onChangeValue(v)}
+                        onSubmit={v => onSubmit(v)}
                     />
                 </Tabs.Panel>
                 <Tabs.Panel value='tile-entities'>
@@ -190,8 +165,8 @@ function _ItemPicker ({
                 <Tabs.Panel value='entities'>
                     ent
                 </Tabs.Panel>
-                <div className="picker-properties">
-                    
+                <div className="picker-parameters">
+                    {getParameterForm()}
                 </div>
             </div>
 
@@ -199,45 +174,117 @@ function _ItemPicker ({
                 <Button variant='light'>
                     Cancel
                 </Button>
-                <Button>
+                <Button color='blue'>
                     Select
                 </Button>
             </div>
         </Tabs>
     );
+
+    function getParameterForm () : React.ReactNode {
+        if (selectedValue?.type === 'tile') {
+            const tileRef = pack.tilesById[selectedValue.object.tileId];
+
+            return (
+                <ParameterForm
+                    pack={pack}
+                    traits={tileRef.data.traits}
+                    traitValues={selectedValue.object.parameters}
+                    onChangeTraitValues={
+                        (traitId, v) => handleTileTraitParamsChange(traitId, v)
+                    }
+                />
+            );
+        }
+    }
+
+    function handleTileTraitParamsChange (
+        traitId: TileTraitId, value: ParameterValueCollection
+    ) {
+        setSelectedValue((prevState) => {
+            if (prevState?.type !== 'tile') return prevState;
+
+            return {
+                ...prevState,
+                object: {
+                    ...prevState.object,
+                    parameters: {
+                        ...prevState.object.parameters,
+                        [traitId]: value,
+                    },
+                }
+            };
+        });
+    }
+
+    function onSubmit (value: Reference) {
+        onChangeValue?.(value);
+        closeForm();
+    }
 }
 
-interface _TileItemPickerProps {
+interface _TilePickerProps {
     pack: ResourcePack;
-    value: ItemReference;
-    onChange: (val: ItemReference) => void;
-    onSubmit: (val: ItemReference) => void;
+    value: Reference | null | undefined;
+    onChange: (val: TileReference) => void;
+    onSubmit: (val: TileReference) => void;
 }
 
-function _TileItemPicker ({
+function _TilePicker ({
     pack,
     value,
     onChange,
     onSubmit,
-}: _TileItemPickerProps) {
+}: _TilePickerProps) {
 
     return (
         <div className="tile-picker">
             {pack.tiles.map(t => <_TileIcon
                 pack={pack}
                 tile={t}
-                selected={value.id === t.id}
-                onSelect={() => onChange({
-                    type: 'tile',
-                    id: t.id,
-                })}
-                onSubmit={() => onSubmit({
-                    type: 'tile',
-                    id: t.id,
-                })}
+                selected={value?.type === 'tile' && value.object.tileId === t.id}
+                onSelect={() => handleChange(t.data)}
+                onSubmit={() => handleSubmit(t.data)}
             />)}
         </div>
     );
+
+    function handleChange (tileDef: Tile) {
+        // if the clicked tile is already selected, nothing is done.
+        if (isTileAlreadySelected(tileDef, value)) {
+            return;
+        }
+
+        onChange(createNewTile(tileDef));
+    }
+
+    function handleSubmit (tileDef: Tile) {
+        // if the clicked tile is already selected, submit the current value.
+        if (isTileAlreadySelected(tileDef, value)) {
+            onSubmit(value);
+        }
+
+        onSubmit(createNewTile(tileDef));
+    }
+
+    function createNewTile (tileDef: Tile) : TileReference {
+        if (value?.type === 'tile' && value.object.tileId === tileDef.id) {
+            return value;
+        }
+
+        const tile: TileReference = {
+            type: 'tile',
+            object: getNewLevelTile(tileDef),
+        };
+
+        return tile;
+    }
+
+    function isTileAlreadySelected (tileDef: Tile, value: Reference | null | undefined)
+        : value is TileReference
+    {
+        return value?.type === 'tile' && value.object.tileId === tileDef.id;
+    }
 }
 
 
