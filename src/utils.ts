@@ -370,7 +370,7 @@ export function normalizeInternalNames<T> (
     }
 }
 
-export function isString (object: any) {
+export function isString (object: any) : object is string {
     return typeof object === 'string' || object instanceof String;
 }
 

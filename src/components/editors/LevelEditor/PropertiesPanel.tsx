@@ -5,14 +5,14 @@ import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import TileTraits, { TileTraitId, TraitParameterCollection } from 'data/TileTraits';
 import BackgroundAssetInput from 'elements/BackgroundAssetInput';
 import MusicAssetInput from 'elements/MusicAssetInput';
-import { Level, LevelSettings, LevelTile, LevelTileParameterCollection } from 'models/Level';
-import { BlockRegenerationMode, Parameter, PlayerDamageType, RewardTypeParameter, Trait } from 'models/SPlatform';
-import { TileTraitDefinition } from 'models/Tile';
+import { Level, LevelSettings, PlacedTile } from 'models/Level';
+import { BlockRegenerationMode, ItemReference, Parameter, TraitValueCollection, PlayerDamageType, RewardTypeParameter, Trait, TraitSpecification } from 'models/splatform';
 import React, { useState } from 'react';
 import CSS_CLASSES from 'sp_css_classes';
 import { clampNumber, vec2equals, vec2toString } from 'utils';
 import { LevelChangeFieldHandler, LevelChangeTileHandler } from '.';
 import TitledCheckbox from 'elements/TitledCheckbox';
+import TileOrEntityInput from 'elements/TileOrEntityInput';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -269,7 +269,7 @@ function _TileProperties ({
     );
 
     function handleTraitParamsChange (
-        levelTile: LevelTile,
+        levelTile: PlacedTile,
         traitId: TileTraitId,
         value: TraitParameterCollection
     ) {
@@ -287,18 +287,18 @@ function _TileProperties ({
      * @returns 
      */
     function getTraitSectionElement (
-        levelTile: LevelTile, trait: TileTraitDefinition
+        levelTile: PlacedTile, trait: TraitSpecification<TileTraitId>
     ) : React.ReactNode {
         if (trait.configurableParameters.length > 0) {
             return <_TileTraitSection
-                key={trait.name}
+                key={trait.id}
                 trait={trait}
-                traitId={trait.name}
-                traitValues={levelTile.parameters[trait.name]!}
+                traitId={trait.id}
+                traitValues={levelTile.parameters[trait.id]!}
                 onChangeTraitParameters={
                     v => handleTraitParamsChange(
                         levelTile,
-                        trait.name,
+                        trait.id,
                         v,
                     )
                 }
@@ -311,10 +311,10 @@ function _TileProperties ({
 }
 
 interface _TileTraitSectionProps {
-    trait: TileTraitDefinition;
+    trait: TraitSpecification<TileTraitId>;
     traitId: TileTraitId;
-    traitValues: TraitParameterCollection;
-    onChangeTraitParameters: (value: LevelTileParameterCollection) => void;
+    traitValues: TraitParameterCollection; // TODO: wtf???
+    onChangeTraitParameters: (value: TraitValueCollection<TileTraitId>) => void;
 }
 
 /**
@@ -328,8 +328,7 @@ function _TileTraitSection ({
     traitValues,
     onChangeTraitParameters,
 }: _TileTraitSectionProps) {
-    const traitDef = TileTraits[trait.name];
-    console.log(traitId, traitValues);
+    const traitDef = TileTraits[trait.id];
 
     return (
         <div className="trait-parameter-section">
@@ -406,6 +405,31 @@ function _TileParameterField<T> ({
             paramDef={paramDef}
             value={value as string}
             onChange={onChange as (v: string) => void}
+        />
+    }
+    if (paramDef.type === 'tileReference') {
+        return <_TileOrEntityProperty
+            paramDef={paramDef}
+            allowTiles
+            allowEntities
+            value={value as ItemReference}
+            onChange={onChange as (v: ItemReference) => void}
+        />
+    }
+    if (paramDef.type === 'entityReference') {
+        return <_TileOrEntityProperty
+            paramDef={paramDef}
+            allowEntities
+            value={value as ItemReference}
+            onChange={onChange as (v: ItemReference) => void}
+        />
+    }
+    if (paramDef.type === 'tileOrEntityReference') {
+        return <_TileOrEntityProperty
+            paramDef={paramDef}
+            allowEntities
+            value={value as ItemReference}
+            onChange={onChange as (v: ItemReference) => void}
         />
     }
     if (paramDef.type === 'playerDamageType') {
@@ -550,6 +574,46 @@ function _SelectProperty<T extends string> ({
                 onChange={v => { if (v) onChange(v as T)}}
                 allowDeselect={false}
                 rightSection={<FontAwesomeIcon icon='chevron-down' />}
+            />
+        </div>
+    );
+}
+
+interface _TileOrEntityPropertyProps {
+    paramDef: Parameter<string>;
+    allowTiles?: Boolean;
+    allowTileEntities?: boolean;
+    allowEntities?: boolean;
+    value: ItemReference;
+    onChange: (v: ItemReference) => void;
+}
+
+function _TileOrEntityProperty ({
+    paramDef,
+    allowTiles = false,
+    allowTileEntities = false,
+    allowEntities = false,
+    value,
+    onChange,
+}: _TileOrEntityPropertyProps) {
+    const { resourcePack } = useLevelEditorContext();
+
+    if (resourcePack === null) return (
+        <div className="property-container property-container-string">
+            no respack selected
+        </div>
+    );
+
+    return (
+        <div className="property-container property-container-string">
+            <TileOrEntityInput
+                pack={resourcePack}
+                label={paramDef.displayName}
+                description={paramDef.description}
+                allowTiles={allowTiles}
+                allowTileEntities={allowTileEntities}
+                allowEntities={allowEntities}
+                value={value}
             />
         </div>
     );

@@ -39,9 +39,26 @@
                         "y": 19
                     },
                     "tile": "question_block",
-                    "behaviorProperties": {
-                        "contentType": "Entity",
-                        "containedEntity": "Super Mushroom"
+                    "parameters": {
+                        "block": {
+                            "isHidden": false
+                        },
+                        "rewardBlock": {
+                            "rewardType": "entity",
+                            "reward": {
+                                "entity": "fire_flower",
+                                "behaviorParameters": {}
+                            },
+                            "smallPlayerHasDifferentReward": true,
+                            "smallPlayerReward": {
+                                "entity": "super_mushroom",
+                                "behaviorParameters": {}
+                            },
+                            "maxHits": 1,
+                            "maxTime": 0,
+                            "hasBonusForReachingMaxHits": false,
+                            "bonusForReachingMaxHits": null
+                        }
                     }
                 }
             ]
@@ -49,14 +66,15 @@
     ],
     "spawns": [
         {
-            "id": 0,
             "position": {
                 "x": 30.0,
                 "y": 24.0
             },
-            "entity": "red_goomba",
-            "behaviorProperties": {
-                "startingDirectionRight": false
+            "entity": {
+                "behavior": "red_goomba",
+                "behaviorParameters": {
+                    "startingDirectionRight": false
+                }
             }
         }
     ]

@@ -2,7 +2,7 @@ import { SPDocument } from 'models/sp_documents';
 import React, { useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { ToolIcons1x } from 'icons';
-import { Level, LevelTile } from 'models/Level';
+import { Level, PlacedTile } from 'models/Level';
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { SP_ResizeHandle } from 'elements/resizablePanel';
 import LocalStorage from 'localStorage';
@@ -19,8 +19,8 @@ import { Vec2, vec2equals } from 'utils';
 export type LevelChangeFieldHandler
     = <K extends keyof Level>(field: K, value: Level[K]) => void;
 export type LevelChangeTileHandler
-    = <K extends keyof LevelTile>(
-        layerIndex: number, tilePos: Vec2, field: K, value: LevelTile[K]
+    = <K extends keyof PlacedTile>(
+        layerIndex: number, tilePos: Vec2, field: K, value: PlacedTile[K]
     ) => void;
 
 export interface LevelEditorProps {
@@ -38,6 +38,10 @@ function LevelEditor ({
 
     const level = doc.content as Level;
     const pack = getResourcePack(level.resourcePack);
+
+    useEffect(() => {
+        levelCtx.setResourcePack(getResourcePack(level.resourcePack));
+    }, [level.resourcePack]);
 
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
@@ -161,8 +165,8 @@ function LevelEditor ({
         updateDocument(doc.id, update);
     }
 
-    function handleTileChange<K extends keyof LevelTile> (
-        layerIndex: number, tilePos: Vec2, field: K, value: LevelTile[K]
+    function handleTileChange<K extends keyof PlacedTile> (
+        layerIndex: number, tilePos: Vec2, field: K, value: PlacedTile[K]
     ) {
         const update = [...level.layers];
         update[layerIndex] = {...update[layerIndex]};

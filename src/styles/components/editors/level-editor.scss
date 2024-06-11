@@ -2,7 +2,7 @@
     //display: grid;
     //grid-template: "tool tool tool" 32px
     //               "pall cont prop" 1fr / 1fr 1fr 340px;
-    @include vertical-gallery-stretch;
+    @include vertical-queue-stretch;
     justify-content: stretch;
 
     .level-toolbar {
@@ -54,7 +54,7 @@
             align-items: stretch;
 
             .palette-panel-content {
-                @include horizontal-gallery(wrap);
+                @include horizontal-queue(wrap);
             }
         }
 
@@ -84,7 +84,7 @@
     }
 
     .level-grid-container {
-        @include horizontal-gallery;
+        @include horizontal-queue;
         @include fill-container;
         align-items: stretch;
 
@@ -117,7 +117,7 @@
             flex: 1;
             min-width: 0;
             background: $color-component-1;
-            @include vertical-gallery-stretch;
+            @include vertical-queue-stretch;
         }
     }
 }
@@ -125,12 +125,12 @@
 .level-grid-features {
     background: $color-background;
     border-top: 1px solid $color-component-2;
-    @include vertical-gallery-stretch;
+    @include vertical-queue-stretch;
     height: 100%;
 
     .sp-section-tab-root {
         @include fill-container;
-        @include vertical-gallery-stretch;
+        @include vertical-queue-stretch;
 
         .sp-section-tab-panel-container {
             flex: 1;
@@ -147,7 +147,7 @@
 
         .terrain-panel {
             @include fill-container;
-            @include vertical-gallery-stretch;
+            @include vertical-queue-stretch;
 
             .terrain-tabs-tab {
                 padding-left: 10px;
@@ -162,7 +162,7 @@
 
 .level-grid-canvas-viewbox {
     @include fill-container;
-    @include horizontal-gallery;
+    @include horizontal-queue;
     position: relative;
     padding-right: 4px;
     padding-bottom: 4px;
@@ -241,7 +241,7 @@
 }
 
 .level-editor .level-properties-panel {
-    @include vertical-gallery-stretch;
+    @include vertical-queue-stretch;
 
     .item-properties {
         .sp-accordion-panel-content {
@@ -251,7 +251,7 @@
     }
     
     .trait-parameter-section {
-        @include vertical-gallery-stretch;
+        @include vertical-queue-stretch;
 
         .header {
             font-weight: $w-semibold;
@@ -269,7 +269,7 @@
         }
 
         .parameters {
-            @include vertical-gallery-stretch;
+            @include vertical-queue-stretch;
             padding: 8px 0;
             flex: 1;
 
@@ -282,7 +282,7 @@
             }
 
             .property-container-boolean {
-                @include horizontal-gallery;
+                @include horizontal-queue;
                 gap: 5px;
 
                 > svg {

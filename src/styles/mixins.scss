@@ -81,7 +81,7 @@
     overflow: hidden;
 }
 
-@mixin horizontal-gallery ($flex-wrap: nowrap) {
+@mixin horizontal-queue ($flex-wrap: nowrap) {
     display: flex;
     flex-direction: row;
     flex-wrap: $flex-wrap;
@@ -89,7 +89,7 @@
     overflow: hidden;
 }
 
-@mixin horizontal-gallery-stretch ($flex-wrap: nowrap) {
+@mixin horizontal-queue-stretch ($flex-wrap: nowrap) {
     display: flex;
     flex-direction: row;
     flex-wrap: $flex-wrap;
@@ -115,7 +115,7 @@
     overflow-y: auto;
 }
 
-@mixin vertical-gallery () {
+@mixin vertical-queue () {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -123,12 +123,33 @@
     overflow: hidden;
 }
 
-@mixin vertical-gallery-stretch () {
+@mixin vertical-queue-stretch () {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
     overflow: hidden;
+}
+
+@mixin gallery () {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+@mixin gallery-list () {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 @mixin default-scrollbar {

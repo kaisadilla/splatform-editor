@@ -1,11 +1,16 @@
 import { TileTraitId } from "data/TileTraits";
+import { TraitSpecification, TraitPreset } from "./splatform";
 
-export interface Tile {
+export interface Tile extends TileFile {
+    id: string;
+}
+
+export type TileFile = {
     type: 'tile';
     name: string;
     category: string | null;
-    traits: TileTraitDefinition[];
-    presets?: TileTraitPreset[];
+    traits: TraitSpecification<TileTraitId>[];
+    presets?: TraitPreset[];
     spritesheet: string;
     animation: {
         type: 'static' | 'dynamic';
@@ -16,18 +21,7 @@ export interface Tile {
     }
 }
 
-export interface TileTraitDefinition {
-    name: TileTraitId;
-    parameters: {[key: string]: any};
-    configurableParameters: string[];
-}
-
-export interface TileTraitPreset {
-    name: string;
-    parameters: {[key: string]: any};
-}
-
-export function getNewTile () : Tile {
+export function getNewTile () : TileFile {
     return {
         type: 'tile',
         name: "New tile",

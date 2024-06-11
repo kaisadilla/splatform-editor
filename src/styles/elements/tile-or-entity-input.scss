@@ -1,0 +1,100 @@
+.sp-item-input-button {
+    width: 100%;
+    padding: 0 10px;
+    margin-top: calc((0.625rem * 1) / 2);
+
+    &[data-disabled] {
+        border: 0.0625rem solid #dde1e9;
+    }
+
+    &:active {
+        transform: none;
+    }
+
+    .sp-asset-input-inner {
+        justify-content: start;
+        font-weight: $w-regular;
+    }
+
+    .sp-item-input-label {
+        width: 100%;
+
+        .label-with-image {
+            @include fill-container;
+            @include horizontal-queue;
+            justify-content: start;
+            gap: 10px;
+
+            > .label-text {
+                @include center-vertically;
+                flex: 1;
+                min-width: 0;
+                border-left: 1px solid $color-component-2;
+                height: 100%;
+                padding-left: 10px;
+            }
+        }
+    }
+}
+
+.sp-item-input-modal-root {
+
+    .sp-item-input-body {
+        @include fill-container;
+    }
+
+    .sp-item-input-content {
+        @include fill-container;
+    }
+
+    .sp-item-picker-tab-root {
+        @include fill-container;
+        @include vertical-queue-stretch;
+        
+        .sp-tab-ribbon-list {
+            margin-bottom: 6px;
+            border-top: 0;
+
+            &::before {
+                border-bottom: 1px solid $color-component-3;
+            }
+        }
+
+        .picker-container {
+            @include fill-container;
+            @include center-vertically;
+
+            .sp-item-picker-tab-panel {
+                @include fill-container;
+                @include center-vertically;
+            }
+        }
+
+        .picker-properties {
+            width: 300px;
+            height: 100%;
+            border-left: 1px solid $color-component-3;
+        }
+
+        .tile-picker {
+            @include fill-container;
+            @include gallery-list;
+            padding: 8px;
+
+            .tile-icon {
+                @include center-content;
+                @include horizontal-queue;
+
+                padding: 4px;
+                width: 196px;
+                height: 24px;
+                gap: 6px;
+
+                .tile-icon-label {
+                    text-align: left;
+                    width: 100%;
+                }
+            }
+        }
+    }
+}

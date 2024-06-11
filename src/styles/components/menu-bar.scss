@@ -1,5 +1,5 @@
 .menu-bar {
-    @include horizontal-gallery;
+    @include horizontal-queue;
     align-items: stretch;
 
     .menu-bar-section.menu-bar-section {
@@ -62,7 +62,7 @@
     }
 
     .menu-bar-option-with-icon {
-        @include horizontal-gallery;
+        @include horizontal-queue;
         gap: 8px;
 
         > img {

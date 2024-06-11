@@ -1,6 +1,10 @@
 import { Version } from "./sp_documents";
 
-export interface Entity {
+export interface Entity extends EntityFile {
+    id: string
+}
+
+export interface EntityFile {
     type: 'entity';
     subtype: 'enemy' | 'item' | 'entity-platform';
     name: string;
@@ -14,7 +18,7 @@ export interface Entity {
     };
 }
 
-export function getNewEntity () : Entity {
+export function getNewEntity () : EntityFile {
     return {
         type: 'entity',
         subtype: 'enemy',

@@ -84,6 +84,7 @@ function _BackgroundImage ({
     onSelect,
 }: _BackgroundImageProps) {
     const className = getClassString(
+        "sp-gallery-selectable-item",
         "sp-background-picker-image",
         selected && "selected",
     );

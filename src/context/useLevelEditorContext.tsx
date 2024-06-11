@@ -1,3 +1,4 @@
+import { ResourcePack } from "models/ResourcePack";
 import { TilePaint } from "models/sp_documents";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Vec2, WithId } from "utils";
@@ -14,6 +15,10 @@ export type GridTool =
 ;
 
 interface LevelEditorContextState {
+    /**
+     * The resource pack currently in use by this level, if any.
+     */
+    resourcePack: ResourcePack | null;
     /**
      * The zoom applied to the editor canvas.
      */
@@ -38,6 +43,7 @@ interface LevelEditorContextState {
      * The terrain layer that is currently selected.
      */
     activeTerrainLayer: number;
+    setResourcePack: (pack: ResourcePack | null) => void;
     setZoom: (zoom: ZoomLevel) => void;
     setTileSelection: (positions: Vec2[]) => void;
     setPaint: (paint: WithId<TilePaint> | null) => void;
@@ -57,6 +63,7 @@ const useLevelEditorContext = () => useContext(LevelEditorContext);
 
 const LevelEditorContextProvider = ({ children }: any) => {
     const [state, setState] = useState<LevelEditorContextState>({
+        resourcePack: null,
         zoom: '2',
         tileSelection: [] as Vec2[],
         showGrid: true,
@@ -66,6 +73,13 @@ const LevelEditorContextProvider = ({ children }: any) => {
     } as LevelEditorContextState);
 
     const value = useMemo(() => {
+        function setResourcePack (pack: ResourcePack | null) {
+            setState(prevState => ({
+                ...prevState,
+                resourcePack: pack,
+            }));
+        }
+
         function setZoom (zoom: ZoomLevel) {
             setState(prevState => ({
                 ...prevState,
@@ -146,6 +160,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
 
         return {
             ...state,
+            setResourcePack,
             setZoom,
             setTileSelection,
             setPaint,

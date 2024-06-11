@@ -1,6 +1,6 @@
 import { ResourcePack, ResourcePackManifest } from "./ResourcePack";
-import { Entity } from "./Entity";
-import { Tile } from "./Tile";
+import { Entity, EntityFile } from "./Entity";
+import { Tile, TileFile } from "./Tile";
 import { World } from "./World";
 import { Game } from "./Game";
 import { Level } from "./Level";
@@ -20,8 +20,8 @@ export type SPDocumentContent =
     | Game
     | ResourcePack
     | ResourcePackManifest
-    | Entity
-    | Tile;
+    | EntityFile
+    | TileFile;
 
 export interface SPDocument {
     id: string;

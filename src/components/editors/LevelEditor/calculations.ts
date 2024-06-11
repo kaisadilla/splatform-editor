@@ -1,4 +1,4 @@
-import { LevelTile } from "models/Level";
+import { PlacedTile } from "models/Level";
 import { Vec2, vec2equals } from "utils";
 
 /**
@@ -11,7 +11,7 @@ import { Vec2, vec2equals } from "utils";
  * @returns 
  */
 export function removePositionsFromTileList (
-    layerTiles: LevelTile[], positions: Vec2[]
+    layerTiles: PlacedTile[], positions: Vec2[]
 ) {
     return layerTiles.filter(
         lt => positions.findIndex(

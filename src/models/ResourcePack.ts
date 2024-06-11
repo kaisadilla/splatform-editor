@@ -20,6 +20,9 @@ export interface ResourcePack {
         ui: MediaAssetMetadata[];
     };
     tiles: DataAssetMetadata<Tile>[];
+    // calculated automatically
+    entitiesById: {[key: string]: DataAssetMetadata<Entity>};
+    tilesById: {[key: string]: DataAssetMetadata<Tile>};
 }
 
 export interface ResourcePackManifest {

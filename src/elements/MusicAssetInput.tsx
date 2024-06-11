@@ -102,6 +102,7 @@ function _MusicImage ({
     onPlay,
 }: _MusicImageProps) {
     const className = getClassString(
+        "sp-gallery-selectable-item",
         "sp-music-picker-icon",
         selected && "selected",
     );

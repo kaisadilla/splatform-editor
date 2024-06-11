@@ -1,6 +1,8 @@
 import { Vec2 } from "utils";
 import { SPDocumentType, Version } from "./sp_documents";
-import { TileTraitId, TraitParameterCollection } from "data/TileTraits";
+import { TileTraitId, TraitId, TraitParameterCollection } from "data/TileTraits";
+import { Tile } from "./Tile";
+import { TraitValueCollection } from "./splatform";
 
 export interface Level {
     type: 'level';
@@ -9,7 +11,7 @@ export interface Level {
     version: Version;
     settings: LevelSettings;
     layers: TileLayer[];
-    spawns: EntitySpawn[];
+    spawns: LevelSpawn[];
     events: LevelEvent[];
 }
 
@@ -21,31 +23,48 @@ export interface LevelSettings {
     time: number;
 }
 
+/**
+ * Represents a layer of tiles in a level.
+ */
 export interface TileLayer {
     name: string;
     settings: TileLayerSettings;
-    tiles: LevelTile[];
+    tiles: PlacedTile[];
 }
 
 export interface TileLayerSettings {
     checksCollisions?: boolean;
 }
 
+/**
+ * Represents a tile in a level.
+ */
 export interface LevelTile {
-    position: Vec2;
     tile: string;
-    parameters: LevelTileParameterCollection;
+    parameters: TraitValueCollection<TileTraitId>;
 }
 
-export type LevelTileParameterCollection = {
-    [key in TileTraitId]?: TraitParameterCollection
-};
-
-export interface EntitySpawn {
-    id?: number;
+/**
+ * Represents a tile in a level that has a predetermined position in said level.
+ */
+export interface PlacedTile extends LevelTile {
     position: Vec2;
-    entity: string,
-    behaviorProperties?: {[prop: string]: any};
+}
+
+/**
+ * Represents an entity in a level.
+ */
+export interface LevelEntity {
+    behavior: string,
+    behaviorProperties: {[prop: string]: any};
+}
+
+/**
+ * Represents a spawn point in a level.
+ */
+export interface LevelSpawn {
+    position: Vec2;
+    entity: LevelEntity;
 }
 
 export interface LevelEvent {
@@ -80,5 +99,24 @@ export function getNewLevel () : Level {
         ],
         spawns: [],
         events: [],
+    };
+}
+
+export function getNewLevelTile (tile: Tile) : LevelTile {
+    const params: TraitValueCollection = {};
+
+    for (const trait of tile.traits) {
+        params[trait.id] = {} as {[key: string]: any};
+
+        for (const configParam of trait.configurableParameters) {
+            const defaultValue = trait.parameters[configParam];
+            //@ts-ignore TODO: Better types for traits.
+            params[trait.id]![configParam] = defaultValue;
+        }
+    }
+    
+    return {
+        tile: tile.id,
+        parameters: params,
     };
 }

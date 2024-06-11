@@ -1,4 +1,4 @@
-import { BlockRegenerationMode, Parameter, PlayerDamageType, RewardTypeParameter, Trait } from "models/SPlatform";
+import { BlockRegenerationMode, ItemReference, Parameter, PlayerDamageType, RewardTypeParameter, Trait } from "models/splatform";
 
 const TileTraits: TileTraitCollection = {
     background: {
@@ -390,6 +390,7 @@ export type TileTraitCollection = {
 }
 
 export type TileTraitId = keyof TileTraitCollection;
+export type TraitId = TileTraitId;
 
 export interface TraitParameterCollection {
     
@@ -411,21 +412,21 @@ export interface BreakableTileTraitParameterCollection extends TraitParameterCol
     breakWhenHitByPlayerFireball: Parameter<boolean>;
     breakWhenHitByEnemyFireball: Parameter<boolean>;
     isReplacedWhenBroken: Parameter<boolean>;
-    replacementWhenBroken: Parameter<string | null>;
+    replacementWhenBroken: Parameter<ItemReference | null>;
 }
 
 export interface RewardBlockTileTraitParameterCollection extends TraitParameterCollection {
     rewardType: Parameter<RewardTypeParameter>;
-    reward: Parameter<string | null>;
+    reward: Parameter<ItemReference | null>;
     smallPlayerHasDifferentReward: Parameter<boolean>;
-    smallPlayerReward: Parameter<string | null>;
+    smallPlayerReward: Parameter<ItemReference | null>;
     maxHits: Parameter<number>;
     maxTime: Parameter<number>;
     waitForFinalHitBeforeBecomingEmpty: Parameter<boolean>;
     hasBonusForReachingMaxHits: Parameter<boolean>;
-    bonusForReachingMaxHits: Parameter<string | null>;
+    bonusForReachingMaxHits: Parameter<ItemReference | null>;
     isReplacedWhenEmptied: Parameter<boolean>;
-    replacementWhenEmptied: Parameter<string | null>;
+    replacementWhenEmptied: Parameter<ItemReference | null>;
     revertToCoinAfterFirstHit: Parameter<boolean>;
     triggerWhenPunched: Parameter<boolean>;
     triggerWhenSpin: Parameter<boolean>;

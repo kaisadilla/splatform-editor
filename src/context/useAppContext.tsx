@@ -57,7 +57,7 @@ const AppContextProvider = ({ children }: any) => {
 
     async function loadData () {
         const userdataPath = await Ipc.getUserdataPath();
-        const resourcePacks = await Ipc.loadResourcePacks();
+        const resourcePacks = await loadResourcePacks();
 
         setState(prevState => ({
             ...prevState,
@@ -65,6 +65,25 @@ const AppContextProvider = ({ children }: any) => {
             userdataPath: userdataPath,
             resourcePacks: resourcePacks,
         }));
+    }
+    
+    async function loadResourcePacks () : Promise<ResourcePack[]> {
+        const resPacks = await Ipc.loadResourcePacks();
+
+        for (const rp of resPacks) {
+            rp.entitiesById = {};
+            rp.tilesById = {};
+
+            for (const e of rp.entities) {
+                rp.entitiesById[e.id] = e;
+            }
+
+            for (const t of rp.tiles) {
+                rp.tilesById[t.id] = t;
+            }
+        }
+
+        return resPacks;
     }
 }
 

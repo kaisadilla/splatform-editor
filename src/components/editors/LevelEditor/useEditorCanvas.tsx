@@ -1,7 +1,7 @@
 import { CSS_VARIABLES } from "_constants";
 import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { getTileImagePath } from "elements/TileImage";
-import { Level, LevelTile, LevelTileParameterCollection, TileLayer } from "models/Level";
+import { Level, PlacedTile, TileLayer, getNewLevelTile } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
 import { Tile } from "models/Tile";
 import { Rectangle, Texture, Graphics as PixiGraphics, Renderer, Sprite, RenderTexture, BaseTexture, ICanvas, SCALE_MODES } from "pixi.js";
@@ -276,7 +276,7 @@ export default function useEditorCanvas (
             }
 
             layerTiles.push(createLevelTile(
-                t, levelCtx.paint.id, levelCtx.paint.object
+                t, levelCtx.paint.object
             ));
         }
 
@@ -375,29 +375,16 @@ export default function useEditorCanvas (
         };
     }
 
-    function getTileAtPos (layerIndex: number, pos: Vec2) : LevelTile | null {
+    function getTileAtPos (layerIndex: number, pos: Vec2) : PlacedTile | null {
         return level.layers[levelCtx.activeTerrainLayer].tiles.find(
             t => vec2equals(t.position, pos)
         ) ?? null;
     }
 
-    function createLevelTile (position: Vec2, tileId: string, tile: Tile) : LevelTile {
-        const params: LevelTileParameterCollection = {};
-
-        for (const trait of tile.traits) {
-            params[trait.name] = {} as {[key: string]: any};
-
-            for (const configParam of trait.configurableParameters) {
-                const defaultValue = trait.parameters[configParam];
-                //@ts-ignore TODO: Better types for traits.
-                params[trait.name]![configParam] = defaultValue;
-            }
-        }
-        
+    function createLevelTile (position: Vec2, tile: Tile) : PlacedTile {
         return {
+            ...getNewLevelTile(tile),
             position: position,
-            tile: tileId,
-            parameters: params,
         }
     }
 

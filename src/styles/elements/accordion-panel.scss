@@ -11,7 +11,7 @@
         }
     
         .sp-accordion-panel-panel {
-            @include vertical-gallery;
+            @include vertical-queue;
     
             .sp-accordion-panel-content {
                 @include fill-container;

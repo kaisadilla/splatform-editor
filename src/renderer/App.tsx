@@ -1,6 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import icon from '@assets/icon.png';
-import { Tooltip } from 'react-tooltip';
 import { DEFAULT_TOOLTIP_ID } from 'names';
 import Window from 'Window';
 import { MantineProvider, createTheme as createMantineTheme } from '@mantine/core';
@@ -13,7 +12,6 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faArrowPointer, faBrush, faChevronDown, faCirclePlay, faCircleQuestion, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
 
 import '@mantine/core/styles.css';
-import 'react-tooltip/dist/react-tooltip.css';
 import 'react-material-symbols/sharp'; // 'rounded' | 'sharp' | 'outlined'.
 import darkTheme from 'styles/main.scss';
 
@@ -67,10 +65,6 @@ export default function App () {
             <div className="app" style={darkTheme}>
                 <Window />
             </div>
-            <Tooltip
-                id={DEFAULT_TOOLTIP_ID}
-                className="tooltip default-tooltip"
-            />
 
         </UserContextProvider>
         </AppContextProvider>

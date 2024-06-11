@@ -10,6 +10,7 @@
 @import "elements/drag-region";
 @import "elements/resizable-panel";
 @import "elements/tab-ribbon";
+@import "elements/tile-or-entity-input";
 @import "elements/toolbar";
 
 @import "components/editors/editor";
@@ -31,7 +32,7 @@
 }
 
 .window {
-    @include vertical-gallery-stretch;
+    @include vertical-queue-stretch;
     @include fill-container;
 }
 

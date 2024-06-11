@@ -1,4 +1,4 @@
-import { getWinPath } from "../util";
+import { getWinPath } from "../main-utils";
 import { confirmDocumentClose, openTextFile, saveDocument, saveNewDocument, saveNewTextFile } from "../files/documentFiles";
 import { getInstalledResourcePacks, getUserdataFolderPath } from "../files/gameData";
 import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT } from "./ipcNames";

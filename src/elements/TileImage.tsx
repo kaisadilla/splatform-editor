@@ -3,11 +3,11 @@ import { ResourcePack } from 'models/ResourcePack';
 import { Tile } from 'models/Tile';
 import React from 'react';
 import { ImgProps } from 'types';
-import { getClassString } from 'utils';
+import { getClassString, isString } from 'utils';
 
 export interface TileImageProps extends ImgProps {
     pack: ResourcePack;
-    tile: Tile | null | undefined;
+    tile: Tile | string | null | undefined;
     scale?: number;
     bordered?: boolean;
 }
@@ -23,12 +23,11 @@ function TileImage ({
 }: TileImageProps) {
     let imgSrc;
 
-    if (tile) {
-        imgSrc = getTileImagePath(pack, tile);
+    if (isString(tile)) {
+        tile = pack.tilesById[tile as string]?.data;
     }
-    else {
-        imgSrc = undefined;
-    }
+
+    imgSrc = tile ? getTileImagePath(pack, tile) : undefined;
 
     const classStr = getClassString(
         "asset-tile-image",

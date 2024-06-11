@@ -13,7 +13,7 @@ import { app, BrowserWindow, shell, ipcMain, protocol, BrowserWindowConstructorO
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import MenuBuilder from "./menu";
-import { resolveHtmlPath } from "./util";
+import { resolveHtmlPath } from "./main-utils";
 import { fileURLToPath } from "url";
 import { WindowType } from "./WindowType";
 import { createIpcHandlers } from "./ipc/ipcMain";

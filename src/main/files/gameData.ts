@@ -3,9 +3,9 @@ import fs from "fs";
 import Registry from "winreg";
 import { DataAssetMetadata, MediaAssetMetadata, ResourcePack, ResourcePackManifest } from "models/ResourcePack";
 import Path from "path";
-import { Entity } from "models/Entity";
-import { Tile } from "models/Tile";
-import { getWinPath } from "../util";
+import { Entity, EntityFile } from "models/Entity";
+import { Tile, TileFile } from "models/Tile";
+import { LOCALE, getWinPath } from "../main-utils";
 import { app } from "electron";
 
 const REGKEY_USER_FOLDER = '\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders';
@@ -72,17 +72,29 @@ async function _readResourcePackFolder (path: string, folderName: string)
 
     for (const file of entityFiles) {
         const entityJson = _readTextFile(file.fullPath);
+        const entityFile = JSON.parse(entityJson) as EntityFile;
+        const entity = {
+            ...entityFile,
+            id: file.id,
+        };
+
         entityMetadata.push({
             ...file,
-            data: JSON.parse(entityJson),
+            data: entity,
         });
     }
 
     for (const file of tileFiles) {
         const tileJson = _readTextFile(file.fullPath);
+        const tileFile = JSON.parse(tileJson) as TileFile;
+        const tile = {
+            ...tileFile,
+            id: file.id,
+        }
+
         tileMetadata.push({
             ...file,
-            data: JSON.parse(tileJson),
+            data: tile,
         });
     }
 
@@ -103,8 +115,8 @@ async function _readResourcePackFolder (path: string, folderName: string)
             tiles: spriteTileFiles,
             ui: spriteUiFiles,
         },
-        tiles: tileMetadata,
-    };
+        tiles: tileMetadata.sort((a, b) => a.data.name.localeCompare(b.data.name, LOCALE)),
+    } as ResourcePack;
 }
 
 async function _scandirForFileType (path: string, ...extensions: string[]) {

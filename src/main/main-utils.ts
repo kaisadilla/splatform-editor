@@ -2,6 +2,8 @@
 import { URL } from 'url';
 import Path from 'path';
 
+export const LOCALE = "en-US";
+
 /**
  * Adjusts the path for the currenet operating system.
  * @param path The path to adjust.

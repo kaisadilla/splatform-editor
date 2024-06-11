@@ -51,12 +51,12 @@ function AssetInput ({
                 opened={disabled === false && opened}
                 onClose={close}
                 classNames={{
-                    root: "sp-asset-input-modal",
-                    content: "sp-asset-input-content",
-                    header: "sp-asset-input-header",
-                    title: "sp-asset-input-title",
-                    close: "sp-asset-input-close",
-                    body: "sp-asset-input-body"
+                    root: "sp-modal-root sp-asset-input-modal-root",
+                    content: "sp-modal-content sp-asset-input-content",
+                    header: "sp-modal-header sp-asset-input-header",
+                    title: "sp-modal-title sp-asset-input-title",
+                    close: "sp-modal-close sp-asset-input-close",
+                    body: "sp-modal-body sp-asset-input-body",
                 }}
             >
                 {children}
