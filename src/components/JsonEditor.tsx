@@ -1,21 +1,21 @@
 import { Editor } from '@monaco-editor/react';
+import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import React, { useState } from 'react';
 
 export interface JsonEditorProps {
-    document: string;
 }
 
 function JsonEditor ({
-    document,
+    
 }: JsonEditorProps) {
-    const [value, setValue] = useState(document);
+    const levelCtx = useLevelEditorContext();
 
     return (
         <div className="json-editor-container">
             <Editor
                 defaultLanguage='json'
-                value={value}
-                onChange={v => setValue(v ?? "")}
+                value={levelCtx.jsonVersion}
+                onChange={v => levelCtx.setJsonVersion(v ?? "")}
             />
         </div>
     );

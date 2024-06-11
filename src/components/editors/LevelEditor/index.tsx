@@ -11,7 +11,7 @@ import LevelEditor_TilesPalette from './TilesPalette';
 import { useAppContext } from 'context/useAppContext';
 import { useUserContext } from 'context/useUserContext';
 import LevelEditor_Content from './Content';
-import { ZoomLevel, useLevelEditorContext } from 'context/useLevelEditorContext';
+import { EditMode, ZoomLevel, useLevelEditorContext } from 'context/useLevelEditorContext';
 import ActionBar, { ActionBarButton, ActionBarCustomElement, ActionBarElement, ActionBarNumberInput, ActionBarSelectInput, ActionBarToggle } from 'elements/ActionBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Vec2, vec2equals } from 'utils';
@@ -85,7 +85,7 @@ function LevelEditor ({
             label: 'Show file JSON',
             icon: 'json',
             value: levelCtx.editMode === 'code',
-            onToggle: v => levelCtx.setEditMode(v ? 'code' : 'visual'),
+            onToggle: v => handleChangeEditMode(v ? 'code' : 'visual'),
         } as ActionBarToggle,
         {
             type: 'separator',
@@ -125,9 +125,7 @@ function LevelEditor ({
                 elements={actionBarElements}
             />
 
-            {levelCtx.editMode === 'code' && <JsonEditor
-                document={JSON.stringify(level, null, 4)}
-            />}
+            {levelCtx.editMode === 'code' && <JsonEditor />}
 
             {levelCtx.editMode === 'visual' && <PanelGroup
                 className="level-edition-container"
@@ -206,6 +204,24 @@ function LevelEditor ({
         handleFieldChange('layers', update);
     }
 
+    function handleChangeEditMode (mode: EditMode) {
+        levelCtx.setEditMode(mode);
+
+        if (mode === 'visual') {
+            const newLevel = parseLevelJson(levelCtx.jsonVersion);
+
+            if (newLevel === null) {
+                // invalid json
+            }
+            else {
+                handleChange(newLevel);
+            }
+        }
+        else if (mode === 'code') {
+            levelCtx.setJsonVersion(JSON.stringify(level, null, 4));
+        }
+    }
+
     function handleKeyDown (evt: KeyboardEvent) {
         // if the current document is not the active tab, return.
         if (activeTab !== doc.id) return;
@@ -261,6 +277,13 @@ function LevelEditor ({
         handleTileLayerChange(levelCtx.activeTerrainLayer, 'tiles', tiles);
         levelCtx.setTileSelection([]);
     }
+}
+
+function parseLevelJson (json: string) : Level | null {
+    // TODO: Implement validation of json file.
+    if (false) return null;
+
+    return JSON.parse(json) as Level;
 }
 
 export default LevelEditor;

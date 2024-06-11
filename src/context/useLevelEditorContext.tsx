@@ -49,6 +49,13 @@ interface LevelEditorContextState {
      */
     activeTerrainLayer: number;
     editMode: EditMode;
+    /**
+     * The json version of this level, to be used in the json editor. This value
+     * should be manually updated whenever the user changes between visual and
+     * code editors. This allows this field to hold invalid values while the
+     * user is editing the code, without that resulting in a failure.
+     */
+    jsonVersion: string;
     setResourcePack: (pack: ResourcePack | null) => void;
     setZoom: (zoom: ZoomLevel) => void;
     setTileSelection: (positions: Vec2[]) => void;
@@ -57,6 +64,7 @@ interface LevelEditorContextState {
     setActiveTerrainLayer: (index: number) => void;
     setShowGrid: (show: boolean) => void;
     setEditMode: (mode: EditMode) => void;
+    setJsonVersion: (value: string) => void;
     getZoomMultiplier: () => number;
     /**
      * Removes all tiles from the current selection. 
@@ -128,7 +136,13 @@ const LevelEditorContextProvider = ({ children }: any) => {
                 ...prevState,
                 editMode: mode,
             }));
+        }
 
+        function setJsonVersion (value: string) {
+            setState(prevState => ({
+                ...prevState,
+                jsonVersion: value,
+            }));
         }
 
         function getZoomMultiplier () {
@@ -184,6 +198,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
             setActiveTerrainLayer,
             setShowGrid,
             setEditMode,
+            setJsonVersion,
             getZoomMultiplier,
             cancelSelection,
             getSelectableGridTools,

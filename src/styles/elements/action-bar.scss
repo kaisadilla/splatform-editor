@@ -1,6 +1,9 @@
 .sp-action-bar {
+    flex-shrink: 0;
+    
     .sp-action-bar-container {
         height: 36px;
+
         @include horizontal-list;
         
         > .sp-button {
