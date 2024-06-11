@@ -5,6 +5,15 @@ import { Vec2, WithId } from "utils";
 
 export type ZoomLevel = '0.25' | '0.5' | '1' | '2' | '3' | '4' | '6' | '8';
 
+export type EditorSection =
+    'terrain'
+    | 'entity-tiles'
+    | 'tracks'
+    | 'warps'
+    | 'spawns'
+    | 'events'
+;
+
 export type GridTool =
     'select'
     | 'brush'
@@ -28,6 +37,7 @@ interface LevelEditorContextState {
      * The zoom applied to the editor canvas.
      */
     zoom: ZoomLevel;
+    activeSection: EditorSection;
     /**
      * The position of the tile(s) that are currently selected (in the active layer).
      */
@@ -58,6 +68,7 @@ interface LevelEditorContextState {
     jsonVersion: string;
     setResourcePack: (pack: ResourcePack | null) => void;
     setZoom: (zoom: ZoomLevel) => void;
+    setActiveSection: (section: EditorSection) => void;
     setTileSelection: (positions: Vec2[]) => void;
     setPaint: (paint: WithId<TilePaint> | null) => void;
     setTerrainGridTool: (tool: GridTool) => void;
@@ -80,6 +91,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
     const [state, setState] = useState<LevelEditorContextState>({
         resourcePack: null,
         zoom: '2',
+        activeSection: 'terrain',
         tileSelection: [] as Vec2[],
         showGrid: true,
         paint: null,
@@ -100,6 +112,13 @@ const LevelEditorContextProvider = ({ children }: any) => {
             setState(prevState => ({
                 ...prevState,
                 zoom,
+            }));
+        }
+
+        function setActiveSection (section: EditorSection) {
+            setState(prevState => ({
+                ...prevState,
+                activeSection: section,
             }));
         }
 
@@ -192,6 +211,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
             ...state,
             setResourcePack,
             setZoom,
+            setActiveSection,
             setTileSelection,
             setPaint,
             setTerrainGridTool: setTerrainTool,

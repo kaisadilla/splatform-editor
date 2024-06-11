@@ -389,8 +389,13 @@ export type TileTraitCollection = {
     terrain: Trait<TerrainTileTraitParameterCollection>
 }
 
+export type EntityTraitCollection = {
+
+}
+
 export type TileTraitId = keyof TileTraitCollection;
-export type TraitId = TileTraitId;
+export type EntityTraitId = keyof EntityTraitCollection;
+export type TraitId = TileTraitId | EntityTraitId;
 
 export interface TraitParameterCollection {
     

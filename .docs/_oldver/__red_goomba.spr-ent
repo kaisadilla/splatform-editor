@@ -1,0 +1,16 @@
+{
+    "name": "Red Goomba",
+    "behavior": "goomba",
+    "behaviorProperties": {
+        "avoidsCliffs": true,
+        "startingDirectionRight": false
+    },
+    "configurableProperties": [
+        "startingDirectionRight"
+    ],
+    "sprite": "goomba_red",
+    "dimensions": {
+        "sprite": [16, 16],
+        "collider": [0, 0, 16, 16]
+    }
+}

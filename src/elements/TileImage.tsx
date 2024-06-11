@@ -24,12 +24,12 @@ function TileImage ({
     let imgSrc;
 
     if (isString(tile)) {
-        tile = pack.tilesById[tile as string]?.data;
+        tile = pack.tilesById[tile]?.data;
     }
 
     imgSrc = tile ? getTileImagePath(pack, tile) : undefined;
 
-    const classStr = getClassString(
+    className = getClassString(
         "asset-tile-image",
         bordered && "bordered",
         className,
@@ -37,7 +37,7 @@ function TileImage ({
 
     return (
         <img
-            className={classStr}
+            className={className}
             src={imgSrc}
             alt=""
             style={{

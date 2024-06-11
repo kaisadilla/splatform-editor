@@ -7,15 +7,14 @@ import { Tile } from 'models/Tile';
 import React from 'react';
 import { getClassString } from 'utils';
 
-export interface LevelEditor_TilesPaletteProps {
+export interface LevelEditor_TilePaletteProps {
     pack: ResourcePack | null;
 }
 
-function LevelEditor_TilesPalette ({
+function LevelEditor_TilePalette ({
     pack,
-}: LevelEditor_TilesPaletteProps) {
-    const { paint: selectedPaint, setPaint: setSelectedPaint } = useLevelEditorContext();
-    const { getResourcePack } = useAppContext();
+}: LevelEditor_TilePaletteProps) {
+    const { paint, setPaint } = useLevelEditorContext();
 
     if (pack === null) {
         return <div className="info-panel">
@@ -95,7 +94,7 @@ function LevelEditor_TilesPalette ({
                                         key={t.baseName}
                                         pack={pack}
                                         tile={t}
-                                        selected={selectedPaint?.id === t.id}
+                                        selected={paint?.id === t.id}
                                         onClick={() => selectPaint(t)}
                                     />)}
                                 </Accordion.Panel>
@@ -108,7 +107,7 @@ function LevelEditor_TilesPalette ({
     );
     
     function selectPaint (tile: DataAssetMetadata<Tile>) {
-        setSelectedPaint({
+        setPaint({
             id: tile.id,
             object: tile.data,
         })
@@ -148,4 +147,4 @@ function _TileButton ({
 }
 
 
-export default LevelEditor_TilesPalette;
+export default LevelEditor_TilePalette;

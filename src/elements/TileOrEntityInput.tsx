@@ -127,7 +127,7 @@ function _ItemPicker ({
     onChangeValue,
     closeForm,
 }: _ItemPickerProps) {
-    const [selectedValue, setSelectedValue] = useState(value);
+    const [currentValue, setCurrentValue] = useState(value);
 
     return (
         <Tabs
@@ -154,8 +154,8 @@ function _ItemPicker ({
                 <Tabs.Panel value='tiles'>
                     <_TilePicker
                         pack={pack}
-                        value={selectedValue}
-                        onChange={setSelectedValue}
+                        value={currentValue}
+                        onChange={setCurrentValue}
                         onSubmit={v => onSubmit(v)}
                     />
                 </Tabs.Panel>
@@ -171,10 +171,10 @@ function _ItemPicker ({
             </div>
 
             <div className="sp-modal-bottom-ribbon">
-                <Button variant='light'>
+                <Button variant='light' onClick={() => closeForm()}>
                     Cancel
                 </Button>
-                <Button color='blue'>
+                <Button color='blue' onClick={handleSelect}>
                     Select
                 </Button>
             </div>
@@ -182,14 +182,14 @@ function _ItemPicker ({
     );
 
     function getParameterForm () : React.ReactNode {
-        if (selectedValue?.type === 'tile') {
-            const tileRef = pack.tilesById[selectedValue.object.tileId];
+        if (currentValue?.type === 'tile') {
+            const tileRef = pack.tilesById[currentValue.object.tileId];
 
             return (
                 <ParameterForm
                     pack={pack}
                     traits={tileRef.data.traits}
-                    traitValues={selectedValue.object.parameters}
+                    traitValues={currentValue.object.parameters}
                     onChangeTraitValues={
                         (traitId, v) => handleTileTraitParamsChange(traitId, v)
                     }
@@ -201,7 +201,7 @@ function _ItemPicker ({
     function handleTileTraitParamsChange (
         traitId: TileTraitId, value: ParameterValueCollection
     ) {
-        setSelectedValue((prevState) => {
+        setCurrentValue((prevState) => {
             if (prevState?.type !== 'tile') return prevState;
 
             return {
@@ -215,6 +215,13 @@ function _ItemPicker ({
                 }
             };
         });
+    }
+
+    function handleSelect () {
+        if (currentValue) {
+            onChangeValue?.(currentValue);
+        }
+        closeForm();
     }
 
     function onSubmit (value: Reference) {

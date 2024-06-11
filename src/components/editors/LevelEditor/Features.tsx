@@ -19,13 +19,14 @@ function LevelEditor_Features ({
     level,
     onChangeField,
 }: LevelEditor_FeaturesProps) {
+    const levelCtx = useLevelEditorContext();
 
     return (
         <div className="level-grid-features">
             <Tabs
-                defaultValue={'terrain'}
+                value={levelCtx.activeSection}
                 // @ts-ignore - false syntax error.
-                //onChange={userCtx.setActiveTab}
+                onChange={v => { if (v) levelCtx.setActiveSection(v)}}
                 classNames={{
                     root: "sp-section-tab-root",
                     list: "sp-section-tab-ribbon-list",
@@ -61,11 +62,13 @@ function LevelEditor_Features ({
                     >
                         Warps
                     </Tabs.Tab>
-                    <Tabs.Tab
-                        value='spawns'
-                    >
-                        Spawns
-                    </Tabs.Tab>
+                    <Tooltip label="Where entities are initially placed in the map.">
+                        <Tabs.Tab
+                            value='spawns'
+                        >
+                            Spawns
+                        </Tabs.Tab>
+                    </Tooltip>
                     <Tabs.Tab
                         value='events'
                     >

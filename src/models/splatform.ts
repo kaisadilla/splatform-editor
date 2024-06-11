@@ -60,6 +60,7 @@ export interface TraitSpecification<T extends TraitId> {
     id: T;
     parameters: {[key: string]: any};
     configurableParameters: string[];
+    stateAnimations?: {[key: string]: string};
 }
 
 /**
@@ -129,3 +130,43 @@ export interface EntityReference extends ReferenceBase<LevelEntity> {
  * Represents a level object in the game, such as a specific entity or tile.
  */
 export type Reference = TileReference | EntityReference;
+
+/**
+ * Defines how a spritesheet works. Used by tiles, entities, etc to define their
+ * sprites.
+ */
+export interface SpritesheetSpecification {
+    /**
+     * The name of the sprite, located in the /sprites/entities/ folder.
+     */
+    name: string;
+    /**
+     * The size, in pixels, of each slice in the spritesheet.
+     */
+    sliceSize: [number, number];
+    /**
+     * The amount of slices in each row and in each column.
+     */
+    slices: [number, number];
+}
+
+export interface DimensionsSpecification {
+    /**
+     * the dimensions of the entity, in pixels. If this value is the same
+     * as `spritesheet.sliceSize`, then the sprite will be pixel-perfect. 
+     */
+    sprite: [number, number];
+    /**
+     * a rect describing the position of the collider in relation to the
+     * dimensions of the entity.
+     */
+    collider: [number, number, number, number];
+}
+
+export interface ObjectAnimation {
+    type: 'static' | 'dynamic';
+    slices?: [number, number];
+    frame?: number;
+    frames?: number[];
+    frameTimes?: number | number[];
+}

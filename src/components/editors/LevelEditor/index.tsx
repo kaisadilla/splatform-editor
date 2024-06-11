@@ -7,7 +7,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { SP_ResizeHandle } from 'elements/resizablePanel';
 import LocalStorage from 'localStorage';
 import LevelEditor_PropertiesPanel from './PropertiesPanel';
-import LevelEditor_TilesPalette from './TilesPalette';
+import LevelEditor_TilePalette from './TilePalette';
 import { useAppContext } from 'context/useAppContext';
 import { useUserContext } from 'context/useUserContext';
 import LevelEditor_Content from './Content';
@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Vec2, vec2equals } from 'utils';
 import { removePositionsFromTileList } from './calculations';
 import JsonEditor from 'components/JsonEditor';
+import LevelEditor_EntityPalette from './EntityPalette';
 
 export type LevelChangeFieldHandler
     = <K extends keyof Level>(field: K, value: Level[K]) => void;
@@ -132,9 +133,7 @@ function LevelEditor ({
                 direction='horizontal'
             >
                 <Panel className="palette-container" defaultSize={6} minSize={4}>
-                    <LevelEditor_TilesPalette
-                        pack={pack}
-                    />
+                    <_Palette />
                 </Panel>
                 <SP_ResizeHandle direction='horizontal' />
                 <Panel className="level-content-container" defaultSize={15} minSize={4}>
@@ -278,6 +277,32 @@ function LevelEditor ({
         levelCtx.setTileSelection([]);
     }
 }
+
+interface _PaletteProps {
+    
+}
+
+function _Palette ({
+    
+}: _PaletteProps) {
+    const levelCtx = useLevelEditorContext();
+
+    if (levelCtx.resourcePack === null) {
+        return <div>No resource pack selected.</div>
+    }
+
+    return (
+        <div>
+            {levelCtx.activeSection === 'terrain' && <LevelEditor_TilePalette
+                pack={levelCtx.resourcePack}
+            />}
+            {levelCtx.activeSection === 'spawns' && <LevelEditor_EntityPalette
+                pack={levelCtx.resourcePack}
+            />}
+        </div>
+    );
+}
+
 
 function parseLevelJson (json: string) : Level | null {
     // TODO: Implement validation of json file.

@@ -1,12 +1,41 @@
+## Entities
+
 The following file describes all the fields in a json describing an entity in
 a resource pack (an `.spr-ent` file).
 
 ```json
 {
+    // the type of object, which for entities is always 'entity'.
+    "type": "entity",
+    // the subtype of object, which is 'enemy' or 'item'.
+    "subtype": "enemy",
+    // The name of the category to group this tile in, in the editor.
+    "category": "Overworld",
     // the display name of the entity, to be shown in the editor.
     "name": "Brown Goomba",
-    // a "list" of traits this entity has. Currently, SPlatform supports only
-    // a single trait for entities.
+
+    // NOTE: Collision checks only refer to physics checks. An entity that doesn't
+    // collide with a player (for example) can still affect it, hurt it, etc.
+
+    // whether this entity has physics checks with tiles. A value of false allows
+    // this entity to pass through tiles (but also fall from the world if it has
+    // gravity).
+    "collidesWithTiles": true,
+    // whether this entity has physics checks with players. A value of false
+    // allows the player to stay at the same position as this entity without
+    // either pushing each other away.
+    "collidesWithPlayers": true,
+    // whether this entity has physics checks with other entities. Works similarly
+    // to the collisions with players.
+    "collidesWithEntities": true,
+    // the strength of gravity on this entity. A value of 0 makes the entity
+    // ignore gravity.
+    "gravityScale": 1,
+    // a list of traits this entity has. Traits will be compiled in the exact
+    // same order they appear here, which means each trait in the list overrides
+    // all traits before it if a conflict arises. For example, when two traits
+    // try to play an animation, the trait that is further down this array will
+    // be the one who plays the animation.
     "traits": [
         {
             // this trait's id. This name is mapped to an integer when compiled.

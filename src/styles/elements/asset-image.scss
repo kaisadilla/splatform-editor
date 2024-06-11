@@ -10,6 +10,21 @@
     }
 }
 
+.asset-entity-image {
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    > img {
+        @include fill-container;
+        object-fit: cover;
+        object-position: top left;
+        display: block;
+        image-rendering: pixelated;
+    }
+}
+
 .asset-background-image {
     display: block;
 }
