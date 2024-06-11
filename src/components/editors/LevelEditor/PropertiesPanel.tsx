@@ -13,6 +13,7 @@ import { clampNumber, vec2equals, vec2toString } from 'utils';
 import { LevelChangeFieldHandler, LevelChangeTileHandler } from '.';
 import TitledCheckbox from 'elements/TitledCheckbox';
 import TileOrEntityInput from 'elements/TileOrEntityInput';
+import ParameterForm from 'components/ParameterForm';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -263,7 +264,17 @@ function _TileProperties ({
                 Properties for {tile.data.name} at {vec2toString(tilePos)}
             </Accordion.Control>
             <Accordion.Panel>
-                {tile.data.traits.map(trait => getTraitSectionElement(levelTile, trait))}
+                <ParameterForm
+                    pack={pack}
+                    traits={tile.data.traits}
+                    traitValues={levelTile.parameters}
+                    onChangeTraitValues={
+                        (traitId, v) => handleTraitParamsChange(
+                            levelTile, traitId, v
+                        )
+                    }
+                />
+                {/*tile.data.traits.map(trait => getTraitSectionElement(levelTile, trait))*/}
             </Accordion.Panel>
         </Accordion.Item>
     );

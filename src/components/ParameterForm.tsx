@@ -18,6 +18,12 @@ export interface ParameterFormProps<T extends TraitId> {
      * The values of the parameters of each trait.
      */
     traitValues: TraitValueCollection<T>;
+    /**
+     * Triggers whenever the user changes the values of a trait's parameters.
+     * @param traitId The id of the trait that was changed.
+     * @param value The new collection of values for all of its parameters.
+     */
+    onChangeTraitValues?: (traitId: T, value: any) => void;
 }
 
 /**
@@ -27,6 +33,7 @@ function ParameterForm<T extends TraitId> ({
     pack,
     traits,
     traitValues,
+    onChangeTraitValues,
 }: ParameterFormProps<T>) {
     return (
         <div className="parameter-form">
@@ -52,7 +59,12 @@ function ParameterForm<T extends TraitId> ({
             pack={pack}
             trait={trait}
             paramValues={values}
+            onChange={v => handleTraitChange(trait.id, v)}
         />
+    }
+
+    function handleTraitChange (id: T, paramValues: ParameterValueCollection) {
+        onChangeTraitValues?.(id, paramValues);
     }
 }
 
@@ -60,6 +72,11 @@ interface _TraitSectionProps<T extends TraitId> {
     pack: ResourcePack;
     trait: TraitSpecification<T>;
     paramValues: ParameterValueCollection;
+    /**
+     * Triggers when the user changes any value of this trait's parameters.
+     * @param paramValues The new values for all of this trait's parameters.
+     */
+    onChange: (paramValues: ParameterValueCollection) => void;
 }
 
 /**
@@ -72,29 +89,45 @@ function _TraitSection<T extends TraitId> ({
     pack,
     trait,
     paramValues,
+    onChange,
 }: _TraitSectionProps<T>) {
     const traitDef = TileTraits[trait.id];
 
     return (
         <div className="trait-parameter-section">
             <div className="header">{traitDef.displayName}</div>
-            <div className="parameter">
+            <div className="parameter-list">
                 {trait.configurableParameters.map(cfgParam => <_TileParameterField
                     pack={pack}
                     param={traitDef.parameters[
                         cfgParam as keyof TraitParameterCollection
                     ] as Parameter<any>}
                     value={paramValues[cfgParam]}
+                    onChange={v => handleParameterChange(cfgParam, v)}
                 />)}
             </div>
         </div>
     );
+
+    function handleParameterChange (paramName: string, val: any) {
+        const update: ParameterValueCollection = {
+            ...paramValues,
+            [paramName]: val,
+        }
+        
+        onChange(update);
+    }
 }
 
 interface _TileParameterFieldProps {
     pack: ResourcePack;
     param: Parameter<any>;
     value: any;
+    /**
+     * Triggers when the user changes the value of this specific parameter.
+     * @param val The new value assigned to it.
+     */
+    onChange: (val: any) => void;
 }
 
 /**
@@ -105,23 +138,21 @@ function _TileParameterField ({
     pack,
     param,
     value,
+    onChange,
 }: _TileParameterFieldProps) {
-    function onChange (v: any) {
-
-    }
 
     if (param.type === 'boolean') {
         return <_BooleanProperty
             param={param}
             value={value as boolean}
-            onChange={onChange as (v: boolean) => void}
+            onChange={handleChange as (v: boolean) => void}
         />
     }
     if (param.type === 'integer') {
         return <_NumberProperty
             param={param}
             value={value as number}
-            onChange={onChange as (v: number) => void}
+            onChange={handleChange as (v: number) => void}
             allowDecimals={false}
         />
     }
@@ -129,7 +160,7 @@ function _TileParameterField ({
         return <_NumberProperty
             param={param}
             value={value as number}
-            onChange={onChange as (v: number) => void}
+            onChange={handleChange as (v: number) => void}
             allowDecimals={true}
         />
     }
@@ -137,7 +168,7 @@ function _TileParameterField ({
         return <_StringProperty
             param={param}
             value={value as string}
-            onChange={onChange as (v: string) => void}
+            onChange={handleChange as (v: string) => void}
         />
     }
     if (param.type === 'tileReference') {
@@ -147,7 +178,7 @@ function _TileParameterField ({
             allowTiles
             allowEntities
             value={value as ItemReference}
-            onChange={onChange as (v: ItemReference) => void}
+            onChange={handleChange as (v: ItemReference) => void}
         />
     }
     if (param.type === 'entityReference') {
@@ -156,7 +187,7 @@ function _TileParameterField ({
             param={param}
             allowEntities
             value={value as ItemReference}
-            onChange={onChange as (v: ItemReference) => void}
+            onChange={handleChange as (v: ItemReference) => void}
         />
     }
     if (param.type === 'tileOrEntityReference') {
@@ -165,7 +196,7 @@ function _TileParameterField ({
             param={param}
             allowEntities
             value={value as ItemReference}
-            onChange={onChange as (v: ItemReference) => void}
+            onChange={handleChange as (v: ItemReference) => void}
         />
     }
     if (param.type === 'playerDamageType') {
@@ -176,7 +207,7 @@ function _TileParameterField ({
                 { value: 'regular', label: "Regular"},
                 { value: 'fatal', label: "Fatal"},
             ]}
-            onChange={onChange as (v: string) => void}
+            onChange={handleChange as (v: string) => void}
         />
     }
     if (param.type === 'rewardType') {
@@ -188,7 +219,7 @@ function _TileParameterField ({
                 { value: 'tile', label: "Tile"},
                 { value: 'entity', label: "Entity"},
             ]}
-            onChange={onChange as (v: string) => void}
+            onChange={handleChange as (v: string) => void}
         />
     }
     if (param.type === 'blockRegenerationMode') {
@@ -199,7 +230,7 @@ function _TileParameterField ({
                 { value: 'time', label: "Time"},
                 { value: 'offscreen', label: "Offscreen"},
             ]}
-            onChange={onChange as (v: string) => void}
+            onChange={handleChange as (v: string) => void}
         />
     }
 
@@ -208,6 +239,10 @@ function _TileParameterField ({
             {param.displayName}
         </div>
     );
+
+    function handleChange (v: any) {
+        onChange(v);
+    }
 }
 
 

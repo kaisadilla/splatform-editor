@@ -1,5 +1,8 @@
 import { TileTraitId, TraitId } from "data/TileTraits";
 
+/**
+ * The type of value a parameter in SPlatform can hold.
+ */
 export type ParameterType =
     'boolean'
     | 'integer'
@@ -12,6 +15,12 @@ export type ParameterType =
     | 'rewardType'
     | 'blockRegenerationMode'
 
+/**
+ * An SPlatform trait. Contains the data that describes how a trait works.
+ * 
+ * **This is the object used by SPlatform.Editor to describe how a trait, such
+ * as "breakable", works in the SPlatform client.**
+ */
 export interface Trait<T> {
     id: string;
     displayName: string;
@@ -20,6 +29,10 @@ export interface Trait<T> {
 
 /**
  * An SPlatform parameter. Contains the data that describes how a parameter works.
+ * 
+ * **This is the object used by SPlatform.Editor to describe how a parameter,
+ * such as the parameter "isHidden" in the trait "breakable", works in the
+ * SPlatform client.**
  */
 export interface Parameter<T> {
     id: string;
@@ -36,7 +49,9 @@ export interface Parameter<T> {
  * resource pack, such as a tile or entity. Contains the name of a trait, the
  * values for that trait's parameters, and a list of parameters that can be
  * further configured for each individual level tile.
- * This is the object used by .spr-til and .spr-ent files to specify traits.
+ * 
+ * **This is the object used by .spr-til and .spr-ent files to specify traits.**
+ * 
  * T is a type that enumerates possible trait ids, such as `TileTraitId` or
  * `EntityTraitId`.
  */
@@ -51,6 +66,9 @@ export interface TraitSpecification<T extends TraitId> {
  * assigned to each of its parameters. Each key is the name of a trait, and each
  * value is an object where each key is the name of one parameter for that trait,
  * and each value is the value assigned to that parameter.
+ * 
+ * **This is the object used by LevelTiles and LevelEntities to specify the
+ * parameter values that apply to that specific world object.**
  */
 export type TraitValueCollection<T extends TraitId> = {
     [key in T]?: ParameterValueCollection;
@@ -58,6 +76,9 @@ export type TraitValueCollection<T extends TraitId> = {
 
 /**
  * A preset that applies values to a trait.
+ * 
+ * **This is the object used by .spr-til and .spr-ent files to specify preset
+ * values for traits.**
  */
 export interface TraitPreset {
     name: string;
@@ -67,6 +88,10 @@ export interface TraitPreset {
 /**
  * Holds specific values assigned to a set of parameters. Each key is the name
  * of a parameter and each value is that parameter's value.
+ * 
+ * **This is the object used by LevelTiles and LevelEntities to specify the
+ * parameter values that apply to a specific trait for that specific level
+ * object.**
  */
 export interface ParameterValueCollection {
     [key: string]: any;
