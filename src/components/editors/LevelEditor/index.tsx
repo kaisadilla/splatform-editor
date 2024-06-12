@@ -239,26 +239,33 @@ function LevelEditor ({
         const selectable = levelCtx.getSelectableGridTools();
 
         if (evt.key.toLowerCase() === 'm' && selectable.includes('select')) {
-            levelCtx.setTerrainGridTool('select');
+            levelCtx.setTool('select');
         }
         if (evt.key.toLowerCase() === 'b' && selectable.includes('brush')) {
-            levelCtx.setTerrainGridTool('brush');
+            levelCtx.setTool('brush');
         }
         if (evt.key.toLowerCase() === 'r' && selectable.includes('rectangle')) {
-            levelCtx.setTerrainGridTool('rectangle');
+            levelCtx.setTool('rectangle');
         }
         if (evt.key.toLowerCase() === 'e' && selectable.includes('eraser')) {
-            levelCtx.setTerrainGridTool('eraser');
+            levelCtx.setTool('eraser');
         }
         if (evt.key.toLowerCase() === 'g' && selectable.includes('bucket')) {
-            levelCtx.setTerrainGridTool('bucket');
+            levelCtx.setTool('bucket');
         }
         if (evt.key.toLowerCase() === 'i' && selectable.includes('picker')) {
-            levelCtx.setTerrainGridTool('picker');
+            levelCtx.setTool('picker');
         }
         if (evt.code === 'Delete') {
-            if (levelCtx.terrainTool === 'select') {
-                removeTilesAt(...levelCtx.tileSelection);
+            if (levelCtx.activeSection === 'terrain') {
+                if (levelCtx.terrainTool === 'select') {
+                    removeTilesAt(...levelCtx.tileSelection);
+                }
+            }
+            else if (levelCtx.activeSection === 'spawns') {
+                if (levelCtx.terrainTool === 'select') {
+                    removeSpawns(...levelCtx.spawnSelection);
+                }
             }
         }
 
@@ -271,10 +278,23 @@ function LevelEditor ({
     }
 
     function removeTilesAt (...pos: Vec2[]) {
+        if (pos.length === 0) return;
+
         let tiles = [...level.layers[levelCtx.activeTerrainLayer].tiles];
         tiles = removePositionsFromTileList(tiles, pos);
         handleTileLayerChange(levelCtx.activeTerrainLayer, 'tiles', tiles);
         levelCtx.setTileSelection([]);
+    }
+
+    /**
+     * Removes the spawns with the ids given.
+     * @param ids The ids of the spawns to remove.
+     */
+    function removeSpawns (...ids: string[]) {
+        if (ids.length === 0) return;
+        
+        const spawns = level.spawns.filter(s => ids.includes(s.uuid) === false);
+        handleFieldChange('spawns', spawns);
     }
 }
 

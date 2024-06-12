@@ -1,3 +1,4 @@
+import { Entity } from "models/Entity";
 import { ResourcePack } from "models/ResourcePack";
 import { TilePaint } from "models/sp_documents";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
@@ -43,13 +44,21 @@ interface LevelEditorContextState {
      */
     tileSelection: Vec2[];
     /**
+     * The ids of the spawn(s) that are currently selected.
+     */
+    spawnSelection: string[];
+    /**
      * Whether to paint the grid over the editor canvas.
      */
     showGrid: boolean;
     /**
      * The tile (or tile composite) currently used to paint new tiles.
      */
-    paint: WithId<TilePaint> | null;
+    terrainPaint: WithId<TilePaint> | null;
+    /**
+     * The entity currently selected to place new level entities.
+     */
+    entityPaint: Entity | null;
     /**
      * The selected tool for the terrain editor.
      */
@@ -70,8 +79,10 @@ interface LevelEditorContextState {
     setZoom: (zoom: ZoomLevel) => void;
     setActiveSection: (section: EditorSection) => void;
     setTileSelection: (positions: Vec2[]) => void;
+    setSpawnSelection: (ids: string[]) => void;
     setPaint: (paint: WithId<TilePaint> | null) => void;
-    setTerrainGridTool: (tool: GridTool) => void;
+    setEntityPaint: (paint: Entity | null) => void;
+    setTool: (tool: GridTool | null) => void;
     setActiveTerrainLayer: (index: number) => void;
     setShowGrid: (show: boolean) => void;
     setEditMode: (mode: EditMode) => void;
@@ -93,8 +104,10 @@ const LevelEditorContextProvider = ({ children }: any) => {
         zoom: '2',
         activeSection: 'terrain',
         tileSelection: [] as Vec2[],
+        spawnSelection: [] as string[],
         showGrid: true,
-        paint: null,
+        terrainPaint: null,
+        entityPaint: null,
         terrainTool: 'select',
         activeTerrainLayer: 0,
         editMode: 'visual',
@@ -129,17 +142,31 @@ const LevelEditorContextProvider = ({ children }: any) => {
             }));
         }
 
-        function setPaint (paint: WithId<TilePaint> | null) {
+        function setSpawnSelection (spawnSelection: string[]) {
             setState(prevState => ({
                 ...prevState,
-                paint,
+                spawnSelection,
             }));
         }
 
-        function setTerrainTool (tool: GridTool) {
+        function setPaint (paint: WithId<TilePaint> | null) {
             setState(prevState => ({
                 ...prevState,
-                terrainTool: tool,
+                terrainPaint: paint,
+            }));
+        }
+
+        function setEntityPaint (paint: Entity | null) {
+            setState(prevState => ({
+                ...prevState,
+                entityPaint: paint,
+            }));
+        }
+
+        function setTool (tool: GridTool | null) {
+            setState(prevState => ({
+                ...prevState,
+                terrainTool: tool ?? 'select',
             }));
         }
 
@@ -198,10 +225,22 @@ const LevelEditorContextProvider = ({ children }: any) => {
         function getSelectableGridTools () {
             const selectableTools = [] as GridTool[];
 
-            selectableTools.push('select', 'eraser', 'picker');
-
-            if (state.paint !== null) {
-                selectableTools.push('brush', 'rectangle', 'bucket');
+            if (state.activeSection === 'terrain') {
+                selectableTools.push('select', 'eraser', 'picker');
+    
+                if (state.terrainPaint !== null) {
+                    selectableTools.push('brush', 'rectangle', 'bucket');
+                }
+            }
+            else if (state.activeSection === 'spawns') {
+                selectableTools.push('select', 'eraser', 'picker');
+    
+                if (state.entityPaint !== null) {
+                    selectableTools.push('brush');
+                }
+            }
+            else {
+                selectableTools.push('select');
             }
 
             return selectableTools;
@@ -213,8 +252,10 @@ const LevelEditorContextProvider = ({ children }: any) => {
             setZoom,
             setActiveSection,
             setTileSelection,
+            setSpawnSelection,
             setPaint,
-            setTerrainGridTool: setTerrainTool,
+            setEntityPaint,
+            setTool,
             setActiveTerrainLayer,
             setShowGrid,
             setEditMode,

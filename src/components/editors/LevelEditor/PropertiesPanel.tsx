@@ -32,11 +32,11 @@ function LevelEditor_PropertiesPanel ({
         <div className="level-properties-panel">
             <Accordion
                 classNames={{
-                    root: "level-properties-accordion-root sp-accordion-panel-root",
-                    item: "level-properties-accordion-item sp-accordion-panel-item",
-                    control: "level-properties-accordion-control sp-accordion-panel-control",
-                    content: "level-properties-accordion-content sp-accordion-panel-content",
-                    panel: "level-properties-accordion-control sp-accordion-panel-panel",
+                    root: "level-properties-accordion-root sp-accordion-root",
+                    item: "level-properties-accordion-item sp-accordion-item",
+                    control: "level-properties-accordion-control sp-accordion-control",
+                    content: "level-properties-accordion-content sp-accordion-content",
+                    panel: "level-properties-accordion-panel sp-accordion-panel",
                 }}
                 multiple
                 defaultValue={['level', 'target']}

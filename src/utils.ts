@@ -448,3 +448,8 @@ function __buildSmartFilterRegex (filter: string, caseSensitive?: boolean) {
 export function getCssVariableValue (variable: string) {
     return window.getComputedStyle(document.body).getPropertyValue(variable) ?? "";
 }
+
+export function isVec2WithinRect (vec: Vec2, rect: Rect) {
+    return vec.x >= rect.left && vec.x <= rect.left + rect.width
+        && vec.y >= rect.top && vec.y <= rect.top + rect.height
+}

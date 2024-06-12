@@ -1,8 +1,9 @@
 import { Vec2 } from "utils";
 import { SPDocumentType, Version } from "./sp_documents";
-import { TileTraitId, TraitId, TraitParameterCollection } from "data/TileTraits";
+import { EntityTraitId, TileTraitId, TraitId, TraitParameterCollection } from "data/TileTraits";
 import { Tile } from "./Tile";
 import { ParameterValueCollection, TraitValueCollection } from "./splatform";
+import { Entity } from "./Entity";
 
 export interface Level {
     type: 'level';
@@ -56,13 +57,19 @@ export interface PlacedTile extends LevelTile {
  */
 export interface LevelEntity {
     entityId: string,
-    behaviorProperties: {[prop: string]: any};
+    parameters: TraitValueCollection<EntityTraitId>;
+    /**
+     * The horizontal direction at which the entity will initially be looking at.
+     * This direction may be changed by some traits.
+     */
+    orientation: 'right' | 'left';
 }
 
 /**
  * Represents a spawn point in a level.
  */
 export interface LevelSpawn {
+    uuid: string;
     position: Vec2;
     entity: LevelEntity;
 }
@@ -106,7 +113,9 @@ export function getNewLevelTile (tile: Tile) : LevelTile {
     const params: TraitValueCollection<TileTraitId> = {};
 
     for (const trait of tile.traits) {
-        params[trait.id] = {} as {[key: string]: ParameterValueCollection};
+        params[trait.id] = {} as ParameterValueCollection;
+
+        if (trait.configurableParameters === undefined) continue;
 
         for (const configParam of trait.configurableParameters) {
             const defaultValue = trait.parameters[configParam];
@@ -118,4 +127,27 @@ export function getNewLevelTile (tile: Tile) : LevelTile {
         tileId: tile.id,
         parameters: params,
     };
+}
+
+export function getNewLevelEntity (entity: Entity) : LevelEntity {
+    const params: TraitValueCollection<EntityTraitId> = {};
+
+    for (const trait of entity.traits) {
+        // @ts-ignore TODO: Remove this ignore
+        params[trait.id] = {} as ParameterValueCollection;
+
+        if (trait.configurableParameters === undefined) continue;
+
+        for (const configParam of trait.configurableParameters) {
+            const defaultValue = trait.parameters[configParam];
+            // @ts-ignore TODO: Remove this ignore
+            params[trait.id]![configParam] = defaultValue;
+        }
+    }
+
+    return {
+        entityId: entity.id,
+        orientation: 'left',
+        parameters: params,
+    }
 }

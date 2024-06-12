@@ -16,6 +16,7 @@ import LevelEditor_Features from './Features';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { SP_ResizeHandle } from 'elements/resizablePanel';
 import { LevelChangeFieldHandler } from '.';
+import LevelEditor_GridToolbar from './GridToolbar';
 
 export interface LevelEditor_ContentProps {
     pack: ResourcePack | null;
@@ -60,65 +61,19 @@ function _GridTools ({
     pack,
     level,
 }: _GridToolsProps) {
-    const levelCtx = useLevelEditorContext();
-
-    const { paint: selectedPaint } = useLevelEditorContext();
-
-    const buttons: ToolbarButton<GridTool>[] = [
-        {
-            value: 'select',
-            label: "Select (M)",
-            icon: 'arrow-pointer',
-            disabled: levelCtx.getSelectableGridTools().includes('select') === false,
-        },
-        {
-            value: 'brush',
-            label: "Brush (B)",
-            icon: 'paintbrush',
-            disabled: levelCtx.getSelectableGridTools().includes('brush') === false,
-        },
-        {
-            value: 'rectangle',
-            label: "Rectangle (R)",
-            icon: 'expand',
-            disabled: levelCtx.getSelectableGridTools().includes('rectangle') === false,
-        },
-        {
-            value: 'eraser',
-            label: "Eraser (E)",
-            icon: 'eraser',
-            disabled: levelCtx.getSelectableGridTools().includes('eraser') === false,
-        },
-        {
-            value: 'bucket',
-            label: "Paint bucket (G)",
-            icon: 'fill-drip',
-            disabled: levelCtx.getSelectableGridTools().includes('bucket') === false,
-        },
-        {
-            value: 'picker',
-            label: "Picker (I)",
-            icon: 'eye-dropper-empty',
-            disabled: levelCtx.getSelectableGridTools().includes('picker') === false,
-        },
-    ];
+    const { terrainPaint: paint } = useLevelEditorContext();
 
     return (
         <div className="level-grid-tools">
             <div className="selected-paint">
                 <TileImage
                     pack={pack}
-                    tile={selectedPaint?.object} 
+                    tile={paint?.object} 
                     scale={2}
                     bordered
                 />
             </div>
-            <Toolbar<GridTool>
-                direction='vertical'
-                selectedValue={levelCtx.terrainTool}
-                onSelectButton={levelCtx.setTerrainGridTool}
-                buttons={buttons}
-            />
+            <LevelEditor_GridToolbar />
         </div>
     );
 }

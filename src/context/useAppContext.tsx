@@ -21,7 +21,13 @@ interface AppContextState {
     appStatus: AppStatus;
     userdataPath: string;
     resourcePacks: ResourcePack[];
+    isShiftKeyPressed: boolean;
+    isCtrlKeyPressed: boolean;
+    isAltKeyPressed: boolean;
     getResourcePack: (packId: string | null) => ResourcePack | null;
+    setShiftKeyPressed: (pressed: boolean) => void;
+    setCtrlKeyPressed: (pressed: boolean) => void;
+    setAltKeyPressed: (pressed: boolean) => void;
 }
 
 const AppContext = createContext<AppContextState>({} as AppContextState);
@@ -32,6 +38,9 @@ const AppContextProvider = ({ children }: any) => {
         appStatus: AppStatus.LoadingData,
         userdataPath: "",
         resourcePacks: [] as ResourcePack[],
+        isShiftKeyPressed: false,
+        isCtrlKeyPressed: false,
+        isAltKeyPressed: false,
     } as AppContextState);
 
     useEffect(() => {
@@ -43,9 +52,33 @@ const AppContextProvider = ({ children }: any) => {
             return state.resourcePacks.find(r => r.folderName === packId) ?? null;
         }
 
+        function setShiftKeyPressed (pressed: boolean) {
+            setState(prevState => ({
+                ...prevState,
+                isShiftKeyPressed: pressed,
+            }))
+        }
+
+        function setCtrlKeyPressed (pressed: boolean) {
+            setState(prevState => ({
+                ...prevState,
+                isCtrlKeyPressed: pressed,
+            }))
+        }
+
+        function setAltKeyPressed (pressed: boolean) {
+            setState(prevState => ({
+                ...prevState,
+                isAltKeyPressed: pressed,
+            }))
+        }
+
         return {
             ...state,
             getResourcePack,
+            setShiftKeyPressed,
+            setCtrlKeyPressed,
+            setAltKeyPressed,
         }
     }, [state]);
 

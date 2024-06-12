@@ -40,13 +40,16 @@ function LevelEditor_Content_Canvas ({
         canvasSize,
         $horizRule,
         $vertRule,
+        $gridLines,
         $tilesBehind,
         $tilesInfront,
         $activeTiles,
-        $gridLines,
+        $spawns,
+        $hoveringPaint,
         setCanvas,
         handlePointerDown,
         handlePointerMove,
+        handlePointerLeave,
         handleScroll,
     } = useEditorCanvas(pack, level, onChangeField);
 
@@ -97,6 +100,7 @@ function LevelEditor_Content_Canvas ({
                         }}
                         onPointerDown={handlePointerDown}
                         onPointerMove={handlePointerMove}
+                        onPointerLeave={handlePointerLeave}
                         onMount={registerCanvas}
                     >
                         {texBg && <Sprite
@@ -109,6 +113,8 @@ function LevelEditor_Content_Canvas ({
                         {$tilesBehind}
                         {$activeTiles}
                         {$tilesInfront}
+                        {$spawns}
+                        {$hoveringPaint}
                         {levelCtx.showGrid && $gridLines}
                     </Stage>
                     <div className="vertical-scroll" />

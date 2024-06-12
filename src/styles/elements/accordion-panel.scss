@@ -1,19 +1,19 @@
-.sp-accordion-panel-root {
-    .sp-accordion-panel-item {
-        .sp-accordion-panel-control {
+.sp-accordion-root {
+    .sp-accordion-item {
+        .sp-accordion-control {
             &:hover {
                 background-color: $color-component-1;
             }
     
-            &.sp-small .sp-accordion-panel-label {
+            &.sp-small .sp-accordion-label {
                 padding: 2px;
             }
         }
     
-        .sp-accordion-panel-panel {
+        .sp-accordion-panel {
             @include vertical-queue;
     
-            .sp-accordion-panel-content {
+            .sp-accordion-content {
                 @include fill-container;
             }
         }

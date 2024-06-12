@@ -14,7 +14,7 @@ export interface LevelEditor_TilePaletteProps {
 function LevelEditor_TilePalette ({
     pack,
 }: LevelEditor_TilePaletteProps) {
-    const { paint, setPaint } = useLevelEditorContext();
+    const { terrainPaint: paint, setPaint } = useLevelEditorContext();
 
     if (pack === null) {
         return <div className="info-panel">
@@ -35,7 +35,7 @@ function LevelEditor_TilePalette ({
 
     return (
         <Tabs
-            defaultValue='tile-composites'
+            defaultValue='tiles'
             classNames={{
                 root: "sp-section-tab-root",
                 list: "sp-section-tab-ribbon-list",
@@ -46,21 +46,18 @@ function LevelEditor_TilePalette ({
         >
             <Tabs.List>
                 <Tabs.Tab
-                    value='tile-composites'
-                >
-                    Smart brushes
-                </Tabs.Tab>
-                <Tabs.Tab
                     value='tiles'
                 >
                     Tiles
                 </Tabs.Tab>
+                <Tabs.Tab
+                    value='tile-composites'
+                >
+                    Smart brushes
+                </Tabs.Tab>
             </Tabs.List>
 
             <div className="sp-section-tab-panel-container level-grid-feature-options">
-                <Tabs.Panel value='tile-composites'>
-                    (tile composites)
-                </Tabs.Panel>
                 <Tabs.Panel value='tiles'>
                     <ScrollArea
                         scrollbars='y'
@@ -91,7 +88,7 @@ function LevelEditor_TilePalette ({
                                 </Accordion.Control>
                                 <Accordion.Panel>
                                     {tilesByGroup[gr].map(t => <_TileButton
-                                        key={t.baseName}
+                                        key={t.id}
                                         pack={pack}
                                         tile={t}
                                         selected={paint?.id === t.id}
@@ -101,6 +98,9 @@ function LevelEditor_TilePalette ({
                             </Accordion.Item>))}
                         </Accordion>
                     </ScrollArea>
+                </Tabs.Panel>
+                <Tabs.Panel value='tile-composites'>
+                    (tile composites)
                 </Tabs.Panel>
             </div>
         </Tabs>
@@ -129,6 +129,7 @@ function _TileButton ({
 }: _TileButtonProps) {
     const classStr = getClassString(
         "tile-button",
+        "sp-gallery-selectable-item",
         selected && "selected",
     );
 

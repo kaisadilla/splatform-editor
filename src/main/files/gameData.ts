@@ -106,7 +106,9 @@ async function _readResourcePackFolder (path: string, folderName: string)
         manifestPath: getWinPath(path + "/manifest.sm-res"),
         manifest: manifest,
         backgrounds: backgroundFiles,
-        entities: entityMetadata,
+        entities: entityMetadata.sort(
+            (a, b) => a.data.name.localeCompare(b.data.name, LOCALE)
+        ),
         music: musicFiles,
         sound: soundFiles,
         sprites: {
@@ -115,7 +117,9 @@ async function _readResourcePackFolder (path: string, folderName: string)
             tiles: spriteTileFiles,
             ui: spriteUiFiles,
         },
-        tiles: tileMetadata.sort((a, b) => a.data.name.localeCompare(b.data.name, LOCALE)),
+        tiles: tileMetadata.sort(
+            (a, b) => a.data.name.localeCompare(b.data.name, LOCALE)
+        ),
     } as ResourcePack;
 }
 

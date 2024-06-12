@@ -198,14 +198,19 @@
 .sp-gallery-selectable-item {
     border: 1px solid transparent;
 
-    &.selected {
-        border-color: $color-highlight;
-        background-color: $color-highlight-l1;
-    }
-
     &:hover {
         background-color: $color-component-1;
         border-color: $color-component-3;
+    }
+
+    &.selected {
+        border-color: $color-highlight;
+        background-color: $color-highlight-l1;
+
+        &:hover {
+            border-color: $color-highlight;
+            background-color: $color-highlight-l2;
+        }
     }
 }
 
@@ -214,5 +219,13 @@
 
     &:active {
         transform: none;
+    }
+}
+
+.sp-accordion-root {
+    .sp-accordion-control {
+        &:hover {
+            background-color: $color-component-1;
+        }
     }
 }

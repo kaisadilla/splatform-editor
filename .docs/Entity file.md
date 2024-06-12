@@ -44,7 +44,7 @@ a resource pack (an `.spr-ent` file).
             // placed in the world will initially have these values.
             "parameters": {
                 "avoidsCliffs": false,
-                "startingDirectionRight": false
+                "walkingSpeed": 32
             },
             // a list of parameters that can be edited on a per-level-entity basis
             // later on. When a goomba is placed in the world, the user can change
@@ -53,7 +53,7 @@ a resource pack (an `.spr-ent` file).
             // and every Brown Goomba in the level, and the user will never be
             // shown any option to change it.
             "configurableParameters": [
-                "startingDirectionRight"
+                "walkingSpeed"
             ],
             // each trait has a state machine that represents different states in
             // which the entity it controls can be in. Each of these states must

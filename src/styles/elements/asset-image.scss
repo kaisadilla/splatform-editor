@@ -11,10 +11,8 @@
 }
 
 .asset-entity-image {
+    @include center-content;
     overflow: hidden;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
 
     > img {
         @include fill-container;

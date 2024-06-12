@@ -12,6 +12,14 @@ import useEditorCanvasDrawing from "./useEditorCanvasDrawing";
 import useEditorCanvasElement from "./useEditorCanvasElement";
 import { TileTraitId } from "data/TileTraits";
 import { LevelChangeFieldHandler } from ".";
+import { useAppContext } from "context/useAppContext";
+import useEditorCanvasInteraction from "./useEditorCanvasInteraction";
+
+/**
+ * The pixels contained in a single unit in a Level. This is not affected by any
+ * transformations in the canvas, such as zoom.
+ */
+const PIXELS_PER_UNIT = 16;
 
 export interface CanvasTileInfo {
     key: string;
@@ -26,11 +34,23 @@ export default function useEditorCanvas (
 ) {
     const { width, height } = level.settings;
 
+    const appCtx = useAppContext();
     const levelCtx = useLevelEditorContext();
     const zoom = levelCtx.getZoomMultiplier();
-    const tileSize = 16 * zoom;
+    /**
+     * The size of a tile in canvas pixels. At zoom 2, for example, the size
+     * is 32x32, instead of 16x16.
+     */
+    const canvasTileSize = PIXELS_PER_UNIT * zoom;
 
     const [btnDown, setBtnDown] = useState<'left' | 'right' | null>(null);
+    // the location in the canvas where the mouse currently is.
+    const [mouseLocation, setMouseLocation] = useState<Vec2 | null>(null);
+    // the position in the level (in pixels) where an element would be placed
+    // right now.
+    const [placePosition, setPlacePosition] = useState<Vec2 | null>(null);
+    // the tile in the grid pointed at by the mouse.
+    const [hoveredTile, setHoveredTile] = useState<Vec2 | null>(null);
 
     // the tiles being placed by this stroke, that will be added to the level
     // once the stroke is finished.
@@ -48,7 +68,27 @@ export default function useEditorCanvas (
         handleScroll,
     } = useEditorCanvasElement(pack, level);
     const drawing = useEditorCanvasDrawing(
-        pack, level, tilesInCurrentStroke, currentView, canvasSize
+        pack,
+        level,
+        placePosition,
+        tilesInCurrentStroke,
+        currentView,
+        canvasSize,
+        levelToCanvasPos,
+    );
+
+    const interaction = useEditorCanvasInteraction(
+        pack,
+        level,
+        canvas,
+        btnDown,
+        placePosition,
+        tilesInCurrentStroke,
+        onChangeField,
+        setTilesInCurrentStroke,
+        getTileAtPos,
+        windowToLevelPos,
+        canvasToLevelPixelPos
     );
 
     useEffect(() => {
@@ -89,6 +129,10 @@ export default function useEditorCanvas (
          */
         $vertRule,
         /**
+         * An element that draws the grid.
+         */
+        $gridLines: drawing.$gridLines,
+        /**
          * The tiles in the currently active layer, for rendering purposes. Note
          * that this doesn't necessarily correspond to the "active layer" in the
          * terrain tab - for example, when editing entity tiles, all tile layers
@@ -105,9 +149,15 @@ export default function useEditorCanvas (
          */
         $tilesInfront: drawing.$tilesInfront,
         /**
-         * An element that draws the grid.
+         * Spawns.
          */
-        $gridLines: drawing.$gridLines,
+        $spawns: drawing.$spawns,
+        /**
+         * A sample of the paint currently selected, when appropriate, at the
+         * position it would be placed if the user clicked at that moment. Should
+         * be painted on top of everything else.
+         */
+        $hoveringPaint: drawing.$hoveringPaint,
         setCanvas,
         /**
          * Handles interaction when the user clicks down into the canvas.
@@ -118,6 +168,10 @@ export default function useEditorCanvas (
          */
         handlePointerMove,
         /**
+         * Handles interactions when the user's pointer leaves the canvas.
+         */
+        handlePointerLeave,
+        /**
          * Handles interaction when the user scrolls the canvas scrollable object.
          */
         handleScroll,
@@ -126,266 +180,138 @@ export default function useEditorCanvas (
     // #region handlers
 
     function handlePointerDown (evt: React.PointerEvent<HTMLCanvasElement>) {
-        const tool = levelCtx.terrainTool;
-
         if (evt.buttons === 1) {
             setBtnDown('left');
-            if (tool === 'select') {
-                selectTileAtCanvasPos(evt.clientX, evt.clientY);
-            }
-            else if (tool === 'brush' || tool == 'eraser') {
-                registerPlaceTileClickAt({
-                    x: evt.clientX,
-                    y: evt.clientY,
-                });
-                levelCtx.cancelSelection();
-            }
-            else if (tool === 'rectangle') {
-                levelCtx.cancelSelection();
-            }
-            else if (tool === 'bucket') {
-                fillAreaFrom(evt.clientX, evt.clientY, 'fill');
-                levelCtx.cancelSelection();
-            }
-            else if (tool === 'picker') {
-                levelCtx.cancelSelection();
-            }
         }
         else if (evt.buttons === 2) {
             setBtnDown('right');
-
-            if (tool === 'bucket') {
-                fillAreaFrom(evt.clientX, evt.clientY, 'unfill');
-            }
         }
+
+        interaction.onPointerDown(evt);
     }
 
-    function handlePointerMove (masterEvt: React.PointerEvent<HTMLCanvasElement>) {
-        const tool = levelCtx.terrainTool;
-        const coalescedEvts = masterEvt.nativeEvent.getCoalescedEvents();
+    function handlePointerMove (evt: React.PointerEvent<HTMLCanvasElement>) {
+        calculateHoverPositions(evt.clientX, evt.clientY);
 
-        if (btnDown === 'left') {
-            if (tool === 'select') {
-
-            }
-            if (tool === 'brush' || tool === 'eraser') {
-                const newPoints = [] as Vec2[]; // raw click pixel coords.
-        
-                for (const evt of coalescedEvts) {
-                    if (btnDown === 'left') {
-                        newPoints.push({
-                            x: evt.clientX,
-                            y: evt.clientY,
-                        });
-                    }
-                }
-                
-                registerPlaceTileClickAt(...newPoints);
-            }
-            else if (tool === 'rectangle') {
-
-            }
-            else if (tool === 'bucket') {
-
-            }
-            else if (tool === 'picker') {
-
-            }
-        }
-        else if (btnDown === 'right') {
-
-        }
+        interaction.onPointerMove(evt);
     }
 
     function handlePointerUp (evt: PointerEvent) {
-        if (btnDown === 'left') {
-                    
-            if (levelCtx.terrainTool === 'brush') {
-                addDrawnTiles(tilesInCurrentStroke);
-            }
-            else if (levelCtx.terrainTool === 'eraser') {
-                removeDrawnTiles(tilesInCurrentStroke);
-            }
-        }
-
         setBtnDown(null);
+
+        interaction.onPointerUp(evt);
+    }
+
+    function handlePointerLeave (evt: React.PointerEvent<HTMLCanvasElement>) {
+        setMouseLocation(null);
+        setPlacePosition(null);
+        setHoveredTile(null);
     }
     // #endregion
 
     // #region Canvas interactions
     /**
-     * Selects the tile at the canvas position given.
+     * Fills in the variables that hold information about where the user is
+     * currently pointing at with their mouse.
      * @param x The x position in the canvas.
      * @param y The y position in the canvas.
      */
-    function selectTileAtCanvasPos (x: number, y: number) {
-        const tilePos = canvasPixelToTileGridPos(x, y);
-        if (tilePos === null) return;
+    function calculateHoverPositions (x: number, y: number) {
+        setMouseLocation({x, y});
+        setHoveredTile(windowToLevelPos(x, y, false));
 
-        // if the user clicks in an empty area, cancel the selection.
-        if (getTileAtPos(levelCtx.activeTerrainLayer, tilePos) === null) {
-            levelCtx.setTileSelection([]);
-            return;
-        }
+        if (levelCtx.activeSection === 'spawns') {
+            const gridPos = windowToLevelPos(x, y, true);
 
-        levelCtx.setTileSelection([tilePos]);
-    }
-    
-    function registerPlaceTileClickAt (...positions : Vec2[]) {
-        if (canvas === null) return [];
-        if (levelCtx.paint === null) return;
-
-        setTilesInCurrentStroke(prevState => {
-            const placedTiles = [] as Vec2[];
-
-            for (const pixelPos of positions) {
-                const tilePos = canvasPixelToTileGridPos(pixelPos.x, pixelPos.y)!;
-    
-                if (prevState.find(lt => vec2equals(lt, tilePos))) {
-                    continue;
-                }
-                if (placedTiles.find(pt => vec2equals(pt, tilePos))) {
-                    continue;
-                }
-    
-                placedTiles.push(tilePos);
-            }
-
-            return [
-                ...prevState,
-                ...placedTiles,
-            ];
-        });
-    }
-
-    function addDrawnTiles (tiles: Vec2[]) {
-        if (levelCtx.paint === null) return;
-
-        let layerTiles = removePositionsFromTileList(
-            level.layers[levelCtx.activeTerrainLayer].tiles,
-            tiles
-        );
-
-        const addedPositions = new Set<string>();
-        for (const t of tiles) {
-            if (addedPositions.has(vec2toString(t))) {
-                continue;
+            if (gridPos === null) {
+                setPlacePosition(null);
             }
             else {
-                addedPositions.add(vec2toString(t));
+                if (appCtx.isCtrlKeyPressed) {
+                    setPlacePosition(gridPos);
+                }
+                else {
+                    setPlacePosition(
+                        snapPositionTo(gridPos, {x: .5, y: .5})
+                    );
+                }
             }
-
-            layerTiles.push(createLevelTile(
-                t, levelCtx.paint.object
-            ));
         }
-
-        const update: TileLayer[] = [...level.layers];
-        update[levelCtx.activeTerrainLayer] = {
-            ...update[levelCtx.activeTerrainLayer],
-            tiles: layerTiles
+        else {
+            const gridPos = windowToLevelPos(x, y, false);
+            setPlacePosition(gridPos);
         }
-
-        onChangeField('layers', update);
-
-        setTilesInCurrentStroke([]);
     }
+    // #endregion
 
-    function removeDrawnTiles (tiles: Vec2[]) {
-        let layerTiles = removePositionsFromTileList(
-            level.layers[levelCtx.activeTerrainLayer].tiles,
-            tiles
-        );
-
-        const update: TileLayer[] = [...level.layers];
-        update[levelCtx.activeTerrainLayer] = {
-            ...update[levelCtx.activeTerrainLayer],
-            tiles: layerTiles
-        }
-
-        onChangeField('layers', update);
-
-        setTilesInCurrentStroke([]);
-    }
-
+    // #region calculations
     /**
-     * Fills an area with the selected paint. The origin of this fill is calculated
-     * from the point in the canvas given. This is the bucket's functionality.
-     * @param x The x position in the canvas.
-     * @param y The y position in the canvas.
-     */
-    function fillAreaFrom (x: number, y: number, fillMode: 'fill' | 'unfill') {
-        if (canvas === null) return;
-        if (levelCtx.paint === null) return;
-
-        const origin = canvasPixelToTileGridPos(x, y);
-        if (origin === null) return;
-        const originTile = getTileAtPos(levelCtx.activeTerrainLayer, origin)?.tileId;
-
-        const placedTiles = [] as Vec2[];
-        const fillStack = [origin];
-
-        while (fillStack.length > 0) {
-            const pos = fillStack.pop()!;
-
-            // these coordinates are outside the level.
-            if (pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) {
-                continue;
-            }
-            // the tile in this position is different, so we don't spill into it.
-            if (getTileAtPos(levelCtx.activeTerrainLayer, pos)?.tileId !== originTile) {
-                continue;
-            }
-            // the tile in this position was already iterated over.
-            if (placedTiles.find(pt => vec2equals(pt, pos))) {
-                continue;
-            }
-
-            placedTiles.push(pos);
-
-            fillStack.push({x: pos.x + 1, y: pos.y});
-            fillStack.push({x: pos.x - 1, y: pos.y});
-            fillStack.push({x: pos.x, y: pos.y + 1});
-            fillStack.push({x: pos.x, y: pos.y - 1});
-        }
-
-        // replacing tiles
-        if (fillMode === 'fill') {
-            addDrawnTiles(placedTiles);
-        }
-        else if (fillMode === 'unfill') {
-            removeDrawnTiles(placedTiles);
-        }
-    }
-
-    /**
-     * Given a pixel position in the canvas, returns the position in the tile
-     * grid to which it corresponds.
-     * @param x The x position in the canvas.
-     * @param y The x position in the canvas.
+     * Given a pixel position in the window, returns the tile position in
+     * the level that corresponds to that position.
+     * @param x The x position in the window.
+     * @param y The x position in the window.
+     * @param allowDecimals If true, the position may not be an integer (e.g. 3.5),
+     * if false, positions are floored to the nearest integer (e.g. 3.5 -> 3).
      * @returns The position in the tile grid, or null if the canvas is null.
      */
-    function canvasPixelToTileGridPos (x: number, y: number) : Vec2 | null {
+    function windowToLevelPos (
+        x: number, y: number, allowDecimals: boolean
+    ) : Vec2 | null {
+        if (canvas === null) return null;
+        const rect = canvas.getBoundingClientRect();
+
+        if (allowDecimals) return snapPositionTo({
+            x: (x - rect.left + currentView.left) / canvasTileSize,
+            y: (y - rect.top + currentView.top) / canvasTileSize,
+        }, {x: 1/16, y: 1/16});
+        else return {
+            x: Math.floor((x - rect.left + currentView.left) / canvasTileSize),
+            y: Math.floor((y - rect.top + currentView.top) / canvasTileSize),
+        };
+    }
+
+    function levelToCanvasPos (levelPos: Vec2) : Vec2 {
+        return {
+            x: (levelPos.x * canvasTileSize) - currentView.left,
+            y: (levelPos.y * canvasTileSize) - currentView.top,
+        };
+    }
+
+    /**
+     * Given a pixel position in the canvas, returns the pixel in the level
+     * that corresponds to that position.
+     * @param x The x position in the canvas.
+     * @param y The x position in the canvas.
+     * @returns The pixel in the level at that position, or null if the canvas is null.
+     */
+    function canvasToLevelPixelPos (x: number, y: number) : Vec2 | null {
         if (canvas === null) return null;
         const rect = canvas.getBoundingClientRect();
 
         return {
-            x: Math.floor((x - rect.left + currentView.left) / tileSize),
-            y: Math.floor((y - rect.top + currentView.top) / tileSize),
+            x: Math.floor((x - rect.left + currentView.left) / zoom),
+            y: Math.floor((y - rect.top + currentView.top) / zoom),
         };
+    }
+
+    /**
+     * Snaps the given position in relation to the snap grid given.
+     * @param pos The position to snap.
+     * @param snapGrid A vector that represents the spacing between valid points
+     * to snap to. A snapGrid of (16, 16) would snap all values between 0 and 15
+     * to 0, and values between 16 and 31 to 16.
+     */
+    function snapPositionTo (pos: Vec2, snapGrid: Vec2) {
+        return {
+            x: Math.floor(pos.x / snapGrid.x) * snapGrid.x,
+            y: Math.floor(pos.y / snapGrid.y) * snapGrid.y,
+        }
     }
 
     function getTileAtPos (layerIndex: number, pos: Vec2) : PlacedTile | null {
         return level.layers[levelCtx.activeTerrainLayer].tiles.find(
             t => vec2equals(t.position, pos)
         ) ?? null;
-    }
-
-    function createLevelTile (position: Vec2, tile: Tile) : PlacedTile {
-        return {
-            ...getNewLevelTile(tile),
-            position: position,
-        }
     }
 
     // #endregion

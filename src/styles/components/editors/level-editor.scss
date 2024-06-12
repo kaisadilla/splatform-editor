@@ -16,10 +16,14 @@
         position: relative;
 
         .palette-container {
-            > .info-panel {
-                padding: 8px;
-                color: $color-text-2;
+            > div {
+                @include fill-container;
+                @include vertical-list-stretch;
             }
+            //> .info-panel {
+            //    padding: 8px;
+            //    color: $color-text-2;
+            //}
         }
     
         .level-content-container {
@@ -44,35 +48,47 @@
             }
         }
     }
+}
 
-    .tile-palette {
+.level-editor .tile-palette {
+    @include fill-container;
+
+    .palette-root {
+        @include vertical-list;
         @include fill-container;
+        align-items: stretch;
 
-        .palette-root {
-            @include vertical-list;
-            @include fill-container;
-            align-items: stretch;
-
-            .palette-panel-content {
-                @include horizontal-queue(wrap);
-            }
+        .palette-panel-content {
+            @include horizontal-queue(wrap);
         }
+    }
 
-        .tile-button {
-            @include center-content;
-            width: 26px;
-            height: 26px;
+    .tile-button {
+        @include center-content;
+        width: 26px;
+        height: 26px;
+    }
+}
 
-            &:hover {
-                background-color: $color-component-1;
-                border: 1px solid $color-component-3;
-            }
+.level-editor .entity-palette {
+    @include fill-container;
+    @include horizontal-queue(wrap);
 
-            &.selected {
-                border: 1px solid $color-highlight;
-                background-color: $color-highlight-l1;
-            }
+    .palette-root {
+        @include vertical-list;
+        @include fill-container;
+        align-items: stretch;
+
+        .palette-panel-content {
+            @include horizontal-queue(wrap);
         }
+    }
+
+    .entity-button {
+        @include center-content;
+        width: 64px;
+        height: 64px;
+        overflow: hidden;
     }
 }
 

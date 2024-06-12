@@ -1,15 +1,12 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '@assets/icon.png';
-import { DEFAULT_TOOLTIP_ID } from 'names';
-import Window from 'Window';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faArrowPointer, faChevronDown, faCirclePlay, faCircleQuestion, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faLocationDot, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
 import { MantineProvider, createTheme as createMantineTheme } from '@mantine/core';
+import loader from '@monaco-editor/loader';
 import { Shadows, ThemeProvider, createTheme as createMuiTheme } from '@mui/material';
+import Window from 'Window';
 import { AppContextProvider } from 'context/useAppContext';
 import { UserContextProvider } from 'context/useUserContext';
-import loader from '@monaco-editor/loader';
 import * as monaco from 'monaco-editor';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowPointer, faBrush, faChevronDown, faCirclePlay, faCircleQuestion, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faPaintBrush, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
 
 import '@mantine/core/styles.css';
 import 'react-material-symbols/sharp'; // 'rounded' | 'sharp' | 'outlined'.
@@ -100,6 +97,7 @@ function initFontAwesome () {
         faEyeDropper,
         faEyeDropperEmpty,
         faFillDrip,
+        faLocationDot,
         faPaintbrush,
         faUpDownLeftRight,
     );

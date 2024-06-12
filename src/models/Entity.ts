@@ -18,7 +18,10 @@ export interface EntityFile {
     traits: TraitSpecification<EntityTraitId>[];
     spritesheet: SpritesheetSpecification;
     dimensions: DimensionsSpecification;
-    animations: {[key: string]: ObjectAnimation}
+    animations: {
+        default: ObjectAnimation,
+        [key: string]: ObjectAnimation
+    }
 }
 
 export function getNewEntity () : EntityFile {

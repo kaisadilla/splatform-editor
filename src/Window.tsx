@@ -15,18 +15,20 @@ export interface WindowProps {
 }
 
 function Window (props: WindowProps) {
-    const { appStatus } = useAppContext();
+    const appCtx = useAppContext();
     const userCtx = useUserContext();
 
-    //useEffect(() => {
-    //    if (userCtx.openDocuments.length > 0) {
-    //        userCtx.setActiveTab(
-    //            userCtx.openDocuments[userCtx.openDocuments.length - 1].id
-    //        );
-    //    }
-    //}, [userCtx.openDocuments.length]);
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+        }
+    }, []);
     
-    if (appStatus != AppStatus.Ready) {
+    if (appCtx.appStatus != AppStatus.Ready) {
         return <div>Loading...</div>
     }
 
@@ -50,6 +52,30 @@ function Window (props: WindowProps) {
             </Tabs>
         </div>
     );
+
+    function handleKeyDown (evt: KeyboardEvent) {
+        if (evt.key === 'Shift') {
+            appCtx.setShiftKeyPressed(true);
+        }
+        else if (evt.key === 'Control') {
+            appCtx.setCtrlKeyPressed(true);
+        }
+        else if (evt.key === 'Alt') {
+            appCtx.setAltKeyPressed(true);
+        }
+    }
+
+    function handleKeyUp (evt: KeyboardEvent) {
+        if (evt.key === 'Shift') {
+            appCtx.setShiftKeyPressed(false);
+        }
+        else if (evt.key === 'Control') {
+            appCtx.setCtrlKeyPressed(false);
+        }
+        else if (evt.key === 'Alt') {
+            appCtx.setAltKeyPressed(false);
+        }
+    }
 }
 
 export default Window;
