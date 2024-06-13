@@ -281,6 +281,7 @@
     .item-properties {
         @include fill-container;
         @include vertical-list-stretch;
+        gap: 6px;
 
         .title {
             font-weight: $w-semibold;

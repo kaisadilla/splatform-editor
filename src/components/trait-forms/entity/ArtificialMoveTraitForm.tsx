@@ -1,18 +1,16 @@
-import EntityTraits, { ArtificialMoveParameter, ArtificialMoveValueCollection } from 'data/EntityTraits';
-import { ParameterValueCollection } from 'models/splatform';
-import React from 'react';
+import EntityTraits, { ArtificialMoveEntityValueCollection, ArtificialMoveEntityParameter } from 'data/EntityTraits';
 import { DivProps } from 'types';
-import { getClassString } from 'utils';
+import TraitForm from '../TraitForm';
 import BooleanParameter from '../input/BooleanParameter';
-import NumberParameter from '../input/NumberParameter';
+import FloatParameter from '../input/FloatParameter';
 
 export type ChangeArtificialMoveValueHandler
-    = <K extends ArtificialMoveParameter>(
-        parameter: K, value: ArtificialMoveValueCollection[K]
+    = <K extends ArtificialMoveEntityParameter>(
+        parameter: K, value: ArtificialMoveEntityValueCollection[K]
     ) => void;
 
 export interface ArtificialMoveTraitFormProps extends DivProps {
-    values: ArtificialMoveValueCollection;
+    values: ArtificialMoveEntityValueCollection;
     onChangeValue?: ChangeArtificialMoveValueHandler;
 }
 
@@ -23,28 +21,27 @@ function ArtificialMoveTraitForm ({
 }: ArtificialMoveTraitFormProps) {
     const traitDef = EntityTraits.artificialMove;
 
-    divProps.className = getClassString(
-        "trait-form",
-        divProps.className,
-    )
-
     return (
-        <div className="trait-form">
-            <div className="header">{traitDef.displayName}</div>
-            <div className="parameter-list">
-                <BooleanParameter
-                    param={traitDef.parameters.avoidCliffs}
-                    value={values.avoidCliffs}
-                    onChange={v => onChangeValue?.('avoidCliffs', v)}
-                />
-                <NumberParameter
-                    param={traitDef.parameters.horizontalSpeed}
-                    value={values.horizontalSpeed}
-                    allowDecimals
-                    onChange={v => onChangeValue?.('horizontalSpeed', v)}
-                />
-            </div>
-        </div>
+        <TraitForm
+            title={traitDef.displayName}
+            {...divProps}
+        >
+            <BooleanParameter
+                param={traitDef.parameters.avoidCliffs}
+                value={values.avoidCliffs}
+                onChange={v => onChangeValue?.('avoidCliffs', v)}
+            />
+            <FloatParameter
+                param={traitDef.parameters.horizontalSpeed}
+                value={values.horizontalSpeed}
+                onChange={v => onChangeValue?.('horizontalSpeed', v)}
+            />
+            <FloatParameter
+                param={traitDef.parameters.verticalSpeed}
+                value={values.verticalSpeed}
+                onChange={v => onChangeValue?.('verticalSpeed', v)}
+            />
+        </TraitForm>
     );
 }
 

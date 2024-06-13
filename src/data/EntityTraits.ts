@@ -41,7 +41,7 @@ const EntityTraits: EntityTraitCollection = {
             damageType: {
                 id: 'damageType',
                 displayName: "Damage type",
-                description: "The type of damage inflicted on the player",
+                description: "The type of damage inflicted on the player.",
                 nullable: false,
                 type: 'playerDamageType',
                 defaultValue: 'regular',
@@ -49,7 +49,7 @@ const EntityTraits: EntityTraitCollection = {
             hurtFromTop: {
                 id: 'hurtFromTop',
                 displayName: "Hurt from top",
-                description: "Whether the player is hurt when it touches this entity's top side",
+                description: "Whether the player is hurt when it touches this entity's top side.",
                 nullable: false,
                 type: 'boolean',
                 defaultValue: true,
@@ -57,7 +57,7 @@ const EntityTraits: EntityTraitCollection = {
             hurtFromBottom: {
                 id: 'hurtFromBottom',
                 displayName: "Hurt from bottom",
-                description: "Whether the player is hurt when it touches this entity's bottom side",
+                description: "Whether the player is hurt when it touches this entity's bottom side.",
                 nullable: false,
                 type: 'boolean',
                 defaultValue: true,
@@ -65,7 +65,7 @@ const EntityTraits: EntityTraitCollection = {
             hurtFromLeft: {
                 id: 'hurtFromLeft',
                 displayName: "Hurt from left",
-                description: "Whether the player is hurt when it touches this entity's left side",
+                description: "Whether the player is hurt when it touches this entity's left side.",
                 nullable: false,
                 type: 'boolean',
                 defaultValue: true,
@@ -73,7 +73,7 @@ const EntityTraits: EntityTraitCollection = {
             hurtFromRight: {
                 id: 'hurtFromRight',
                 displayName: "Hurt from right",
-                description: "Whether the player is hurt when it touches this entity's right side",
+                description: "Whether the player is hurt when it touches this entity's right side.",
                 nullable: false,
                 type: 'boolean',
                 defaultValue: true,
@@ -270,8 +270,8 @@ const EntityTraits: EntityTraitCollection = {
 };
 
 export type EntityTraitCollection = {
-    artificialMove: TraitWithId<'artificialMove', ArtificialMoveParameterCollection>
-    hurtPlayer: TraitWithId<'hurtPlayer', HurtPlayerParameterCollection>;
+    artificialMove: TraitWithId<'artificialMove', ArtificialMoveEntityParameterCollection>
+    hurtPlayer: TraitWithId<'hurtPlayer', HurtPlayerEntityParameterCollection>;
     killable: TraitWithId<'killable', KillableEntityParameterCollection>;
     moveAndFire: TraitWithId<'moveAndFire', MoveAndFireEntityParameterCollection>;
     powerUp: TraitWithId<'powerUp', PowerUpEntityParameterCollection>;
@@ -279,69 +279,91 @@ export type EntityTraitCollection = {
     walk: TraitWithId<'walk', WalkEntityParameterCollection>;
 }
 
-export interface ArtificialMoveValueCollection {
+export interface ArtificialMoveEntityValueCollection {
     avoidCliffs: boolean;
     horizontalSpeed: number;
     verticalSpeed: number;
 }
-export type ArtificialMoveParameterCollection = TraitCollectionOf<ArtificialMoveValueCollection>;
+export type ArtificialMoveEntityParameterCollection
+    = TraitCollectionOf<ArtificialMoveEntityValueCollection>;
 
-export interface HurtPlayerParameterCollection {
-    damageType: Parameter<PlayerDamageType>;
-    hurtFromTop: Parameter<boolean>;
-    hurtFromBottom: Parameter<boolean>;
-    hurtFromLeft: Parameter<boolean>;
-    hurtFromRight: Parameter<boolean>;
+export interface HurtPlayerEntityValueCollection {
+    damageType: PlayerDamageType;
+    hurtFromTop: boolean;
+    hurtFromBottom: boolean;
+    hurtFromLeft: boolean;
+    hurtFromRight: boolean;
 }
+export type HurtPlayerEntityParameterCollection
+    = TraitCollectionOf<HurtPlayerEntityValueCollection>;
 
-export interface KillableEntityParameterCollection {
-    damageFromStomp: Parameter<EntityDamageType>;
-    damageFromFireball: Parameter<EntityDamageType>;
+export interface KillableEntityValueCollection {
+    damageFromStomp: EntityDamageType;
+    damageFromFireball: EntityDamageType;
 }
+export type KillableEntityParameterCollection
+    = TraitCollectionOf<KillableEntityValueCollection>;
 
-export interface MoveAndFireEntityParameterCollection {
-    bulletAmount: Parameter<number>;
-    bulletDamageType: Parameter<PlayerDamageType>;
-    minimumDistanceToActivate: Parameter<number>;
-    moveDirection: Parameter<Direction>;
-    distanceToMove: Parameter<number>;
-    timeToMove: Parameter<number>;
-    timeToFire: Parameter<number>;
-    timeBetweenBullets: Parameter<number>;
-    timeBetweenMoves: Parameter<number>;
+export interface MoveAndFireEntityValueCollection {
+    bulletAmount: number;
+    bulletDamageType: PlayerDamageType;
+    minimumDistanceToActivate: number;
+    moveDirection: Direction;
+    distanceToMove: number;
+    timeToMove: number;
+    timeToFire: number;
+    timeBetweenBullets: number;
+    timeBetweenMoves: number;
 }
+export type MoveAndFireEntityParameterCollection
+    = TraitCollectionOf<MoveAndFireEntityValueCollection>;
 
-export interface PowerUpEntityParameterCollection {
-    powerUpType: Parameter<PowerUpType>;
-    overridesBetterPowers: Parameter<boolean>;
+export interface PowerUpEntityValueCollection {
+    powerUpType: PowerUpType;
+    overridesBetterPowers: boolean;
 }
+export type PowerUpEntityParameterCollection
+    = TraitCollectionOf<PowerUpEntityValueCollection>;
 
-export interface TurnIntoShellEntityParameterCollection {
-    shellSpeed: Parameter<number>;
-    revive: Parameter<boolean>;
-    secondsUntilReviveStart: Parameter<number>;
-    secondsUntilReviveEnd: Parameter<number>;
+export interface TurnIntoShellEntityValueCollection {
+    shellSpeed: number;
+    revive: boolean;
+    secondsUntilReviveStart: number;
+    secondsUntilReviveEnd: number;
 }
+export type TurnIntoShellEntityParameterCollection
+    = TraitCollectionOf<TurnIntoShellEntityValueCollection>;
 
-export interface WalkEntityParameterCollection {
-    avoidCliffs: Parameter<boolean>;
-    walkingSpeed: Parameter<number>;
+export interface WalkEntityValueCollection {
+    avoidCliffs: boolean;
+    walkingSpeed: number;
 }
+export type WalkEntityParameterCollection
+    = TraitCollectionOf<WalkEntityValueCollection>;
 
-export type ArtificialMoveParameter = keyof ArtificialMoveParameterCollection;
-export type HurtPlayerParameter = keyof HurtPlayerParameterCollection;
+export type ArtificialMoveEntityParameter = keyof ArtificialMoveEntityParameterCollection;
+export type HurtPlayerEntityParameter = keyof HurtPlayerEntityParameterCollection;
 export type KillableEntityParameter = keyof KillableEntityParameterCollection;
 export type MoveAndFireEntityParameter = keyof MoveAndFireEntityParameterCollection;
 export type TurnIntoShellEntityParameter = keyof TurnIntoShellEntityParameterCollection;
 export type WalkEntityParameter = keyof WalkEntityParameterCollection;
 
 export type EntityParameterCollection =
-    ArtificialMoveParameterCollection
-    | HurtPlayerParameterCollection
+    ArtificialMoveEntityParameterCollection
+    | HurtPlayerEntityParameterCollection
     | KillableEntityParameterCollection
     | MoveAndFireEntityParameterCollection
     | TurnIntoShellEntityParameterCollection
     | WalkEntityParameterCollection
+;
+
+export type EntityValueCollection =
+    ArtificialMoveEntityValueCollection
+    | HurtPlayerEntityValueCollection
+    | KillableEntityValueCollection
+    | MoveAndFireEntityValueCollection
+    | TurnIntoShellEntityValueCollection
+    | WalkEntityValueCollection
 ;
 
 export type _EntityParamKeys<T> = T extends T ? keyof T : never;

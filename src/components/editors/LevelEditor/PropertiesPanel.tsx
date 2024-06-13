@@ -1,21 +1,22 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Accordion, NumberInput, Select, Tabs, TextInput } from '@mantine/core';
+import { NumberInput, Select, Tabs, TextInput } from '@mantine/core';
 import ParameterForm from 'components/ParameterForm';
+import ArtificialMoveTraitForm from 'components/trait-forms/entity/ArtificialMoveTraitForm';
+import HurtPlayerTraitForm from 'components/trait-forms/entity/HurtPlayerTraitForm';
 import { useAppContext } from 'context/useAppContext';
 import { PropertiesPanel, useLevelEditorContext } from 'context/useLevelEditorContext';
+import { ArtificialMoveEntityValueCollection, EntityValueCollection, HurtPlayerEntityValueCollection, KillableEntityValueCollection } from 'data/EntityTraits';
 import { TraitParameterCollection } from 'data/TileTraits';
+import { EntityTraitId, TileTraitId } from 'data/Traits';
 import BackgroundAssetInput from 'elements/BackgroundAssetInput';
 import MusicAssetInput from 'elements/MusicAssetInput';
-import { Level, LevelSettings, LevelSpawn, PlacedTile } from 'models/Level';
-import { clampNumber, vec2equals, vec2toString } from 'utils';
-import { LevelChangeSpawnHandler, LevelChangeFieldHandler, LevelChangeTileHandler } from '.';
-import { EntityTraitId, TileTraitId } from 'data/Traits';
-import TitledCheckbox from 'elements/TitledCheckbox';
-import { Entity } from 'models/Entity';
 import SelectGallery from 'elements/SelectGallery';
-import EntityTraits, { ArtificialMoveValueCollection } from 'data/EntityTraits';
+import { Entity } from 'models/Entity';
+import { Level, LevelSettings, LevelSpawn, PlacedTile } from 'models/Level';
 import { ParameterValueCollection, TraitSpecification } from 'models/splatform';
-import ArtificialMoveTraitForm from 'components/trait-forms/entity/ArtificialMoveTraitForm';
+import { clampNumber, vec2equals, vec2toString } from 'utils';
+import { LevelChangeFieldHandler, LevelChangeSpawnHandler, LevelChangeTileHandler } from '.';
+import KillableTraitForm from 'components/trait-forms/entity/KillableTraitForm';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -441,7 +442,19 @@ function _LevelSpawnTrait ({
 
     if (trait.id === 'artificialMove') {
         return <ArtificialMoveTraitForm
-            values={values as ArtificialMoveValueCollection}
+            values={values as ArtificialMoveEntityValueCollection}
+            onChangeValue={handleParameterValueChange<ArtificialMoveEntityValueCollection>}
+        />
+    }
+    else if (trait.id === 'hurtPlayer') {
+        return <HurtPlayerTraitForm
+            values={values as HurtPlayerEntityValueCollection}
+            onChangeValue={handleParameterValueChange}
+        />
+    }
+    else if (trait.id === 'killable') {
+        return <KillableTraitForm
+            values={values as KillableEntityValueCollection}
             onChangeValue={handleParameterValueChange}
         />
     }
@@ -452,7 +465,15 @@ function _LevelSpawnTrait ({
         </div>
     );
 
-    function handleParameterValueChange (paramName: string, value: any) {
+    /**
+     * Modifies a single parameter for the trait and updates the level with it.
+     * T is the type of valuecollection corresponding to this trait.
+     * @param paramName The name of the parameter to modify.
+     * @param value The value to assign to that parameter.
+     */
+    function handleParameterValueChange<T extends EntityValueCollection> (
+        paramName: keyof T, value: T[keyof T]
+    ) {
         const update = {
             ...spawn,
             entity: {

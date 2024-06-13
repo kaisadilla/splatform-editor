@@ -1,19 +1,19 @@
 import { NumberInput } from "@mantine/core";
 import { Parameter } from "models/splatform";
 
-interface NumberParameterProps {
+export interface _NumberFieldProps {
     param: Parameter<number>;
     value: number;
     allowDecimals: boolean;
     onChange?: (v: number) => void;
 }
 
-function NumberParameter ({
+function _NumberField ({
     param,
     value,
     allowDecimals,
     onChange,
-}: NumberParameterProps) {
+}: _NumberFieldProps) {
 
     return (
         <div className="parameter-container parameter-container-number">
@@ -28,4 +28,4 @@ function NumberParameter ({
     );
 }
 
-export default NumberParameter;
+export default _NumberField;
