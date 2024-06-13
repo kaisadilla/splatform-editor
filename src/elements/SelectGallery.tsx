@@ -13,17 +13,22 @@ export interface SelectGalleryProps<T extends string> extends InputWrapperProps 
     value: T;
     multipleSelection?: boolean;
     onSelectValue: (value: T) => void;
+    minWidth?: number;
+    stretch?: boolean;
 }
 
 function SelectGallery<T extends string> ({
     data,
     value,
     onSelectValue,
+    minWidth,
+    stretch = false,
     classNames,
     ...inputWrapperProps
 }: SelectGalleryProps<T>) {
     const rootClassName = getClassString(
         "sp-select-gallery-root",
+        stretch && "stretch",
         // @ts-ignore
         classNames?.root,
     )
@@ -42,6 +47,7 @@ function SelectGallery<T extends string> ({
                     data={d}
                     selected={value === d.value}
                     onClick={() => handleToggleValue(d.value)}
+                    minWidth={minWidth}
                 />)}
             </div>
         </InputWrapper>
@@ -58,12 +64,14 @@ interface _ToggleButtonProps<T extends string> {
     data: SelectGalleryOptionData<T>;
     selected: boolean;
     onClick: () => void;
+    minWidth: number | undefined;
 }
 
 function _ToggleButton<T extends string> ({
     data,
     selected,
     onClick,
+    minWidth,
 }: _ToggleButtonProps<T>) {
 
     return (
@@ -71,6 +79,7 @@ function _ToggleButton<T extends string> ({
             classNames={{root: "sp-select-gallery-button-root"}}
             variant={selected ? 'filled' : 'outline'}
             onClick={() => onClick()}
+            style={{minWidth: minWidth}}
         >
             {data.label}
         </Button>

@@ -181,6 +181,7 @@ function LevelEditor ({
         updateDocument(doc.id, update);
     }
 
+    // TODO: Redo with prevstates.
     function handleFieldChange<K extends keyof Level> (field: K, value: Level[K]) {
         const update = {...level};
         update[field] = value;

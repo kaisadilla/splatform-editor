@@ -5,7 +5,7 @@ import ArtificialMoveTraitForm from 'components/trait-forms/entity/ArtificialMov
 import HurtPlayerTraitForm from 'components/trait-forms/entity/HurtPlayerTraitForm';
 import { useAppContext } from 'context/useAppContext';
 import { PropertiesPanel, useLevelEditorContext } from 'context/useLevelEditorContext';
-import { ArtificialMoveEntityValueCollection, EntityValueCollection, HurtPlayerEntityValueCollection, KillableEntityValueCollection } from 'data/EntityTraits';
+import { ArtificialMoveEntityValueCollection, EntityTraitCollection, EntityValueCollection, HurtPlayerEntityValueCollection, KillableEntityValueCollection, MoveAndFireEntityValueCollection, PowerUpEntityValueCollection, TurnIntoShellEntityValueCollection, WalkEntityValueCollection } from 'data/EntityTraits';
 import { TraitParameterCollection } from 'data/TileTraits';
 import { EntityTraitId, TileTraitId } from 'data/Traits';
 import BackgroundAssetInput from 'elements/BackgroundAssetInput';
@@ -17,6 +17,10 @@ import { ParameterValueCollection, TraitSpecification } from 'models/splatform';
 import { clampNumber, vec2equals, vec2toString } from 'utils';
 import { LevelChangeFieldHandler, LevelChangeSpawnHandler, LevelChangeTileHandler } from '.';
 import KillableTraitForm from 'components/trait-forms/entity/KillableTraitForm';
+import MoveAndFireTraitForm from 'components/trait-forms/entity/MoveAndFireTraitForm';
+import TurnIntoShellTraitForm from 'components/trait-forms/entity/TurnIntoShellTraitForm';
+import WalkTraitForm from 'components/trait-forms/entity/WalkTraitForm';
+import PowerUpTraitForm from 'components/trait-forms/entity/PowerUpTraitForm';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -394,6 +398,7 @@ function _LevelSpawnSettings ({
                         ]}
                         value={spawn.entity.orientation}
                         onSelectValue={handleOrientationChange}
+                        stretch
                     />
                 </div>
             </div>
@@ -427,6 +432,11 @@ function _LevelSpawnTrait ({
     trait,
     onChangeSpawn,
 }: _LevelSpawnTraitProps) {
+    // if there's no configurable parameters, no component is rendered.
+    if (!trait.configurableParameters || trait.configurableParameters.length === 0) {
+        return <></>;
+    }
+
     const configValues = spawn.entity.parameters[trait.id] ?? {};
     const defaultValues = entityDef.traits.find(t => t.id === trait.id);
 
@@ -442,19 +452,51 @@ function _LevelSpawnTrait ({
 
     if (trait.id === 'artificialMove') {
         return <ArtificialMoveTraitForm
+            configurableParameters={trait.configurableParameters}
             values={values as ArtificialMoveEntityValueCollection}
             onChangeValue={handleParameterValueChange<ArtificialMoveEntityValueCollection>}
         />
     }
     else if (trait.id === 'hurtPlayer') {
         return <HurtPlayerTraitForm
+            configurableParameters={trait.configurableParameters}
             values={values as HurtPlayerEntityValueCollection}
             onChangeValue={handleParameterValueChange}
         />
     }
     else if (trait.id === 'killable') {
         return <KillableTraitForm
+            configurableParameters={trait.configurableParameters}
             values={values as KillableEntityValueCollection}
+            onChangeValue={handleParameterValueChange}
+        />
+    }
+    else if (trait.id === 'moveAndFire') {
+        return <MoveAndFireTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as MoveAndFireEntityValueCollection}
+            onChangeValue={handleParameterValueChange}
+        />
+    }
+    else if (trait.id === 'powerUp') {
+        return <PowerUpTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as PowerUpEntityValueCollection}
+            onChangeValue={handleParameterValueChange}
+        />
+    }
+    else if (trait.id === 'turnIntoShell') {
+        return <TurnIntoShellTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as TurnIntoShellEntityValueCollection}
+            onChangeValue={handleParameterValueChange}
+            onChangeMultipleValues={handleTraitValueChange}
+        />
+    }
+    else if (trait.id === 'walk') {
+        return <WalkTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as WalkEntityValueCollection}
             onChangeValue={handleParameterValueChange}
         />
     }
@@ -484,6 +526,21 @@ function _LevelSpawnTrait ({
                         ...spawn.entity.parameters[trait.id],
                         [paramName]: value,
                     }
+                }
+            }
+        };
+
+        onChangeSpawn(spawn.uuid, update);
+    }
+
+    function handleTraitValueChange (value: EntityValueCollection) {
+        const update = {
+            ...spawn,
+            entity: {
+                ...spawn.entity,
+                parameters: {
+                    ...spawn.entity.parameters,
+                    [trait.id]: value
                 }
             }
         };

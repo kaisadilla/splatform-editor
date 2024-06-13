@@ -235,11 +235,21 @@
         @include horizontal-list-stretch;
         margin-top: $mantine-input-wrapper-margin;
         gap: 8px;
+        padding-bottom: 1px;
 
         .sp-select-gallery-button-root {
             width: 80px;
             height: 24px;
             flex-shrink: 0;
+        }
+    }
+
+    &.stretch .sp-select-gallery-option-container {
+        width: 100%;
+
+        .sp-select-gallery-button-root {
+            flex: 1;
+            min-width: fit-content;
         }
     }
 }

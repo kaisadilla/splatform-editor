@@ -111,7 +111,6 @@ export default function useEditorCanvasElement (
      * @param yTop 
      */
     function recalculateView (xTop: number, yTop: number) {
-        console.info("Recalculating view...");
         setCurrentView(
             new Rect(xTop, yTop, canvasSize.x, canvasSize.y)
         );

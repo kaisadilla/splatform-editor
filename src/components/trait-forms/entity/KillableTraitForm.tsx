@@ -1,8 +1,6 @@
 import EntityTraits, { KillableEntityParameter, KillableEntityValueCollection } from 'data/EntityTraits';
-import React from 'react';
 import { DivProps } from 'types';
-import TraitForm from '../TraitForm';
-import BooleanParameter from '../input/BooleanParameter';
+import TraitForm, { isEditable } from '../TraitForm';
 import EnemyDamageParameter from '../input/EnemyDamageParameter';
 
 export type ChangeKillableValueHandler
@@ -11,32 +9,37 @@ export type ChangeKillableValueHandler
     ) => void;
 
 export interface KillableTraitFormProps extends DivProps {
+    configurableParameters?: string[] | 'all';
     values: KillableEntityValueCollection;
     onChangeValue?: ChangeKillableValueHandler;
 }
 
 function KillableTraitForm ({
+    configurableParameters,
     values,
     onChangeValue,
     ...divProps
 }: KillableTraitFormProps) {
     const traitDef = EntityTraits.killable;
 
+    const bDamageFromStomp = isEditable(configurableParameters, 'damageFromStomp');
+    const bDamageFromFireball = isEditable(configurableParameters, 'damageFromFireball');
+
     return (
         <TraitForm
             title={traitDef.displayName}
             {...divProps}
         >
-            <EnemyDamageParameter
+            {bDamageFromStomp && <EnemyDamageParameter
                 param={traitDef.parameters.damageFromStomp}
                 value={values.damageFromStomp}
                 onChange={v => onChangeValue?.('damageFromStomp', v)}
-            />
-            <EnemyDamageParameter
+            />}
+            {bDamageFromFireball && <EnemyDamageParameter
                 param={traitDef.parameters.damageFromFireball}
                 value={values.damageFromFireball}
                 onChange={v => onChangeValue?.('damageFromFireball', v)}
-            />
+            />}
         </TraitForm>
     );
 }

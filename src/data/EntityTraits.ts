@@ -345,6 +345,7 @@ export type ArtificialMoveEntityParameter = keyof ArtificialMoveEntityParameterC
 export type HurtPlayerEntityParameter = keyof HurtPlayerEntityParameterCollection;
 export type KillableEntityParameter = keyof KillableEntityParameterCollection;
 export type MoveAndFireEntityParameter = keyof MoveAndFireEntityParameterCollection;
+export type PowerUpEntityParameter = keyof PowerUpEntityParameterCollection;
 export type TurnIntoShellEntityParameter = keyof TurnIntoShellEntityParameterCollection;
 export type WalkEntityParameter = keyof WalkEntityParameterCollection;
 
@@ -353,6 +354,7 @@ export type EntityParameterCollection =
     | HurtPlayerEntityParameterCollection
     | KillableEntityParameterCollection
     | MoveAndFireEntityParameterCollection
+    | PowerUpEntityParameterCollection
     | TurnIntoShellEntityParameterCollection
     | WalkEntityParameterCollection
 ;
@@ -362,6 +364,7 @@ export type EntityValueCollection =
     | HurtPlayerEntityValueCollection
     | KillableEntityValueCollection
     | MoveAndFireEntityValueCollection
+    | PowerUpEntityValueCollection
     | TurnIntoShellEntityValueCollection
     | WalkEntityValueCollection
 ;
