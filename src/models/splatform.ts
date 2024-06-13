@@ -1,4 +1,4 @@
-import { TraitId } from "data/TileTraits";
+import { TraitId } from "data/Traits";
 import { LevelEntity, LevelTile } from "./Level";
 
 /**
@@ -12,9 +12,12 @@ export type ParameterType =
     | 'tileReference'
     | 'entityReference'
     | 'tileOrEntityReference'
+    | 'direction'
     | 'playerDamageType'
+    | 'powerUpType'
     | 'rewardType'
     | 'blockRegenerationMode'
+    | 'entityDamageType'
 
 /**
  * An SPlatform trait. Contains the data that describes how a trait works.
@@ -25,6 +28,7 @@ export type ParameterType =
 export interface Trait<T> {
     id: string;
     displayName: string;
+    description?: string;
     parameters: T;
 }
 
@@ -58,7 +62,7 @@ export interface Parameter<T> {
  */
 export interface TraitSpecification<T extends TraitId> {
     id: T;
-    parameters: {[key: string]: any};
+    parameters: ParameterValueCollection;
     configurableParameters: string[];
     stateAnimations?: {[key: string]: string};
 }
@@ -93,7 +97,11 @@ export interface TraitPreset {
  * 
  * **This is the object used by LevelTiles and LevelEntities to specify the
  * parameter values that apply to a specific trait for that specific level
- * object.**
+ * object. This is also the object used by Entities and Tiles to specify the
+ * default values for their parameters.**
+ * 
+ * In general, this object should be used to store values for parameters for
+ * a give ntrait.
  */
 export interface ParameterValueCollection {
     [key: string]: any;
@@ -101,6 +109,9 @@ export interface ParameterValueCollection {
 
 export const PlayerDamageTypeValues = ["regular", "fatal"] as const;
 export type PlayerDamageType = typeof PlayerDamageTypeValues[number];
+
+export const EntityDamageTypeValues = ["none", "regular", "fatal"] as const;
+export type EntityDamageType = typeof EntityDamageTypeValues[number];
 
 export const RewardTypeParameterValues = ["coin", "tile", "entity"] as const;
 export type RewardTypeParameter = typeof RewardTypeParameterValues[number];
@@ -170,3 +181,14 @@ export interface ObjectAnimation {
     frames?: number[];
     frameTimes?: number | number[];
 }
+
+export type Direction = 'up' | 'down' | 'left' | 'right';
+export type PowerUpType =
+    'strong'
+    | 'fireball'
+    | 'frog'
+    | 'hammer'
+    | 'leaf'
+    | 'superball'
+    | 'tanooki'
+;

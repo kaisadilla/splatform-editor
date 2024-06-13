@@ -6,6 +6,8 @@ import { Vec2, WithId } from "utils";
 
 export type ZoomLevel = '0.25' | '0.5' | '1' | '2' | '3' | '4' | '6' | '8';
 
+export type PropertiesPanel = 'level' | 'item';
+
 export type EditorSection =
     'terrain'
     | 'entity-tiles'
@@ -38,6 +40,10 @@ interface LevelEditorContextState {
      * The zoom applied to the editor canvas.
      */
     zoom: ZoomLevel;
+    /**
+     * The properties panel that is currently shown.
+     */
+    activePropertiesPanel: PropertiesPanel;
     activeSection: EditorSection;
     /**
      * The position of the tile(s) that are currently selected (in the active layer).
@@ -77,6 +83,7 @@ interface LevelEditorContextState {
     jsonVersion: string;
     setResourcePack: (pack: ResourcePack | null) => void;
     setZoom: (zoom: ZoomLevel) => void;
+    setActivePropertiesPanel: (panel: PropertiesPanel) => void;
     setActiveSection: (section: EditorSection) => void;
     setTileSelection: (positions: Vec2[]) => void;
     setSpawnSelection: (ids: string[]) => void;
@@ -102,6 +109,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
     const [state, setState] = useState<LevelEditorContextState>({
         resourcePack: null,
         zoom: '2',
+        activePropertiesPanel: 'level',
         activeSection: 'terrain',
         tileSelection: [] as Vec2[],
         spawnSelection: [] as string[],
@@ -125,6 +133,13 @@ const LevelEditorContextProvider = ({ children }: any) => {
             setState(prevState => ({
                 ...prevState,
                 zoom,
+            }));
+        }
+
+        function setActivePropertiesPanel (panel: PropertiesPanel) {
+            setState(prevState => ({
+                ...prevState,
+                activePropertiesPanel: panel,
             }));
         }
 
@@ -216,6 +231,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
             setState(prevState => ({
                 ...prevState,
                 tileSelection: [],
+                spawnSelection: [],
             }));
         }
 
@@ -250,6 +266,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
             ...state,
             setResourcePack,
             setZoom,
+            setActivePropertiesPanel,
             setActiveSection,
             setTileSelection,
             setSpawnSelection,

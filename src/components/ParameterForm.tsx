@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NumberInput, Select, TextInput } from '@mantine/core';
-import TileTraits, { TraitId, TraitParameterCollection } from 'data/TileTraits';
+import TileTraits, { TraitParameterCollection } from 'data/TileTraits';
+import { TraitId } from 'data/Traits';
 import TileOrEntityInput from 'elements/TileOrEntityInput';
 import TitledCheckbox from 'elements/TitledCheckbox';
 import { ResourcePack } from 'models/ResourcePack';

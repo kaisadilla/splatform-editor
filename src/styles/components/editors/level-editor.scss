@@ -282,6 +282,11 @@
         @include fill-container;
         @include vertical-list-stretch;
 
+        .title {
+            font-weight: $w-semibold;
+            padding: 6px 12px;
+        }
+
         .parameter-form {
             flex-shrink: 0;
         }

@@ -169,6 +169,7 @@ export default function useEditorCanvasInteraction (
             else if (tool === 'eraser') {
                 if (placePosition !== null) {
                     deleteEntityAt(placePosition);
+                    levelCtx.cancelSelection();
                 }
             }
         }

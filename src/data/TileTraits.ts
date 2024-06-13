@@ -223,7 +223,7 @@ const TileTraits: TileTraitCollection = {
         }
     },
     rewardBlock: {
-        id: 'block',
+        id: 'rewardBlock',
         displayName: "Reward block",
         parameters: {
             rewardType: {
@@ -389,14 +389,6 @@ export type TileTraitCollection = {
     terrain: Trait<TerrainTileTraitParameterCollection>
 }
 
-export type EntityTraitCollection = {
-
-}
-
-export type TileTraitId = keyof TileTraitCollection;
-export type EntityTraitId = keyof EntityTraitCollection;
-export type TraitId = TileTraitId | EntityTraitId;
-
 export interface TraitParameterCollection {
     
 }
@@ -472,5 +464,6 @@ export type BreakableTileTraitParameter = keyof BreakableTileTraitParameterColle
 export type RewardBlockTileTraitParameter = keyof RewardBlockTileTraitParameterCollection;
 export type FallTileTraitParameter = keyof FallTileTraitParameterCollection;
 export type TerrainTileTraitParameter = keyof TerrainTileTraitParameterCollection;
+
 
 export default TileTraits;

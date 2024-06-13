@@ -2,13 +2,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion, NumberInput, Select, Tabs, TextInput } from '@mantine/core';
 import ParameterForm from 'components/ParameterForm';
 import { useAppContext } from 'context/useAppContext';
-import { useLevelEditorContext } from 'context/useLevelEditorContext';
-import { TileTraitId, TraitParameterCollection } from 'data/TileTraits';
+import { PropertiesPanel, useLevelEditorContext } from 'context/useLevelEditorContext';
+import { TraitParameterCollection } from 'data/TileTraits';
 import BackgroundAssetInput from 'elements/BackgroundAssetInput';
 import MusicAssetInput from 'elements/MusicAssetInput';
-import { Level, LevelSettings, PlacedTile } from 'models/Level';
+import { Level, LevelSettings, LevelSpawn, PlacedTile } from 'models/Level';
 import { clampNumber, vec2equals, vec2toString } from 'utils';
-import { LevelChangeFieldHandler, LevelChangeTileHandler } from '.';
+import { LevelChangeSpawnHandler, LevelChangeFieldHandler, LevelChangeTileHandler } from '.';
+import { EntityTraitId, TileTraitId } from 'data/Traits';
+import TitledCheckbox from 'elements/TitledCheckbox';
+import { Entity } from 'models/Entity';
+import SelectGallery from 'elements/SelectGallery';
+import EntityTraits, { ArtificialMoveValueCollection } from 'data/EntityTraits';
+import { ParameterValueCollection, TraitSpecification } from 'models/splatform';
+import ArtificialMoveTraitForm from 'components/trait-forms/entity/ArtificialMoveTraitForm';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -19,6 +26,7 @@ export interface LevelEditor_PropertiesPanelProps {
     onChangeField: LevelChangeFieldHandler;
     onChangeResourcePack: (val: string | null) => void;
     onChangeTile: LevelChangeTileHandler;
+    onChangeSpawn: LevelChangeSpawnHandler;
 }
 
 function LevelEditor_PropertiesPanel ({
@@ -27,13 +35,19 @@ function LevelEditor_PropertiesPanel ({
     onChangeField,
     onChangeResourcePack,
     onChangeTile,
+    onChangeSpawn,
 }: LevelEditor_PropertiesPanelProps) {
     const levelCtx = useLevelEditorContext();
 
     return (
         <div className="level-properties-panel">
             <Tabs
-                defaultValue="level"
+                value={levelCtx.activePropertiesPanel}
+                onChange={a => {
+                    if (a) {
+                        levelCtx.setActivePropertiesPanel(a as PropertiesPanel);
+                    }
+                }}
                 classNames={{
                     root: "sp-section-tab-root",
                     list: "sp-section-tab-ribbon-list",
@@ -60,6 +74,7 @@ function LevelEditor_PropertiesPanel ({
                         level={level}
                         onChangeField={onChangeField}
                         onChangeTile={onChangeTile}
+                        onChangeSpawn={onChangeSpawn}
                     />
                 </Tabs.Panel>
             </Tabs>
@@ -188,20 +203,22 @@ interface _ItemPropertiesProps {
     level: Level;
     onChangeField: LevelChangeFieldHandler;
     onChangeTile: LevelChangeTileHandler;
+    onChangeSpawn: LevelChangeSpawnHandler;
 }
 
 function _ItemProperties ({
     level,
     onChangeField,
     onChangeTile,
+    onChangeSpawn,
 }: _ItemPropertiesProps) {
     const levelCtx = useLevelEditorContext();
 
     if (levelCtx.activeSection === 'terrain') {
-        return <_TileProperties level={level} onChangeTile={onChangeTile} />
+        return <_TileProperties level={level} onChangeTile={onChangeTile} />;
     }
     else if (levelCtx.activeSection === 'spawns') {
-        return <_SpawnProperties level={level} onChangeField={onChangeField} />
+        return <_SpawnProperties level={level} onChangeSpawn={onChangeSpawn} />
     }
 
     return <></>;
@@ -269,6 +286,9 @@ function _TileProperties ({
     // tiles of the same type
     return (
         <div className="item-properties">
+            <div className="title">
+                {tile.data.name} at {vec2toString(levelTile.position)}
+            </div>
             <ParameterForm
                 pack={pack}
                 traits={tile.data.traits}
@@ -296,19 +316,159 @@ function _TileProperties ({
 
 interface _SpawnPropertiesProps {
     level: Level;
-    onChangeField: LevelChangeFieldHandler;
+    onChangeSpawn: LevelChangeSpawnHandler;
 }
 
 function _SpawnProperties ({
     level,
-    onChangeField,
+    onChangeSpawn,
 }: _SpawnPropertiesProps) {
+    const levelCtx = useLevelEditorContext();
+
+    if (levelCtx.resourcePack === null) return <></>;
+    if (levelCtx.spawnSelection.length === 0) return <></>;
+    if (levelCtx.spawnSelection.length > 1) return (
+        <div>
+            Multiple spawn edition is not supported yet.
+        </div>
+    );
+
+    const spawnId = levelCtx.spawnSelection[0];
+    const spawn = level.spawns.find(s => s.uuid === spawnId);
+    if (!spawn) {
+        console.error(
+            `Couldn't find spawn with id ${spawnId} even though it's selected.`
+        );
+        return <></>;
+    }
+
+    const entityDef = levelCtx.resourcePack.entitiesById[spawn.entity.entityId];
+    if (!entityDef) {
+        console.error(
+            `Couldn't find entity with id '${spawn.entity.entityId}'`
+        );
+        return <></>;
+    }
+
+    return (
+        <div className="item-properties">
+            <_LevelSpawnSettings
+                spawn={spawn}
+                entityDef={entityDef.data}
+                onChangeSpawn={onChangeSpawn}
+            />
+            {entityDef.data.traits.map(t => <_LevelSpawnTrait
+                key={t.id}
+                spawn={spawn}
+                entityDef={entityDef.data}
+                trait={t}
+                onChangeSpawn={onChangeSpawn}
+            />)}
+        </div>
+    );
+}
+
+interface _LevelSpawnSettingsProps {
+    spawn: LevelSpawn;
+    entityDef: Entity;
+    onChangeSpawn: LevelChangeSpawnHandler;
+}
+
+function _LevelSpawnSettings ({
+    spawn,
+    entityDef,
+    onChangeSpawn
+}: _LevelSpawnSettingsProps) {
+    return (
+        <div className="trait-form">
+            <div className="parameter-list">
+                <div className="parameter-container">
+                    <SelectGallery<'left' | 'right'>
+                        size='sm'
+                        label="Orientation"
+                        description="The direction this entity starts looking at."
+                        data={[
+                            { value: "left", label: "Left" },
+                            { value: "right", label: "Right" },
+                        ]}
+                        value={spawn.entity.orientation}
+                        onSelectValue={handleOrientationChange}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+
+    function handleOrientationChange (val: string | null) {
+        if (val === null) return;
+        if (val !== "left" && val !== "right") return;
+
+        onChangeSpawn(spawn.uuid, {
+            ...spawn,
+            entity: {
+                ...spawn.entity,
+                orientation: val,
+            },
+        });
+    }
+}
+
+interface _LevelSpawnTraitProps {
+    spawn: LevelSpawn;
+    entityDef: Entity;
+    trait: TraitSpecification<EntityTraitId>;
+    onChangeSpawn: LevelChangeSpawnHandler;
+}
+
+function _LevelSpawnTrait ({
+    spawn,
+    entityDef,
+    trait,
+    onChangeSpawn,
+}: _LevelSpawnTraitProps) {
+    const configValues = spawn.entity.parameters[trait.id] ?? {};
+    const defaultValues = entityDef.traits.find(t => t.id === trait.id);
+
+    if (!defaultValues) {
+        console.error(`Couldn't find default values for trait '${trait.id}'`);
+        return <></>;
+    }
+
+    const values: ParameterValueCollection = {
+        ...defaultValues.parameters,
+        ...configValues,
+    }
+
+    if (trait.id === 'artificialMove') {
+        return <ArtificialMoveTraitForm
+            values={values as ArtificialMoveValueCollection}
+            onChangeValue={handleParameterValueChange}
+        />
+    }
 
     return (
         <div>
-            
+            {trait.id}
         </div>
     );
+
+    function handleParameterValueChange (paramName: string, value: any) {
+        const update = {
+            ...spawn,
+            entity: {
+                ...spawn.entity,
+                parameters: {
+                    ...spawn.entity.parameters,
+                    [trait.id]: {
+                        ...spawn.entity.parameters[trait.id],
+                        [paramName]: value,
+                    }
+                }
+            }
+        };
+
+        onChangeSpawn(spawn.uuid, update);
+    }
 }
 
 

@@ -2,7 +2,7 @@ import { SPDocument } from 'models/sp_documents';
 import React, { useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { ToolIcons1x } from 'icons';
-import { Level, PlacedTile, TileLayer } from 'models/Level';
+import { Level, LevelSpawn, PlacedTile, TileLayer } from 'models/Level';
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { SP_ResizeHandle } from 'elements/resizablePanel';
 import LocalStorage from 'localStorage';
@@ -26,6 +26,8 @@ export type LevelChangeTileHandler
         layerIndex: number, tilePos: Vec2, field: K, value: PlacedTile[K]
     ) => void;
 
+export type LevelChangeSpawnHandler = (uuid: string, value: LevelSpawn) => void;
+
 export interface LevelEditorProps {
     doc: SPDocument;
 }
@@ -46,6 +48,18 @@ function LevelEditor ({
         const mainIndex = level.layers.findIndex(l => l.name === "Main");
         levelCtx.setActiveTerrainLayer(mainIndex >= 0 ? mainIndex : 0);
     }, []);
+
+    // When the user selects an item, the properties panel tab is changed automatically
+    // to the item's properties. When nothing is selected, it's changed automatically
+    // to the level's properties.
+    useEffect(() => {
+        if (levelCtx.tileSelection.length > 0 || levelCtx.spawnSelection.length > 0) {
+            levelCtx.setActivePropertiesPanel('item');
+        }
+        else {
+            levelCtx.setActivePropertiesPanel('level');
+        }
+    }, [levelCtx.tileSelection, levelCtx.spawnSelection]);
 
     useEffect(() => {
         levelCtx.setResourcePack(getResourcePack(level.resourcePack));
@@ -156,6 +170,7 @@ function LevelEditor ({
                         onChangeField={handleFieldChange}
                         onChangeResourcePack={handleResourcePackChange}
                         onChangeTile={handleTileChange}
+                        onChangeSpawn={handleSpawnChange}
                     />
                 </Panel>
             </PanelGroup>}
@@ -206,6 +221,16 @@ function LevelEditor ({
         };
         
         handleFieldChange('layers', update);
+    }
+
+    function handleSpawnChange (uuid: string, value: LevelSpawn) {
+        const index = level.spawns.findIndex(s => s.uuid === uuid);
+        if (index === -1) return;
+
+        const update = [...level.spawns];
+        update[index] = value;
+        
+        handleFieldChange('spawns', update);
     }
 
     function handleChangeEditMode (mode: EditMode) {

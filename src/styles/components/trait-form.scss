@@ -1,0 +1,28 @@
+.trait-form {
+    .header {
+        font-weight: $w-semibold;
+        font-style: italic;
+        padding: 0 0.75rem;
+        color: $color-text-2;
+
+        &::before {
+            background: $color-component-3;
+            width: 12px;
+            height: 6px;
+            content: "\00a0";
+            margin-right: 6px;
+        }
+    }
+
+    .parameter-list {
+        @include vertical-list-stretch;
+    }
+
+    .parameter-container {
+        padding: 5px 1.5rem;
+
+        &:hover {
+            background-color: $color-component-1;
+        }
+    }
+}

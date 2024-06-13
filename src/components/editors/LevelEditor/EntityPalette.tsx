@@ -94,7 +94,7 @@ function _EntityButton ({
                     pack={pack}
                     entity={entity.data}
                     size={56}
-                    //lookLeft
+                    lookLeft
                 />
             </div>
         </Tooltip>

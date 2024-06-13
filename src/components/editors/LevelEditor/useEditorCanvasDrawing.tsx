@@ -113,7 +113,6 @@ export default function useEditorCanvasDrawing (
     ]);
     const $spawns = useMemo(() => {
         const spawns = buildVisibleSpawnArray();
-        console.log(spawns);
 
         const sprites = spawns.map(s => <Sprite
             key={s.key}
@@ -130,7 +129,7 @@ export default function useEditorCanvasDrawing (
         tilesInCurrentStroke,
         currentView,
         levelCtx.spawnSelection,
-        level.spawns.length,
+        level.spawns,
         zoom,
     ]);
     const $hoveringPaint = generateHoveringPaint();
@@ -358,7 +357,8 @@ export default function useEditorCanvasDrawing (
             }
 
             const newEntity: CanvasSpriteInfo = {
-                key: i + "," + spawn.entity.entityId + "," + vec2toString(spawn.position),
+                key: i + "," + spawn.entity.orientation + ", "
+                    + spawn.entity.entityId + "," + vec2toString(spawn.position),
                 position: canvasPos,
                 texture: tex,
                 scale: scale,

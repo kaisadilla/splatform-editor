@@ -229,3 +229,17 @@
         }
     }
 }
+
+.sp-select-gallery-root {
+    .sp-select-gallery-option-container {
+        @include horizontal-list-stretch;
+        margin-top: $mantine-input-wrapper-margin;
+        gap: 8px;
+
+        .sp-select-gallery-button-root {
+            width: 80px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+    }
+}

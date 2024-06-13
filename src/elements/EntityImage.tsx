@@ -55,7 +55,7 @@ function EntityImage ({
     //const ty = Math.floor(size / entity.spritesheet.sliceSize[1]);
     //const multiplier = Math.max(Math.min(tx, ty), 2);
     const biggestDim = Math.max(...entity.spritesheet.sliceSize);
-    const multiplier = biggestDim > size ? 1 : 2;
+    const multiplier = (biggestDim * 1.5) > size ? 1 : 2;
     // the size of the image is set to exactly the size of the first sprite by
     // two, which ensures all images only show the first sprite of the spritesheet.
     const imgX = entity.spritesheet.sliceSize[0] * multiplier;

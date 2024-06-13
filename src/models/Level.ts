@@ -1,9 +1,10 @@
 import { Vec2 } from "utils";
 import { SPDocumentType, Version } from "./sp_documents";
-import { EntityTraitId, TileTraitId, TraitId, TraitParameterCollection } from "data/TileTraits";
 import { Tile } from "./Tile";
 import { ParameterValueCollection, TraitValueCollection } from "./splatform";
 import { Entity } from "./Entity";
+import { EntityTraitId, TileTraitId } from "data/Traits";
+import { EntityTraitCollection } from "data/EntityTraits";
 
 export interface Level {
     type: 'level';
@@ -120,13 +121,14 @@ export function getNewLevelTile (tile: Tile) : LevelTile {
     const params: TraitValueCollection<TileTraitId> = {};
 
     for (const trait of tile.traits) {
-        params[trait.id] = {} as ParameterValueCollection;
-
         if (trait.configurableParameters === undefined) continue;
+        if (trait.configurableParameters.length === 0) continue;
+
+        params[trait.id as TileTraitId] = {} as ParameterValueCollection;
 
         for (const configParam of trait.configurableParameters) {
             const defaultValue = trait.parameters[configParam];
-            params[trait.id]![configParam] = defaultValue;
+            params[trait.id as TileTraitId]![configParam] = defaultValue;
         }
     }
     
@@ -140,15 +142,14 @@ export function getNewLevelEntity (entity: Entity) : LevelEntity {
     const params: TraitValueCollection<EntityTraitId> = {};
 
     for (const trait of entity.traits) {
-        // @ts-ignore TODO: Remove this ignore
-        params[trait.id] = {} as ParameterValueCollection;
-
         if (trait.configurableParameters === undefined) continue;
+        if (trait.configurableParameters.length === 0) continue;
+
+        params[trait.id as EntityTraitId] = {} as ParameterValueCollection;
 
         for (const configParam of trait.configurableParameters) {
             const defaultValue = trait.parameters[configParam];
-            // @ts-ignore TODO: Remove this ignore
-            params[trait.id]![configParam] = defaultValue;
+            params[trait.id as EntityTraitId]![configParam] = defaultValue;
         }
     }
 
