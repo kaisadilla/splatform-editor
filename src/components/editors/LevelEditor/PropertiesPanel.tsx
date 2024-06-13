@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Accordion, NumberInput, Select, TextInput } from '@mantine/core';
+import { Accordion, NumberInput, Select, Tabs, TextInput } from '@mantine/core';
 import ParameterForm from 'components/ParameterForm';
 import { useAppContext } from 'context/useAppContext';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
@@ -28,30 +28,41 @@ function LevelEditor_PropertiesPanel ({
     onChangeResourcePack,
     onChangeTile,
 }: LevelEditor_PropertiesPanelProps) {
+    const levelCtx = useLevelEditorContext();
+
     return (
         <div className="level-properties-panel">
-            <Accordion
+            <Tabs
+                defaultValue="level"
                 classNames={{
-                    root: "level-properties-accordion-root sp-accordion-root",
-                    item: "level-properties-accordion-item sp-accordion-item",
-                    control: "level-properties-accordion-control sp-accordion-control",
-                    content: "level-properties-accordion-content sp-accordion-content",
-                    panel: "level-properties-accordion-panel sp-accordion-panel",
+                    root: "sp-section-tab-root",
+                    list: "sp-section-tab-ribbon-list",
+                    tab: "sp-section-tab-ribbon-tab",
+                    tabLabel: "sp-section-tab-ribbon-tab-label",
+                    panel: "sp-section-tab-panel",
                 }}
-                multiple
-                defaultValue={['level', 'target']}
             >
-                <_LevelProperties
-                    level={level}
-                    onChange={onChange}
-                    onChangeField={onChangeField}
-                    onChangeResourcePack={onChangeResourcePack}
-                />
-                <_TileProperties
-                    level={level}
-                    onChangeTile={onChangeTile}
-                />
-            </Accordion>
+                <Tabs.List>
+                    <Tabs.Tab value="level">Level properties</Tabs.Tab>
+                    <Tabs.Tab value="item">Item properties</Tabs.Tab>
+                </Tabs.List>
+
+                <Tabs.Panel value="level">
+                    <_LevelProperties
+                        level={level}
+                        onChange={onChange}
+                        onChangeField={onChangeField}
+                        onChangeResourcePack={onChangeResourcePack}
+                    />
+                </Tabs.Panel>
+                <Tabs.Panel value="item">
+                    <_ItemProperties
+                        level={level}
+                        onChangeField={onChangeField}
+                        onChangeTile={onChangeTile}
+                    />
+                </Tabs.Panel>
+            </Tabs>
         </div>
     );
 }
@@ -80,73 +91,68 @@ function _LevelProperties ({
     }
 
     return (
-        <Accordion.Item value={'level'}>
-            <Accordion.Control>
-                Level properties
-            </Accordion.Control>
-            <Accordion.Panel>
-                <Select
-                    size='sm'
-                    label="Resource pack"
-                    placeholder="Select a pack"
-                    data={resourcePacksData}
-                    value={level.resourcePack}
-                    onChange={v => onChangeResourcePack(v)}
-                    allowDeselect={false}
-                    rightSection={<FontAwesomeIcon icon='chevron-down' />}
-                />
-                <TextInput
-                    size='sm'
-                    label="Name"
-                    value={level.displayName}
-                    onChange={evt => onChangeField(
-                        'displayName', evt.currentTarget.value
-                    )}
-                />
-                <NumberInput
-                    size='sm'
-                    label="Width"
-                    value={level.settings.width}
-                    //min={MIN_DIMENSION_VAL}
-                    max={MAX_DIMENSION_VAL}
-                    allowDecimal={false}
-                    allowNegative={false}
-                    onChange={handleWidthChange}
-                />
-                <NumberInput
-                    size='sm'
-                    label="Height"
-                    value={level.settings.height}
-                    //min={MIN_DIMENSION_VAL}
-                    max={MAX_DIMENSION_VAL}
-                    allowDecimal={false}
-                    allowNegative={false}
-                    onChange={handleHeightChange}
-                />
-                <BackgroundAssetInput
-                    label="Background"
-                    pack={level.resourcePack}
-                    value={level.settings.background}
-                    onSelectValue={v => handleSettingsValue('background', v)}
-                />
-                <MusicAssetInput
-                    label="Music"
-                    pack={level.resourcePack}
-                    value={level.settings.music}
-                    onSelectValue={v => handleSettingsValue('music', v)}
-                />
-                <NumberInput
-                    size='sm'
-                    label="Time"
-                    value={level.settings.time}
-                    min={1}
-                    allowNegative={false}
-                    stepHoldDelay={300}
-                    stepHoldInterval={20}
-                    onChange={handleTimeChange}
-                />
-            </Accordion.Panel>
-        </Accordion.Item>
+        <div className="level-properties-level-section">
+            <Select
+                size='sm'
+                label="Resource pack"
+                placeholder="Select a pack"
+                data={resourcePacksData}
+                value={level.resourcePack}
+                onChange={v => onChangeResourcePack(v)}
+                allowDeselect={false}
+                rightSection={<FontAwesomeIcon icon='chevron-down' />}
+            />
+            <TextInput
+                size='sm'
+                label="Name"
+                value={level.displayName}
+                onChange={evt => onChangeField(
+                    'displayName', evt.currentTarget.value
+                )}
+            />
+            <NumberInput
+                size='sm'
+                label="Width"
+                value={level.settings.width}
+                //min={MIN_DIMENSION_VAL}
+                max={MAX_DIMENSION_VAL}
+                allowDecimal={false}
+                allowNegative={false}
+                onChange={handleWidthChange}
+            />
+            <NumberInput
+                size='sm'
+                label="Height"
+                value={level.settings.height}
+                //min={MIN_DIMENSION_VAL}
+                max={MAX_DIMENSION_VAL}
+                allowDecimal={false}
+                allowNegative={false}
+                onChange={handleHeightChange}
+            />
+            <BackgroundAssetInput
+                label="Background"
+                pack={level.resourcePack}
+                value={level.settings.background}
+                onSelectValue={v => handleSettingsValue('background', v)}
+            />
+            <MusicAssetInput
+                label="Music"
+                pack={level.resourcePack}
+                value={level.settings.music}
+                onSelectValue={v => handleSettingsValue('music', v)}
+            />
+            <NumberInput
+                size='sm'
+                label="Time"
+                value={level.settings.time}
+                min={1}
+                allowNegative={false}
+                stepHoldDelay={300}
+                stepHoldInterval={20}
+                onChange={handleTimeChange}
+            />
+        </div>
     );
 
     function handleSettingsValue (field: keyof LevelSettings, value: any) {
@@ -178,6 +184,30 @@ function _LevelProperties ({
     }
 }
 
+interface _ItemPropertiesProps {
+    level: Level;
+    onChangeField: LevelChangeFieldHandler;
+    onChangeTile: LevelChangeTileHandler;
+}
+
+function _ItemProperties ({
+    level,
+    onChangeField,
+    onChangeTile,
+}: _ItemPropertiesProps) {
+    const levelCtx = useLevelEditorContext();
+
+    if (levelCtx.activeSection === 'terrain') {
+        return <_TileProperties level={level} onChangeTile={onChangeTile} />
+    }
+    else if (levelCtx.activeSection === 'spawns') {
+        return <_SpawnProperties level={level} onChangeField={onChangeField} />
+    }
+
+    return <></>;
+}
+
+
 interface _TilePropertiesProps {
     level: Level;
     onChangeTile: LevelChangeTileHandler;
@@ -200,26 +230,16 @@ function _TileProperties ({
     // when multiple tiles are selected, we can't edit their info yet.
     // TODO: Show only traits all targets have in common.
     if (levelCtx.tileSelection.length > 1) return (
-        <Accordion.Item value={'target'}>
-            <Accordion.Control>
-                Target properties
-            </Accordion.Control>
-            <Accordion.Panel>
-                <span>Multiple tile edition is not supported yet.</span>
-            </Accordion.Panel>
-        </Accordion.Item>
+        <div>
+            <span>Multiple tile edition is not supported yet.</span>
+        </div>
     );
 
     const pack = getResourcePack(level.resourcePack);
     if (pack === null) return (
-        <Accordion.Item value={'target'}>
-            <Accordion.Control>
-                Target properties
-            </Accordion.Control>
-            <Accordion.Panel>
-                <span>Select a valid resource pack to access properties.</span>
-            </Accordion.Panel>
-        </Accordion.Item>
+        <div>
+            <span>Select a valid resource pack to access properties.</span>
+        </div>
     );
     
     // get the tile in the level currently selected.
@@ -248,29 +268,18 @@ function _TileProperties ({
     // each item has a key to ensure all nodes update when changing between
     // tiles of the same type
     return (
-        <Accordion.Item
-            key={vec2toString(tilePos)}
-            classNames={{
-                item: "item-properties",
-            }}
-            value={'target'}
-        >
-            <Accordion.Control>
-                Properties for {tile.data.name} at {vec2toString(tilePos)}
-            </Accordion.Control>
-            <Accordion.Panel>
-                <ParameterForm
-                    pack={pack}
-                    traits={tile.data.traits}
-                    traitValues={levelTile.parameters}
-                    onChangeTraitValues={
-                        (traitId, v) => handleTraitParamsChange(
-                            levelTile, traitId, v
-                        )
-                    }
-                />
-            </Accordion.Panel>
-        </Accordion.Item>
+        <div className="item-properties">
+            <ParameterForm
+                pack={pack}
+                traits={tile.data.traits}
+                traitValues={levelTile.parameters}
+                onChangeTraitValues={
+                    (traitId, v) => handleTraitParamsChange(
+                        levelTile, traitId, v
+                    )
+                }
+            />
+        </div>
     );
 
     function handleTraitParamsChange (
@@ -284,5 +293,23 @@ function _TileProperties ({
        onChangeTile(levelCtx.activeTerrainLayer, tilePos, 'parameters', update);
     }
 }
+
+interface _SpawnPropertiesProps {
+    level: Level;
+    onChangeField: LevelChangeFieldHandler;
+}
+
+function _SpawnProperties ({
+    level,
+    onChangeField,
+}: _SpawnPropertiesProps) {
+
+    return (
+        <div>
+            
+        </div>
+    );
+}
+
 
 export default LevelEditor_PropertiesPanel;

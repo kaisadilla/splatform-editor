@@ -43,6 +43,11 @@ function LevelEditor ({
     const pack = getResourcePack(level.resourcePack);
 
     useEffect(() => {
+        const mainIndex = level.layers.findIndex(l => l.name === "Main");
+        levelCtx.setActiveTerrainLayer(mainIndex >= 0 ? mainIndex : 0);
+    }, []);
+
+    useEffect(() => {
         levelCtx.setResourcePack(getResourcePack(level.resourcePack));
     }, [level.resourcePack]);
 
@@ -292,7 +297,7 @@ function LevelEditor ({
      */
     function removeSpawns (...ids: string[]) {
         if (ids.length === 0) return;
-        
+
         const spawns = level.spawns.filter(s => ids.includes(s.uuid) === false);
         handleFieldChange('spawns', spawns);
     }

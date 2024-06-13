@@ -97,6 +97,13 @@ export function getNewLevel () : Level {
         },
         layers: [
             {
+                name: "Background",
+                settings: {
+                    checksCollisions: false,
+                },
+                tiles: []
+            },
+            {
                 name: "Main",
                 settings: {
                     checksCollisions: true,

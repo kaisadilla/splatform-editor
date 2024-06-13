@@ -1,5 +1,5 @@
 import { Checkbox, CloseButton, ScrollArea, Tabs, Text, Tooltip } from '@mantine/core';
-import { useLevelEditorContext } from 'context/useLevelEditorContext';
+import { EditorSection, useLevelEditorContext } from 'context/useLevelEditorContext';
 import ActivatableTextInput from 'elements/ActivatableTextInput';
 import { Level } from 'models/Level';
 import { ResourcePack } from 'models/ResourcePack';
@@ -26,7 +26,7 @@ function LevelEditor_Features ({
             <Tabs
                 value={levelCtx.activeSection}
                 // @ts-ignore - false syntax error.
-                onChange={v => { if (v) levelCtx.setActiveSection(v)}}
+                onChange={handleSectionChange}
                 classNames={{
                     root: "sp-section-tab-root",
                     list: "sp-section-tab-ribbon-list",
@@ -103,6 +103,14 @@ function LevelEditor_Features ({
             </Tabs>
         </div>
     );
+
+    function handleSectionChange (section: string | null) {
+        if (section === null) return;
+
+        levelCtx.setActiveSection(section as EditorSection);
+        levelCtx.setTileSelection([]);
+        levelCtx.setSpawnSelection([]);
+    }
 }
 
 interface _TerrainTabProps {

@@ -1,7 +1,4 @@
 .level-editor {
-    //display: grid;
-    //grid-template: "tool tool tool" 32px
-    //               "pall cont prop" 1fr / 1fr 1fr 340px;
     @include vertical-queue-stretch;
     justify-content: stretch;
 
@@ -258,8 +255,37 @@
 
 .level-editor .level-properties-panel {
     @include vertical-queue-stretch;
+    @include fill-container;
+
+    .sp-section-tab-root {
+        @include fill-container;
+        @include vertical-queue-stretch;
+
+        .sp-section-tab-ribbon-list {
+            flex-shrink: 0;
+        }
+
+        .sp-section-tab-panel {
+            @include fill-container;
+        }
+    }
+
+    .level-properties-level-section {
+        @include fill-container;
+        @include vertical-list-stretch;
+        justify-content: start;
+        padding: 12px;
+        gap: 6px;
+    }
 
     .item-properties {
+        @include fill-container;
+        @include vertical-list-stretch;
+
+        .parameter-form {
+            flex-shrink: 0;
+        }
+
         .sp-accordion-panel-content {
             padding: 0;
             padding-top: 0.625rem;
