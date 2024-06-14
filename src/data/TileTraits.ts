@@ -1,4 +1,5 @@
 import { BlockRegenerationMode, Reference, Parameter, PlayerDamageType, RewardTypeParameter, Trait } from "models/splatform";
+import { TraitCollectionOf, TraitWithId } from "./Traits";
 
 const TileTraits: TileTraitCollection = {
     background: {
@@ -380,60 +381,59 @@ const TileTraits: TileTraitCollection = {
 }
 
 export type TileTraitCollection = {
-    background: Trait<BackgroundTileTraitParameterCollection>
-    block: Trait<BlockTileTraitParameterCollection>;
-    breakable: Trait<BreakableTileTraitParameterCollection>;
-    fall: Trait<FallTileTraitParameterCollection>;
-    platform: Trait<PlatformTileTraitParameterCollection>;
-    rewardBlock: Trait<RewardBlockTileTraitParameterCollection>;
-    terrain: Trait<TerrainTileTraitParameterCollection>
+    background: TraitWithId<'background', BackgroundTileParameterCollection>
+    block: TraitWithId<'block', BlockTileParameterCollection>;
+    breakable: TraitWithId<'breakable', BreakableTileParameterCollection>;
+    fall: TraitWithId<'fall', FallTileParameterCollection>;
+    platform: TraitWithId<'platform', PlatformTileParameterCollection>;
+    rewardBlock: TraitWithId<'rewardBlock', RewardBlockTileParameterCollection>;
+    terrain: TraitWithId<'terrain', TerrainTileParameterCollection>
 }
 
-export interface TraitParameterCollection {
+export interface BackgroundTileValueCollection {
     
 }
+export type BackgroundTileParameterCollection = TraitCollectionOf<BackgroundTileValueCollection>;
 
-export interface BackgroundTileTraitParameterCollection extends TraitParameterCollection {
-    
+export interface BlockTileValueCollection {
+    isHidden: Boolean;
+}
+export type BlockTileParameterCollection = TraitCollectionOf<BlockTileValueCollection>;
+
+export interface BreakableTileValueCollection {
+    breakWhenPunched: boolean;
+    breakWhenSpin: boolean;
+    breakWhenHitByShell: boolean;
+    breakWhenHitByRaccoonTail: boolean;
+    breakWhenHitByPlayerFireball: boolean;
+    breakWhenHitByEnemyFireball: boolean;
+    isReplacedWhenBroken: boolean;
+    replacementWhenBroken: Reference | null;
+}
+export type BreakableTileParameterCollection = TraitCollectionOf<BreakableTileValueCollection>;
+
+export interface RewardBlockTileParameterCollection {
+    rewardType: RewardTypeParameter;
+    reward: Reference | null;
+    smallPlayerHasDifferentReward: boolean;
+    smallPlayerReward: Reference | null;
+    maxHits: number;
+    maxTime: number;
+    waitForFinalHitBeforeBecomingEmpty: boolean;
+    hasBonusForReachingMaxHits: boolean;
+    bonusForReachingMaxHits: Reference | null;
+    isReplacedWhenEmptied: boolean;
+    replacementWhenEmptied: Reference | null;
+    revertToCoinAfterFirstHit: boolean;
+    triggerWhenPunched: boolean;
+    triggerWhenSpin: boolean;
+    triggerWhenHitByShell: boolean;
+    triggerWhenHitByRaccoonTail: boolean;
+    triggerWhenHitByPlayerFireball: boolean;
+    triggerWhenHitByEnemyFireball: boolean;
 }
 
-export interface BlockTileTraitParameterCollection extends TraitParameterCollection {
-    isHidden: Parameter<Boolean>;
-}
-
-export interface BreakableTileTraitParameterCollection extends TraitParameterCollection {
-    breakWhenPunched: Parameter<boolean>;
-    breakWhenSpin: Parameter<boolean>;
-    breakWhenHitByShell: Parameter<boolean>;
-    breakWhenHitByRaccoonTail: Parameter<boolean>;
-    breakWhenHitByPlayerFireball: Parameter<boolean>;
-    breakWhenHitByEnemyFireball: Parameter<boolean>;
-    isReplacedWhenBroken: Parameter<boolean>;
-    replacementWhenBroken: Parameter<Reference | null>;
-}
-
-export interface RewardBlockTileTraitParameterCollection extends TraitParameterCollection {
-    rewardType: Parameter<RewardTypeParameter>;
-    reward: Parameter<Reference | null>;
-    smallPlayerHasDifferentReward: Parameter<boolean>;
-    smallPlayerReward: Parameter<Reference | null>;
-    maxHits: Parameter<number>;
-    maxTime: Parameter<number>;
-    waitForFinalHitBeforeBecomingEmpty: Parameter<boolean>;
-    hasBonusForReachingMaxHits: Parameter<boolean>;
-    bonusForReachingMaxHits: Parameter<Reference | null>;
-    isReplacedWhenEmptied: Parameter<boolean>;
-    replacementWhenEmptied: Parameter<Reference | null>;
-    revertToCoinAfterFirstHit: Parameter<boolean>;
-    triggerWhenPunched: Parameter<boolean>;
-    triggerWhenSpin: Parameter<boolean>;
-    triggerWhenHitByShell: Parameter<boolean>;
-    triggerWhenHitByRaccoonTail: Parameter<boolean>;
-    triggerWhenHitByPlayerFireball: Parameter<boolean>;
-    triggerWhenHitByEnemyFireball: Parameter<boolean>;
-}
-
-export interface FallTileTraitParameterCollection extends TraitParameterCollection {
+export interface FallTileParameterCollection extends TraitParameterCollection {
     timeUntilFall: Parameter<number>;
     shakeBeforeFall: Parameter<boolean>;
     shakeAfter: Parameter<number>;
@@ -447,23 +447,23 @@ export interface FallTileTraitParameterCollection extends TraitParameterCollecti
     damageToPlayer: Parameter<PlayerDamageType | null>;
 }
 
-export interface PlatformTileTraitParameterCollection extends TraitParameterCollection {
+export interface PlatformTileParameterCollection extends TraitParameterCollection {
     collideFromTop: Parameter<boolean>;
     collideFromBottom: Parameter<boolean>;
     collideFromLeft: Parameter<boolean>;
     collideFromRight: Parameter<boolean>;
 }
 
-export interface TerrainTileTraitParameterCollection extends TraitParameterCollection {
+export interface TerrainTileParameterCollection extends TraitParameterCollection {
     
 }
 
 export type BackgroundTileTraitParameter = keyof BackgroundTileTraitParameterCollection;
 export type BlockTileTraitParameter = keyof BlockTileTraitParameterCollection;
 export type BreakableTileTraitParameter = keyof BreakableTileTraitParameterCollection;
-export type RewardBlockTileTraitParameter = keyof RewardBlockTileTraitParameterCollection;
-export type FallTileTraitParameter = keyof FallTileTraitParameterCollection;
-export type TerrainTileTraitParameter = keyof TerrainTileTraitParameterCollection;
+export type RewardBlockTileTraitParameter = keyof RewardBlockTileParameterCollection;
+export type FallTileTraitParameter = keyof FallTileParameterCollection;
+export type TerrainTileTraitParameter = keyof TerrainTileParameterCollection;
 
 
 export default TileTraits;

@@ -12,7 +12,7 @@ import BackgroundAssetInput from 'elements/BackgroundAssetInput';
 import MusicAssetInput from 'elements/MusicAssetInput';
 import SelectGallery from 'elements/SelectGallery';
 import { Entity } from 'models/Entity';
-import { Level, LevelSettings, LevelSpawn, PlacedTile } from 'models/Level';
+import { Level, LevelSettings, LevelSpawn, LevelTile, PlacedTile } from 'models/Level';
 import { ParameterValueCollection, TraitSpecification } from 'models/splatform';
 import { clampNumber, vec2equals, vec2toString } from 'utils';
 import { LevelChangeFieldHandler, LevelChangeSpawnHandler, LevelChangeTileHandler } from '.';
@@ -21,6 +21,7 @@ import MoveAndFireTraitForm from 'components/trait-forms/entity/MoveAndFireTrait
 import TurnIntoShellTraitForm from 'components/trait-forms/entity/TurnIntoShellTraitForm';
 import WalkTraitForm from 'components/trait-forms/entity/WalkTraitForm';
 import PowerUpTraitForm from 'components/trait-forms/entity/PowerUpTraitForm';
+import { Tile } from 'models/Tile';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -219,10 +220,10 @@ function _ItemProperties ({
 }: _ItemPropertiesProps) {
     const levelCtx = useLevelEditorContext();
 
-    if (levelCtx.activeSection === 'terrain') {
+    if (levelCtx.tileSelection.length > 0) {
         return <_TileProperties level={level} onChangeTile={onChangeTile} />;
     }
-    else if (levelCtx.activeSection === 'spawns') {
+    else if (levelCtx.spawnSelection.length > 0) {
         return <_SpawnProperties level={level} onChangeSpawn={onChangeSpawn} />
     }
 
@@ -243,24 +244,14 @@ function _TileProperties ({
     level,
     onChangeTile,
 }: _TilePropertiesProps) {
-    const { getResourcePack } = useAppContext();
     const levelCtx = useLevelEditorContext();
 
-    // if no tile is selected, this panel is not rendered.
+    // Under certain conditions, this panel is not rendered.
+    if (levelCtx.resourcePack === null) return <></>;
     if (levelCtx.tileSelection.length === 0) return <></>;
-
-    // when multiple tiles are selected, we can't edit their info yet.
-    // TODO: Show only traits all targets have in common.
     if (levelCtx.tileSelection.length > 1) return (
         <div>
             <span>Multiple tile edition is not supported yet.</span>
-        </div>
-    );
-
-    const pack = getResourcePack(level.resourcePack);
-    if (pack === null) return (
-        <div>
-            <span>Select a valid resource pack to access properties.</span>
         </div>
     );
     
@@ -269,8 +260,6 @@ function _TileProperties ({
     const levelTile = level.layers[levelCtx.activeTerrainLayer].tiles.find(
         t => vec2equals(t.position, tilePos)
     );
-    // it should always find a tile, since selection is restricted to existing
-    // tiles. If it doesn't, that's an error.
     if (levelTile === undefined) {
         console.error(
             `Couldn't find level tile at ${tilePos}, even though it's selected.`
@@ -278,46 +267,75 @@ function _TileProperties ({
         return <></>;
     }
 
-    // the tile info in the resource pack.
-    const tile = pack.tiles.find(t => t.id === levelTile.tileId);
-    if (tile === undefined) {
+    const tileDef = levelCtx.resourcePack.tiles.find(t => t.id === levelTile.tileId);
+    if (tileDef === undefined) {
         console.error(
             `Resource pack doesn't contain tile '${levelTile.tileId}'.`
         );
         return <></>;
     }
-    
-    // each item has a key to ensure all nodes update when changing between
-    // tiles of the same type
+
     return (
         <div className="item-properties">
             <div className="title">
-                {tile.data.name} at {vec2toString(levelTile.position)}
+                {tileDef.data.name} at {vec2toString(levelTile.position)}
             </div>
-            <ParameterForm
-                pack={pack}
-                traits={tile.data.traits}
-                traitValues={levelTile.parameters}
-                onChangeTraitValues={
-                    (traitId, v) => handleTraitParamsChange(
-                        levelTile, traitId, v
-                    )
-                }
-            />
+            {tileDef.data.traits.map(t => <_LevelTileTrait
+                key={t.id}
+                levelTile={levelTile}
+                tileDef={tileDef.data}
+                trait={t}
+                onChangeTile={onChangeTile}
+            />)}
+        </div>
+    )
+}
+
+interface _LevelTileTraitProps {
+    levelTile: PlacedTile;
+    tileDef: Tile;
+    trait: TraitSpecification<TileTraitId>;
+    onChangeTile: LevelChangeTileHandler;
+}
+
+function _LevelTileTrait ({
+    levelTile,
+    tileDef,
+    trait,
+    onChangeTile,
+}: _LevelTileTraitProps) {
+    // if there's no configurable parameters, no component is rendered.
+    //if (!trait.configurableParameters || trait.configurableParameters.length === 0) {
+    //    return <></>;
+    //}
+
+    const configValues = levelTile.parameters[trait.id] ?? {};
+    const defaultValues = tileDef.traits.find(t => t.id === trait.id);
+
+    if (!defaultValues) {
+        console.error(`Couldn't find default values for trait '${trait.id}'`);
+        return <></>;
+    }
+
+    const values: ParameterValueCollection = {
+        ...defaultValues.parameters,
+        ...configValues,
+    }
+
+    return (
+        <div>
+            {trait.id}
         </div>
     );
 
-    function handleTraitParamsChange (
-        levelTile: PlacedTile,
-        traitId: TileTraitId,
-        value: TraitParameterCollection
-    ) {
+    function handleTraitValueChange (value: TraitParameterCollection) {
         const update = {...levelTile.parameters};
         update[traitId] = value;
 
        onChangeTile(levelCtx.activeTerrainLayer, tilePos, 'parameters', update);
     }
 }
+
 
 interface _SpawnPropertiesProps {
     level: Level;
@@ -350,18 +368,24 @@ function _SpawnProperties ({
     const entityDef = levelCtx.resourcePack.entitiesById[spawn.entity.entityId];
     if (!entityDef) {
         console.error(
-            `Couldn't find entity with id '${spawn.entity.entityId}'`
+            `Resource pack doesn't contain entity '${spawn.entity.entityId}'`
         );
         return <></>;
     }
 
     return (
         <div className="item-properties">
-            <_LevelSpawnSettings
-                spawn={spawn}
-                entityDef={entityDef.data}
-                onChangeSpawn={onChangeSpawn}
-            />
+            <div className="title">
+                {entityDef.data.name} at {vec2toString(spawn.position)}
+            </div>
+            <div className="trait-form">
+                <div className="header">Spawn parameters</div>
+                <_LevelSpawnSettings
+                    spawn={spawn}
+                    entityDef={entityDef.data}
+                    onChangeSpawn={onChangeSpawn}
+                />
+            </div>
             {entityDef.data.traits.map(t => <_LevelSpawnTrait
                 key={t.id}
                 spawn={spawn}

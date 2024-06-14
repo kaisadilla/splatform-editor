@@ -77,7 +77,7 @@ export default function useEditorCanvasInteraction (
         // you just clicked it.
         if (evt.button === MOUSE_BUTTON_LEFT) {
             if (tool === 'select') {
-                selectTileAtCanvasPos(evt.clientX, evt.clientY);
+                selectAtPos(evt.clientX, evt.clientY);
             }
             else if (tool === 'brush' || tool == 'eraser') {
                 registerPlaceTileClickAt({
@@ -158,7 +158,7 @@ export default function useEditorCanvasInteraction (
 
         if (evt.button === MOUSE_BUTTON_LEFT) {
             if (tool === 'select') {
-                selectEntityAtCanvasPos(evt.clientX, evt.clientY);
+                selectAtPos(evt.clientX, evt.clientY);
             }
             else if (tool === 'brush') {
                 if (placePosition !== null && levelCtx.entityPaint !== null) {
@@ -178,38 +178,76 @@ export default function useEditorCanvasInteraction (
 
     //#region Selections
     /**
+     * Selects whatever it is where the user clicked. The priority of the selection
+     * (tiles, spawns, events, etc) depends on the currently selected edit section.
+     * @param x 
+     * @param y 
+     * @returns 
+     */
+    function selectAtPos (x: number, y: number) {
+        levelCtx.cancelSelection();
+        
+        if (levelCtx.activeSection === 'terrain') {
+            const selectedTile = selectTileAtCanvasPos(x, y);
+            if (selectedTile) return;
+            _regularSelectOrder();
+        }
+        else if (levelCtx.activeSection === 'spawns') {
+            const selectedSpawn = selectEntityAtCanvasPos(x, y);
+            if (selectedSpawn) return;
+            _regularSelectOrder();
+        }
+        else {
+            _regularSelectOrder();
+        }
+
+        // the regular order to select, to be used when an object in the active
+        // section hasn't been found.
+        function _regularSelectOrder () {
+            const selectedSpawn = selectEntityAtCanvasPos(x, y);
+            if (selectedSpawn) return;
+            const selectedTile = selectTileAtCanvasPos(x, y);
+            if (selectedTile) return;
+        }
+    }
+    /**
      * Selects the tile at the canvas position given.
      * @param x The x position in the canvas.
      * @param y The y position in the canvas.
+     * @returns True when a selection has been made, false otherwise.
      */
-    function selectTileAtCanvasPos (x: number, y: number) {
+    function selectTileAtCanvasPos (x: number, y: number) : boolean {
         const levelPos = windowToLevelPos(x, y, false);
-        if (levelPos === null) return;
+        if (levelPos === null) return false;
 
         // if the user clicks in an empty area, cancel the selection.
         if (getTileAtPos(levelCtx.activeTerrainLayer, levelPos) === null) {
             levelCtx.setTileSelection([]);
-            return;
+            return false;
         }
 
         levelCtx.setTileSelection([levelPos]);
+        return true;
     }
 
     /**
      * Selects the front-most entity at the canvas position given.
      * @param x The x position in the canvas.
      * @param y The y position in the canvas.
+     * @returns True when a selection has been made, false otherwise.
      */
-    function selectEntityAtCanvasPos (x: number, y: number) {
+    function selectEntityAtCanvasPos (x: number, y: number) : boolean {
         const levelPos = windowToLevelPos(x, y, true);
-        if (levelPos === null) return;
+        if (levelPos === null) return false;
         
         const spawn = getFirstSpawnAt(levelPos);
         if (spawn) {
             levelCtx.setSpawnSelection([spawn.uuid]);
+            return true;
         }
         else {
             levelCtx.setSpawnSelection([]);
+            return false;
         }
     }
     //#endregion
