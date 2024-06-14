@@ -51,7 +51,7 @@ function TileImage ({
 
 export function getTileImagePath (pack: ResourcePack, tile: Tile) {
     const imgPath = pack.fullPath + "\\" + RESOURCE_FOLDERS.sprites.tiles
-        + "\\" + tile.spritesheet + ".png";
+        + "\\" + tile.spritesheet.name + ".png";
 
     return "asset://" + imgPath;
 }

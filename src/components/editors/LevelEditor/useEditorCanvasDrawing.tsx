@@ -161,10 +161,11 @@ export default function useEditorCanvasDrawing (
         const dict = {} as {[key: string]: Texture};
 
         for (const tile of pack.tiles) {
-          const anim = tile.data.animation;
-          const slices = anim.slices ?? [1, 1];
-          // a tile needs slicing if its sprite has more than one frame.
-          const needsSlicing = slices[0] !== 1 || slices[1] !== 1;
+            console.log(tile);
+            const anim = tile.data.animations.default;
+            const slices = anim.slices ?? [1, 1];
+            // a tile needs slicing if its sprite has more than one frame.
+            const needsSlicing = slices[0] !== 1 || slices[1] !== 1;
               
             if (needsSlicing) {
                 // select the first frame available

@@ -429,11 +429,13 @@ export default function useEditorCanvasInteraction (
             const entityDef = pack.entitiesById[spawn.entity.entityId];
             if (entityDef === undefined) continue;
 
+            const sliceSize = entityDef.data.spritesheet.sliceSize ?? [16, 16];
+
             const entityRect = new Rect(
                 spawn.position.x,
                 spawn.position.y,
-                entityDef.data.spritesheet.sliceSize[0] / PIXELS_PER_UNIT,
-                entityDef.data.spritesheet.sliceSize[1] / PIXELS_PER_UNIT,
+                sliceSize[0] / PIXELS_PER_UNIT,
+                sliceSize[1] / PIXELS_PER_UNIT,
             )
 
             if (isVec2WithinRect(levelPos, entityRect)) {

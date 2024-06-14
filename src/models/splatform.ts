@@ -154,11 +154,11 @@ export interface SpritesheetSpecification {
     /**
      * The size, in pixels, of each slice in the spritesheet.
      */
-    sliceSize: [number, number];
+    sliceSize?: [number, number];
     /**
      * The amount of slices in each row and in each column.
      */
-    slices: [number, number];
+    slices?: [number, number];
 }
 
 export interface DimensionsSpecification {

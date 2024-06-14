@@ -1,4 +1,4 @@
-import { EntityTraitId } from "data/TileTraits";
+import { EntityTraitId } from "data/Traits";
 import { Version } from "./sp_documents";
 import { DimensionsSpecification, ObjectAnimation, SpritesheetSpecification, TraitSpecification } from "./splatform";
 

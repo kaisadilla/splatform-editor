@@ -1,5 +1,5 @@
-import { TileTraitId } from "data/TileTraits";
-import { TraitSpecification, TraitPreset, ObjectAnimation } from "./splatform";
+import { TileTraitId } from "data/Traits";
+import { TraitSpecification, TraitPreset, ObjectAnimation, SpritesheetSpecification } from "./splatform";
 
 export interface Tile extends TileFile {
     id: string;
@@ -11,8 +11,11 @@ export type TileFile = {
     category: string | null;
     traits: TraitSpecification<TileTraitId>[];
     presets?: TraitPreset[];
-    spritesheet: string;
-    animation: ObjectAnimation;
+    spritesheet: SpritesheetSpecification;
+    animations: {
+        default: ObjectAnimation,
+        [key: string]: ObjectAnimation
+    }
 }
 
 export function getNewTile () : TileFile {
@@ -21,9 +24,13 @@ export function getNewTile () : TileFile {
         name: "New tile",
         category: null,
         traits: [],
-        spritesheet: "block_empty",
-        animation: {
-            type: "static",
+        spritesheet: {
+            name:  "block_empty"
+        },
+        animations: {
+            default: {
+                type: "static",
+            }
         },
     }
 }
