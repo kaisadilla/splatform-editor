@@ -21,9 +21,10 @@ import TurnIntoShellTraitForm from 'components/trait-forms/entity/TurnIntoShellT
 import WalkTraitForm from 'components/trait-forms/entity/WalkTraitForm';
 import PowerUpTraitForm from 'components/trait-forms/entity/PowerUpTraitForm';
 import { Tile } from 'models/Tile';
-import { BackgroundTileValueCollection, BlockTileValueCollection, TileValueCollection } from 'data/TileTraits';
+import { BackgroundTileValueCollection, BlockTileValueCollection, BreakableTileValueCollection, TileValueCollection } from 'data/TileTraits';
 import BlockTraitForm from 'components/trait-forms/tile/BlockTraitForm';
 import BackgroundTraitForm from 'components/trait-forms/tile/BackgroundTraitForm';
+import BreakableTraitForm from 'components/trait-forms/tile/BreakableTraitForm';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -342,6 +343,14 @@ function _LevelTileTrait ({
             onChangeValue={handleParameterValueChange<BackgroundTileValueCollection>}
         />
     }
+    else if (trait.id === 'breakable') {
+        return <BreakableTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as BreakableTileValueCollection}
+            onChangeValue={handleParameterValueChange<BreakableTileValueCollection>}
+            onChangeMultipleValues={handleTraitValueChange}
+        />
+    }
 
     return (
         <div>
@@ -361,7 +370,7 @@ function _LevelTileTrait ({
         const update = {
             ...levelTile.parameters,
             [trait.id]: {
-                ...trait,
+                ...levelTile.parameters[trait.id],
                 [paramName]: value,
             },
         };
