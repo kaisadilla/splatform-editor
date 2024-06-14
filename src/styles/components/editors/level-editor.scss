@@ -2,6 +2,10 @@
     @include vertical-queue-stretch;
     justify-content: stretch;
 
+    &:active {
+        outline: none;
+    }
+
     .level-toolbar {
         border-bottom: 1px solid $color-component-3;
         padding: 0 8px;
@@ -131,6 +135,10 @@
             min-width: 0;
             background: $color-component-1;
             @include vertical-queue-stretch;
+
+            .canvas-element {
+                cursor: crosshair !important;
+            }
         }
     }
 }

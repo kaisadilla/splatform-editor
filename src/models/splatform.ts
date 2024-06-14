@@ -176,7 +176,6 @@ export interface DimensionsSpecification {
 
 export interface ObjectAnimation {
     type: 'static' | 'dynamic';
-    slices?: [number, number];
     frame?: number;
     frames?: number[];
     frameTimes?: number | number[];
