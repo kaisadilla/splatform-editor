@@ -12,6 +12,7 @@ export interface SelectGalleryProps<T extends string> extends InputWrapperProps 
     data: SelectGalleryOptionData<T>[];
     value: T;
     multipleSelection?: boolean;
+    disabled?: boolean;
     onSelectValue: (value: T) => void;
     minWidth?: number;
     stretch?: boolean;
@@ -20,6 +21,7 @@ export interface SelectGalleryProps<T extends string> extends InputWrapperProps 
 function SelectGallery<T extends string> ({
     data,
     value,
+    disabled = false,
     onSelectValue,
     minWidth,
     stretch = false,
@@ -29,6 +31,7 @@ function SelectGallery<T extends string> ({
     const rootClassName = getClassString(
         "sp-select-gallery-root",
         stretch && "stretch",
+        disabled && "disabled",
         // @ts-ignore
         classNames?.root,
     )
@@ -54,7 +57,7 @@ function SelectGallery<T extends string> ({
     );
 
     function handleToggleValue (selectedVal: T) {
-        if (value !== selectedVal) {
+        if (disabled === false && value !== selectedVal) {
             onSelectValue(selectedVal);
         }
     }

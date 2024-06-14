@@ -5,6 +5,7 @@ import { Parameter } from 'models/splatform';
 export interface IntegerParameterProps {
     param: Parameter<number>;
     value: number;
+    disabled?: boolean;
     onChange?: (v: number) => void;
 }
 

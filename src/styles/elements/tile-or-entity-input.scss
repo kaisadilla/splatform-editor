@@ -5,6 +5,17 @@
 
     &[data-disabled] {
         border: 0.0625rem solid #dde1e9;
+
+        .sp-item-input-label {
+            .label {
+                color: $color-text-disabled;
+            }
+
+            .label-image {
+                filter: grayscale(70%);
+                opacity: 0.5;
+            }
+        }
     }
 
     &:active {

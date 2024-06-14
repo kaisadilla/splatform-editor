@@ -16,6 +16,8 @@
     --text-color: var(--text-color-black);
     --text-color-1: var(--text-color-black-1);
     --text-color-2: var(--text-color-black-2);
+    --text-color-disabled: var(--text-color-black-disabled);
+    --text-color-disabled-1: var(--text-color-black-disabled-1);
 
     --component-color-theme-0: var(--component-color-light-0);
     --component-color-theme-1: var(--component-color-light-1);
@@ -65,6 +67,8 @@
     --text-color-black: #111111;
     --text-color-black-1: #363636;
     --text-color-black-2: #5a5a5a;
+    --text-color-black-disabled: #868e96; //#909090;
+    --text-color-black-disabled-1: #aaa;
 
     --color-danger: #df1021;
     --color-success-l1: #25d14d;

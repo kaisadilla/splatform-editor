@@ -252,4 +252,8 @@
             min-width: fit-content;
         }
     }
+
+    &.disabled {
+        cursor: not-allowed;
+    }
 }

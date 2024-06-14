@@ -6,12 +6,14 @@ import SelectGallery from 'elements/SelectGallery';
 export interface DirectionParameterProps {
     param: Parameter<Direction>;
     value: Direction;
+    disabled?: boolean;
     onChange?: (v: Direction) => void;
 }
 
 function DirectionParameter ({
     param,
     value,
+    disabled,
     onChange,
 }: DirectionParameterProps) {
     return (
@@ -20,13 +22,14 @@ function DirectionParameter ({
             size='sm'
             label="Orientation"
             description="The direction this entity starts looking at."
+            value={value}
             data={[
                 { value: 'up', label: "Up"},
                 { value: 'down', label: "Down"},
                 { value: 'left', label: "Left"},
                 { value: 'right', label: "Right"},
             ]}
-            value={value}
+            disabled={disabled}
             onSelectValue={v => onChange?.(v)}
             stretch
         />

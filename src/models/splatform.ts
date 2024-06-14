@@ -113,8 +113,8 @@ export type PlayerDamageType = typeof PlayerDamageTypeValues[number];
 export const EntityDamageTypeValues = ["none", "regular", "fatal"] as const;
 export type EntityDamageType = typeof EntityDamageTypeValues[number];
 
-export const RewardTypeParameterValues = ["coin", "tile", "entity"] as const;
-export type RewardTypeParameter = typeof RewardTypeParameterValues[number];
+export const RewardTypeValues = ["coin", "item"] as const;
+export type RewardType = typeof RewardTypeValues[number];
 
 export const BlockRegenerationModeValues = ["time", "offscreen"] as const;
 export type BlockRegenerationMode = typeof BlockRegenerationModeValues[number];

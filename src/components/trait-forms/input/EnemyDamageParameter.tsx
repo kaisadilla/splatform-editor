@@ -5,12 +5,14 @@ import React from 'react';
 export interface EnemyDamageParameterProps {
     param: Parameter<EntityDamageType>;
     value: EntityDamageType;
+    disabled?: boolean;
     onChange?: (v: EntityDamageType) => void;
 }
 
 function EnemyDamageParameter ({
     param,
     value,
+    disabled,
     onChange,
 }: EnemyDamageParameterProps) {
 
@@ -23,6 +25,7 @@ function EnemyDamageParameter ({
                 { value: 'regular', label: "Regular"},
                 { value: 'fatal', label: "Fatal"},
             ]}
+            disabled={disabled}
             onChange={onChange}
         />
     );

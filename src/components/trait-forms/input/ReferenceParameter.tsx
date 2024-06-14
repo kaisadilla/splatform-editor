@@ -2,6 +2,7 @@ import TileOrEntityInput from "elements/TileOrEntityInput";
 import TitledCheckbox from "elements/TitledCheckbox";
 import { ResourcePack } from "models/ResourcePack";
 import { Parameter, Reference } from "models/splatform";
+import { getClassString } from "utils";
 
 export interface ReferenceParameterProps {    
     pack: ResourcePack;
@@ -10,6 +11,7 @@ export interface ReferenceParameterProps {
     allowTileEntities?: boolean;
     allowEntities?: boolean;
     value: Reference | null;
+    disabled?: boolean;
     onChange?: (v: Reference) => void;
 }
 
@@ -20,14 +22,20 @@ function ReferenceParameter ({
     allowTileEntities = false,
     allowEntities = false,
     value,
+    disabled,
     onChange,
 }: ReferenceParameterProps) {
     if (!allowTiles && !allowTileEntities && !allowEntities) {
         throw `Must allow something to select.`;
     }
+    const className = getClassString(
+        "parameter-container",
+        "parameter-container-reference",
+        disabled && "disabled",
+    );
 
     return (
-        <div className="parameter-container parameter-container-boolean">
+        <div className={className}>
             <TileOrEntityInput
                 pack={pack}
                 label={param.displayName}
@@ -36,6 +44,7 @@ function ReferenceParameter ({
                 allowTileEntities={allowTileEntities}
                 allowEntities={allowEntities}
                 value={value}
+                disabled={disabled}
                 onChangeValue={handleChange}
             />
         </div>

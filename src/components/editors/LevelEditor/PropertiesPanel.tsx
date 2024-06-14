@@ -21,10 +21,14 @@ import TurnIntoShellTraitForm from 'components/trait-forms/entity/TurnIntoShellT
 import WalkTraitForm from 'components/trait-forms/entity/WalkTraitForm';
 import PowerUpTraitForm from 'components/trait-forms/entity/PowerUpTraitForm';
 import { Tile } from 'models/Tile';
-import { BackgroundTileValueCollection, BlockTileValueCollection, BreakableTileValueCollection, TileValueCollection } from 'data/TileTraits';
+import { BackgroundTileValueCollection, BlockTileValueCollection, BreakableTileValueCollection, FallTileValueCollection, PlatformTileValueCollection, RewardBlockTileValueCollection, TerrainTileValueCollection, TileValueCollection } from 'data/TileTraits';
 import BlockTraitForm from 'components/trait-forms/tile/BlockTraitForm';
 import BackgroundTraitForm from 'components/trait-forms/tile/BackgroundTraitForm';
 import BreakableTraitForm from 'components/trait-forms/tile/BreakableTraitForm';
+import FallTraitForm from 'components/trait-forms/tile/FallTraitForm';
+import PlatformTraitForm from 'components/trait-forms/tile/PlatformTraitForm';
+import RewardBlockTraitForm from 'components/trait-forms/tile/RewardBlockTraitForm';
+import TerrainTraitForm from 'components/trait-forms/tile/TerrainTraitForm';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -349,6 +353,36 @@ function _LevelTileTrait ({
             values={values as BreakableTileValueCollection}
             onChangeValue={handleParameterValueChange<BreakableTileValueCollection>}
             onChangeMultipleValues={handleTraitValueChange}
+        />
+    }
+    else if (trait.id === 'fall') {
+        return <FallTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as FallTileValueCollection}
+            onChangeValue={handleParameterValueChange<FallTileValueCollection>}
+        />
+    }
+    else if (trait.id === 'platform') {
+        return <PlatformTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as PlatformTileValueCollection}
+            onChangeValue={handleParameterValueChange<PlatformTileValueCollection>}
+            onChangeMultipleValues={handleTraitValueChange}
+        />
+    }
+    else if (trait.id === 'rewardBlock') {
+        return <RewardBlockTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as RewardBlockTileValueCollection}
+            onChangeValue={handleParameterValueChange<RewardBlockTileValueCollection>}
+            onChangeMultipleValues={handleTraitValueChange}
+        />
+    }
+    else if (trait.id === 'terrain') {
+        return <TerrainTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as TerrainTileValueCollection}
+            onChangeValue={handleParameterValueChange<TerrainTileValueCollection>}
         />
     }
 

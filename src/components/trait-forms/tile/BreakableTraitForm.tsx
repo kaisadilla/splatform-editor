@@ -95,7 +95,6 @@ function BreakableTraitForm ({
         if (onChangeValue === undefined) return;
         if (onChangeMultipleValues === undefined) return;
 
-        
         if (val) {
             onChangeValue('isReplacedWhenBroken', val);
         }

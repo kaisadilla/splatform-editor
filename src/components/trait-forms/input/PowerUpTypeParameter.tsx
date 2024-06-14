@@ -4,12 +4,14 @@ import _SelectField from './base/SelectField';
 export interface PowerUpTypeParameterProps {
     param: Parameter<PowerUpType>;
     value: PowerUpType;
+    disabled?: boolean;
     onChange?: (v: PowerUpType) => void;
 }
 
 function PowerUpTypeParameter ({
     param,
     value,
+    disabled,
     onChange,
 }: PowerUpTypeParameterProps) {
 
@@ -26,6 +28,7 @@ function PowerUpTypeParameter ({
                 { value: 'superball', label: "Superball"},
                 { value: 'tanooki', label: "Tanooki"},
             ]}
+            disabled={disabled}
             onChange={onChange}
         />
     );

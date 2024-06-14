@@ -5,7 +5,7 @@ import { TraitId } from 'data/Traits';
 import TileOrEntityInput from 'elements/TileOrEntityInput';
 import TitledCheckbox from 'elements/TitledCheckbox';
 import { ResourcePack } from 'models/ResourcePack';
-import { BlockRegenerationMode, EntityReference, LevelObject, Reference, Parameter, ParameterValueCollection, PlayerDamageType, RewardTypeParameter, TileReference, TraitSpecification, TraitValueCollection } from 'models/splatform';
+import { BlockRegenerationMode, EntityReference, LevelObject, Reference, Parameter, ParameterValueCollection, PlayerDamageType, RewardType, TileReference, TraitSpecification, TraitValueCollection } from 'models/splatform';
 import React from 'react';
 import { DivProps } from 'types';
 import { getClassString } from 'utils';
@@ -230,7 +230,7 @@ function _TileParameterField ({
     if (param.type === 'rewardType') {
         return <_SelectProperty
             param={param}
-            value={value as RewardTypeParameter}
+            value={value as RewardType}
             options={[
                 { value: 'coin', label: "Coin"},
                 { value: 'tile', label: "Tile"},

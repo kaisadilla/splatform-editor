@@ -1,4 +1,4 @@
-import { BlockRegenerationMode, Reference, Parameter, PlayerDamageType, RewardTypeParameter, Trait } from "models/splatform";
+import { BlockRegenerationMode, Reference, Parameter, PlayerDamageType, RewardType, Trait } from "models/splatform";
 import { TraitCollectionOf, TraitWithId } from "./Traits";
 
 const TileTraits: TileTraitCollection = {
@@ -277,7 +277,7 @@ const TileTraits: TileTraitCollection = {
             },
             waitForFinalHitBeforeBecomingEmpty: {
                 id: 'waitForFinalHitBeforeBecomingEmpty',
-                displayName: "Wait for finl hit before becoming empty",
+                displayName: "Wait for final hit before becoming empty",
                 description: "Wait for a final hit before becoming empty, once the timer runs out.",
                 nullable: false,
                 type: 'boolean',
@@ -415,8 +415,33 @@ export interface BreakableTileValueCollection {
 export type BreakableTileParameterCollection
     = TraitCollectionOf<BreakableTileValueCollection>;
 
+export interface FallTileValueCollection {
+    timeUntilFall: number;
+    shakeBeforeFall: boolean;
+    shakeAfter: number;
+    resetWhenPlayerLeaves: boolean;
+    regenerate: boolean;
+    regenerationMode: BlockRegenerationMode | null;
+    regenerationTime: number;
+    fallSpeed: number;
+    hasCollisionWhileFalling: boolean;
+    canHitPlayers: boolean;
+    damageToPlayer: PlayerDamageType;
+}
+export type FallTileParameterCollection
+    = TraitCollectionOf<FallTileValueCollection>;
+
+export interface PlatformTileValueCollection {
+    collideFromTop: boolean;
+    collideFromBottom: boolean;
+    collideFromLeft: boolean;
+    collideFromRight: boolean;
+}
+export type PlatformTileParameterCollection
+    = TraitCollectionOf<PlatformTileValueCollection>;
+
 export interface RewardBlockTileValueCollection {
-    rewardType: RewardTypeParameter;
+    rewardType: RewardType;
     reward: Reference | null;
     smallPlayerHasDifferentReward: boolean;
     smallPlayerReward: Reference | null;
@@ -437,31 +462,6 @@ export interface RewardBlockTileValueCollection {
 }
 export type RewardBlockTileParameterCollection
     = TraitCollectionOf<RewardBlockTileValueCollection>;
-
-export interface FallTileValueCollection {
-    timeUntilFall: number;
-    shakeBeforeFall: boolean;
-    shakeAfter: number;
-    resetWhenPlayerLeaves: boolean;
-    regenerate: boolean;
-    regenerationMode: BlockRegenerationMode | null;
-    regenerationTime: number | null;
-    fallSpeed: number;
-    hasCollisionWhileFalling: boolean;
-    canHitPlayers: boolean;
-    damageToPlayer: PlayerDamageType | null;
-}
-export type FallTileParameterCollection
-    = TraitCollectionOf<FallTileValueCollection>;
-
-export interface PlatformTileValueCollection {
-    collideFromTop: boolean;
-    collideFromBottom: boolean;
-    collideFromLeft: boolean;
-    collideFromRight: boolean;
-}
-export type PlatformTileParameterCollection
-    = TraitCollectionOf<PlatformTileValueCollection>;
 
 export interface TerrainTileValueCollection {
     

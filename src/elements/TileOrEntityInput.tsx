@@ -8,7 +8,7 @@ import { Tile } from 'models/Tile';
 import { getClassString } from 'utils';
 import { getNewLevelTile } from 'models/Level';
 import ParameterForm from 'components/ParameterForm';
-import { TileTraitId, TraitId } from 'data/TileTraits';
+import { TileTraitId } from 'data/Traits';
 
 const VALID_TYPES = ['tile', 'entity'];
 
@@ -84,7 +84,9 @@ function TileOrEntityInput ({
     function getValueElement () {
         if (!value || value.type === null || value.object === null) {
             return <div className="plain-label">
-                <Text size='sm' truncate='end'>No value</Text>
+                <Text className="label" size='sm' truncate='end'>
+                    No value
+                </Text>
             </div>;
         }
 
@@ -98,7 +100,9 @@ function TileOrEntityInput ({
                     tile={tile.data}
                 />
                 <div className="label-text">
-                    <Text size='sm' truncate='end'>{tile.data.name}</Text>
+                    <Text className="label" size='sm' truncate='end'>
+                        {tile.data.name}
+                    </Text>
                 </div>
             </div>
         }

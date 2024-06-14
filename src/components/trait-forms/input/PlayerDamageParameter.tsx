@@ -5,12 +5,14 @@ import React from 'react';
 export interface PlayerDamageParameterProps {
     param: Parameter<PlayerDamageType>;
     value: PlayerDamageType;
+    disabled?: boolean;
     onChange?: (v: PlayerDamageType) => void;
 }
 
 function PlayerDamageParameter ({
     param,
     value,
+    disabled,
     onChange,
 }: PlayerDamageParameterProps) {
 
@@ -22,6 +24,7 @@ function PlayerDamageParameter ({
                 { value: 'regular', label: "Regular"},
                 { value: 'fatal', label: "Fatal"},
             ]}
+            disabled={disabled}
             onChange={onChange}
         />
     );

@@ -5,6 +5,7 @@ import _NumberField, { _NumberFieldProps } from './base/NumberField';
 export interface FloatParameterProps {
     param: Parameter<number>;
     value: number;
+    disabled?: boolean;
     onChange?: (v: number) => void;
 }
 

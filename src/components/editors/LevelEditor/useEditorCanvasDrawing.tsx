@@ -28,6 +28,11 @@ const SPAWN_TOOLS_WITH_PREVIEW: GridTool[] = ['brush'];
 
 const NO_TINT_COLOR = 0xffffff;
 
+/**
+ * A filter to apply to sprites that are potential additions / modifications of
+ * the level, but aren't actually in the level. e.g. the tile the user is going
+ * to place if they click.
+ */
 const ETHEREAL_FILTER = new ColorMatrixFilter();
 ETHEREAL_FILTER.matrix = [
     1, 0, 0, 0, 0.25, 
