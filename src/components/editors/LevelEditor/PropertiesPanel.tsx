@@ -6,7 +6,6 @@ import HurtPlayerTraitForm from 'components/trait-forms/entity/HurtPlayerTraitFo
 import { useAppContext } from 'context/useAppContext';
 import { PropertiesPanel, useLevelEditorContext } from 'context/useLevelEditorContext';
 import { ArtificialMoveEntityValueCollection, EntityTraitCollection, EntityValueCollection, HurtPlayerEntityValueCollection, KillableEntityValueCollection, MoveAndFireEntityValueCollection, PowerUpEntityValueCollection, TurnIntoShellEntityValueCollection, WalkEntityValueCollection } from 'data/EntityTraits';
-import { TraitParameterCollection } from 'data/TileTraits';
 import { EntityTraitId, TileTraitId } from 'data/Traits';
 import BackgroundAssetInput from 'elements/BackgroundAssetInput';
 import MusicAssetInput from 'elements/MusicAssetInput';
@@ -14,7 +13,7 @@ import SelectGallery from 'elements/SelectGallery';
 import { Entity } from 'models/Entity';
 import { Level, LevelSettings, LevelSpawn, LevelTile, PlacedTile } from 'models/Level';
 import { ParameterValueCollection, TraitSpecification } from 'models/splatform';
-import { clampNumber, vec2equals, vec2toString } from 'utils';
+import { Vec2, clampNumber, vec2equals, vec2toString } from 'utils';
 import { LevelChangeFieldHandler, LevelChangeSpawnHandler, LevelChangeTileHandler } from '.';
 import KillableTraitForm from 'components/trait-forms/entity/KillableTraitForm';
 import MoveAndFireTraitForm from 'components/trait-forms/entity/MoveAndFireTraitForm';
@@ -22,6 +21,9 @@ import TurnIntoShellTraitForm from 'components/trait-forms/entity/TurnIntoShellT
 import WalkTraitForm from 'components/trait-forms/entity/WalkTraitForm';
 import PowerUpTraitForm from 'components/trait-forms/entity/PowerUpTraitForm';
 import { Tile } from 'models/Tile';
+import { BackgroundTileValueCollection, BlockTileValueCollection, TileValueCollection } from 'data/TileTraits';
+import BlockTraitForm from 'components/trait-forms/tile/BlockTraitForm';
+import BackgroundTraitForm from 'components/trait-forms/tile/BackgroundTraitForm';
 
 const MIN_DIMENSION_VAL = 10;
 const MAX_DIMENSION_VAL = 100_000;
@@ -283,6 +285,7 @@ function _TileProperties ({
             {tileDef.data.traits.map(t => <_LevelTileTrait
                 key={t.id}
                 levelTile={levelTile}
+                tilePos={tilePos}
                 tileDef={tileDef.data}
                 trait={t}
                 onChangeTile={onChangeTile}
@@ -293,6 +296,7 @@ function _TileProperties ({
 
 interface _LevelTileTraitProps {
     levelTile: PlacedTile;
+    tilePos: Vec2;
     tileDef: Tile;
     trait: TraitSpecification<TileTraitId>;
     onChangeTile: LevelChangeTileHandler;
@@ -300,10 +304,12 @@ interface _LevelTileTraitProps {
 
 function _LevelTileTrait ({
     levelTile,
+    tilePos,
     tileDef,
     trait,
     onChangeTile,
 }: _LevelTileTraitProps) {
+    const levelCtx = useLevelEditorContext();
     // if there's no configurable parameters, no component is rendered.
     //if (!trait.configurableParameters || trait.configurableParameters.length === 0) {
     //    return <></>;
@@ -322,17 +328,54 @@ function _LevelTileTrait ({
         ...configValues,
     }
 
+    if (trait.id === 'block') {
+        return <BlockTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as BlockTileValueCollection}
+            onChangeValue={handleParameterValueChange<BlockTileValueCollection>}
+        />
+    }
+    else if (trait.id === 'background') {
+        return <BackgroundTraitForm
+            configurableParameters={trait.configurableParameters}
+            values={values as BackgroundTileValueCollection}
+            onChangeValue={handleParameterValueChange<BackgroundTileValueCollection>}
+        />
+    }
+
     return (
         <div>
             {trait.id}
         </div>
     );
 
-    function handleTraitValueChange (value: TraitParameterCollection) {
-        const update = {...levelTile.parameters};
-        update[traitId] = value;
+    /**
+     * Modifies a single parameter for the trait and updates the level with it.
+     * T is the type of valuecollection corresponding to this trait.
+     * @param paramName The name of the parameter to modify.
+     * @param value The value to assign to that parameter.
+     */
+    function handleParameterValueChange<T extends TileValueCollection> (
+        paramName: keyof T, value: T[keyof T]
+    ) {
+        const update = {
+            ...levelTile.parameters,
+            [trait.id]: {
+                ...trait,
+                [paramName]: value,
+            },
+        };
 
-       onChangeTile(levelCtx.activeTerrainLayer, tilePos, 'parameters', update);
+        onChangeTile(levelCtx.activeTerrainLayer, tilePos, 'parameters', update);
+    }
+
+    function handleTraitValueChange (value: TileValueCollection) {
+        const update = {
+            ...levelTile.parameters,
+            [trait.id]: value,
+        };
+
+        onChangeTile(levelCtx.activeTerrainLayer, tilePos, 'parameters', update);
     }
 }
 

@@ -4,7 +4,7 @@ import { getClassString } from 'utils';
 
 export interface TraitFormProps extends DivProps {
     title: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 function TraitForm ({

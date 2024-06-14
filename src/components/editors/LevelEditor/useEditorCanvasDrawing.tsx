@@ -464,7 +464,7 @@ export default function useEditorCanvasDrawing (
         g.clear();
         g.beginFill(0xff3300);
         //g.lineStyle(1, 0xff3300, 0.5);
-        g.lineStyle(1, 0x000000, 1);
+        g.lineStyle(1, 0x000000, 1, 0);
 
         for (let x = xFirst; x < canvasSize.x; x += cellSizeInCanvas) {
             g.moveTo(x, 0);

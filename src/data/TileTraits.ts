@@ -393,12 +393,14 @@ export type TileTraitCollection = {
 export interface BackgroundTileValueCollection {
     
 }
-export type BackgroundTileParameterCollection = TraitCollectionOf<BackgroundTileValueCollection>;
+export type BackgroundTileParameterCollection
+    = TraitCollectionOf<BackgroundTileValueCollection>;
 
 export interface BlockTileValueCollection {
-    isHidden: Boolean;
+    isHidden: boolean;
 }
-export type BlockTileParameterCollection = TraitCollectionOf<BlockTileValueCollection>;
+export type BlockTileParameterCollection
+    = TraitCollectionOf<BlockTileValueCollection>;
 
 export interface BreakableTileValueCollection {
     breakWhenPunched: boolean;
@@ -410,9 +412,10 @@ export interface BreakableTileValueCollection {
     isReplacedWhenBroken: boolean;
     replacementWhenBroken: Reference | null;
 }
-export type BreakableTileParameterCollection = TraitCollectionOf<BreakableTileValueCollection>;
+export type BreakableTileParameterCollection
+    = TraitCollectionOf<BreakableTileValueCollection>;
 
-export interface RewardBlockTileParameterCollection {
+export interface RewardBlockTileValueCollection {
     rewardType: RewardTypeParameter;
     reward: Reference | null;
     smallPlayerHasDifferentReward: boolean;
@@ -432,38 +435,69 @@ export interface RewardBlockTileParameterCollection {
     triggerWhenHitByPlayerFireball: boolean;
     triggerWhenHitByEnemyFireball: boolean;
 }
+export type RewardBlockTileParameterCollection
+    = TraitCollectionOf<RewardBlockTileValueCollection>;
 
-export interface FallTileParameterCollection extends TraitParameterCollection {
-    timeUntilFall: Parameter<number>;
-    shakeBeforeFall: Parameter<boolean>;
-    shakeAfter: Parameter<number>;
-    resetWhenPlayerLeaves: Parameter<boolean>;
-    regenerate: Parameter<boolean>;
-    regenerationMode: Parameter<BlockRegenerationMode | null>;
-    regenerationTime: Parameter<number | null>;
-    fallSpeed: Parameter<number>;
-    hasCollisionWhileFalling: Parameter<boolean>;
-    canHitPlayers: Parameter<boolean>;
-    damageToPlayer: Parameter<PlayerDamageType | null>;
+export interface FallTileValueCollection {
+    timeUntilFall: number;
+    shakeBeforeFall: boolean;
+    shakeAfter: number;
+    resetWhenPlayerLeaves: boolean;
+    regenerate: boolean;
+    regenerationMode: BlockRegenerationMode | null;
+    regenerationTime: number | null;
+    fallSpeed: number;
+    hasCollisionWhileFalling: boolean;
+    canHitPlayers: boolean;
+    damageToPlayer: PlayerDamageType | null;
 }
+export type FallTileParameterCollection
+    = TraitCollectionOf<FallTileValueCollection>;
 
-export interface PlatformTileParameterCollection extends TraitParameterCollection {
-    collideFromTop: Parameter<boolean>;
-    collideFromBottom: Parameter<boolean>;
-    collideFromLeft: Parameter<boolean>;
-    collideFromRight: Parameter<boolean>;
+export interface PlatformTileValueCollection {
+    collideFromTop: boolean;
+    collideFromBottom: boolean;
+    collideFromLeft: boolean;
+    collideFromRight: boolean;
 }
+export type PlatformTileParameterCollection
+    = TraitCollectionOf<PlatformTileValueCollection>;
 
-export interface TerrainTileParameterCollection extends TraitParameterCollection {
+export interface TerrainTileValueCollection {
     
 }
+export type TerrainTileParameterCollection
+    = TraitCollectionOf<TerrainTileValueCollection>;
 
-export type BackgroundTileTraitParameter = keyof BackgroundTileTraitParameterCollection;
-export type BlockTileTraitParameter = keyof BlockTileTraitParameterCollection;
-export type BreakableTileTraitParameter = keyof BreakableTileTraitParameterCollection;
-export type RewardBlockTileTraitParameter = keyof RewardBlockTileParameterCollection;
-export type FallTileTraitParameter = keyof FallTileParameterCollection;
-export type TerrainTileTraitParameter = keyof TerrainTileParameterCollection;
+export type BackgroundTileParameter = keyof BackgroundTileParameterCollection;
+export type BlockTileParameter = keyof BlockTileParameterCollection;
+export type BreakableTileParameter = keyof BreakableTileParameterCollection;
+export type FallTileParameter = keyof FallTileParameterCollection;
+export type PlatformTileParameter = keyof PlatformTileParameterCollection;
+export type RewardBlockTileParameter = keyof RewardBlockTileParameterCollection;
+export type TerrainTileParameter = keyof TerrainTileParameterCollection;
 
+export type TileParameterCollection = 
+    BackgroundTileParameterCollection
+    | BlockTileParameterCollection
+    | BreakableTileParameterCollection
+    | FallTileParameterCollection
+    | PlatformTileParameterCollection
+    | RewardBlockTileParameterCollection
+    | TerrainTileParameterCollection
+;
+
+export type TileValueCollection = 
+    BackgroundTileValueCollection
+    | BlockTileValueCollection
+    | BreakableTileValueCollection
+    | FallTileValueCollection
+    | PlatformTileValueCollection
+    | RewardBlockTileValueCollection
+    | TerrainTileValueCollection
+;
+
+export type _TileParamKeys<T> = T extends T ? keyof T : never;
+export type TileTraitParameter = _TileParamKeys<TileParameterCollection>;
 
 export default TileTraits;
