@@ -175,11 +175,13 @@ export interface DimensionsSpecification {
 }
 
 export interface ObjectAnimation {
-    type: 'static' | 'dynamic';
+    type: ObjectAnimationType;
     frame?: number;
     frames?: number[];
     frameTimes?: number | number[];
 }
+
+export type ObjectAnimationType = 'static' | 'dynamic';
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 export type PowerUpType =
