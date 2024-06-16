@@ -37,7 +37,7 @@ export default function compileLevel (pack: ResourcePack, level: Level) : Uint8A
     ); // music
     writer.writeUint16(level.settings.time); // time
 
-    writer.writeUint16(level.layers.length); // tileLayerCount
+    writer.writeUint8(level.layers.length); // tileLayerCount
     for (const layer of level.layers) {
         compileTileLayer(writer, pack, layer); // tileLayers[]
     }
@@ -74,9 +74,9 @@ function compileTile (writer: BinaryWriter, pack: ResourcePack, tile: LevelTile)
 
     const animKeys = Object.keys(tileDef.animations);
 
-    writer.writeUint16(spriteIndex); // spriteIndex
-    writer.writeUint16(spriteSlices[0]); // xSliceCount
-    writer.writeUint16(spriteSlices[1]); // ySliceCount
+    writer.writeInt32(spriteIndex); // spriteIndex
+    writer.writeUint8(spriteSlices[0]); // xSliceCount
+    writer.writeUint8(spriteSlices[1]); // ySliceCount
 
     writer.writeUint16(animKeys.length); // animationCount
     for (const animKey of animKeys) {
@@ -106,7 +106,7 @@ function compileAnimation (
 function compileStaticAnimation (
     writer: BinaryWriter, anim: ObjectAnimation
 ) {
-    writer.writeUint8(anim.frame ?? 1); // frame
+    writer.writeUint8(anim.frame ?? 0); // frame
 }
 
 function compileDynamicAnimation (
