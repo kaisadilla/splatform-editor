@@ -66,12 +66,18 @@ function _GridTools ({
     return (
         <div className="level-grid-tools">
             <div className="selected-paint">
-                <TileImage
+                {paint?.type === 'tile' && <TileImage
                     pack={pack}
-                    tile={paint?.object} 
+                    tile={paint} 
                     scale={2}
                     bordered
-                />
+                />}
+                {paint === null && <TileImage
+                    pack={pack}
+                    tile={null} 
+                    scale={2}
+                    bordered
+                />}
             </div>
             <LevelEditor_GridToolbar />
         </div>

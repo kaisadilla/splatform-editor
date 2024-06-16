@@ -9,7 +9,7 @@ export interface ConditionalClass {
     [className: string]: boolean;
 }
 
-export interface WithId<T> {
+export interface __REMOVE_WithId<T> {
     id: string;
     object: T;
 }

@@ -14,7 +14,7 @@ export interface LevelEditor_TilePaletteProps {
 function LevelEditor_TilePalette ({
     pack,
 }: LevelEditor_TilePaletteProps) {
-    const { terrainPaint: paint, setPaint } = useLevelEditorContext();
+    const { terrainPaint, setTerrainPaint } = useLevelEditorContext();
 
     if (pack === null) {
         return <div className="info-panel">
@@ -91,7 +91,7 @@ function LevelEditor_TilePalette ({
                                         key={t.id}
                                         pack={pack}
                                         tile={t}
-                                        selected={paint?.id === t.id}
+                                        selected={terrainPaint?.id === t.id}
                                         onClick={() => selectPaint(t)}
                                     />)}
                                 </Accordion.Panel>
@@ -107,10 +107,7 @@ function LevelEditor_TilePalette ({
     );
     
     function selectPaint (tile: DataAssetMetadata<Tile>) {
-        setPaint({
-            id: tile.id,
-            object: tile.data,
-        })
+        setTerrainPaint(tile.data);
     }
 }
 

@@ -4,6 +4,7 @@ import { Tile, TileFile } from "./Tile";
 import { World } from "./World";
 import { Game } from "./Game";
 import { Level } from "./Level";
+import { TileComposite } from "./TileComposite";
 
 export type SPDocumentType =
     'level'
@@ -38,4 +39,6 @@ export interface Version {
     revision: number;
 }
 
-export type TilePaint = Tile;
+export type TilePaint = Tile | TileComposite;
+
+export type WithId<T> = T & { id: string };

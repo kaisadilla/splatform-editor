@@ -6,7 +6,7 @@ import { clampNumber } from "utils";
 import { ObjectAnimation, ParameterValueCollection, TraitSpecification } from "models/splatform";
 import { Tile } from "models/Tile";
 import { TileTraitId, TraitId } from "data/Traits";
-import { BlockTileValueCollection, BreakableTileValueCollection, FallTileValueCollection } from "data/TileTraits";
+import { BlockTileValueCollection, BreakableTileValueCollection, FallTileValueCollection, PlatformTileValueCollection } from "data/TileTraits";
 
 const VERSION_MAJOR = 0;
 const VERSION_MINOR = 1;
@@ -141,6 +141,9 @@ function compileTrait (
     else if (trait.id === 'fall') {
         compileFallTileTrait(writer, pack, tile, tileDef);
     }
+    else if (trait.id === 'platform') {
+        compilePlatformTileTrait(writer, pack, tile, tileDef);
+    }
 }
 
 function compileBackgroundTileTrait (
@@ -171,7 +174,6 @@ function compileBlockTileTrait (
     
     writer.writeBoolean(values.isHidden); // isHidden
 }
-
 
 function compileBreakableTileTrait (
     writer: BinaryWriter,
@@ -205,7 +207,6 @@ function compileBreakableTileTrait (
         }
     }
 }
-
 
 function compileFallTileTrait (
     writer: BinaryWriter,
@@ -246,6 +247,27 @@ function compileFallTileTrait (
             writer.writeUint8(PLAYER_DAMAGE_INDICES[values.damageToPlayer!]); // damageToPlayer
         }
     }
+}
+
+function compilePlatformTileTrait (
+    writer: BinaryWriter,
+    pack: ResourcePack,
+    tile: LevelTile,
+    tileDef: Tile,
+) {
+    writer.writeUint32(TRAIT_ID_INDICES.platform); // traitId
+    
+    const tileDefTrait = _getTraitSpecificationFromTile(tileDef, 'breakable');
+
+    const values: PlatformTileValueCollection = {
+        ...tileDefTrait.parameters as PlatformTileValueCollection,
+        ...tile.parameters,
+    }
+    
+    writer.writeBoolean(values.collideFromTop); // collideFromTop
+    writer.writeBoolean(values.collideFromBottom); // collideFromBottom
+    writer.writeBoolean(values.collideFromLeft); // collideFromLeft
+    writer.writeBoolean(values.collideFromRight); // collideFromRight
 }
 
 function _getTraitSpecificationFromTile (tileDef: Tile, traitId: TileTraitId)

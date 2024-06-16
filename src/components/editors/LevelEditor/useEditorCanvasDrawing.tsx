@@ -5,7 +5,7 @@ import { GridTool, useLevelEditorContext } from "context/useLevelEditorContext";
 import { useSettingsContext } from "context/useSettings";
 import { getEntityImagePath } from "elements/EntityImage";
 import { getTileImagePath } from "elements/TileImage";
-import { Level } from "models/Level";
+import { Level, PlacedTile } from "models/Level";
 import { ResourcePack } from "models/ResourcePack";
 import { BaseTexture, Rectangle, SCALE_MODES, Texture, Graphics as PixiGraphics, ColorMatrixFilter, RenderTexture } from "pixi.js";
 import { useMemo } from "react";
@@ -55,7 +55,8 @@ export default function useEditorCanvasDrawing (
      * The pixel position in the level where an object would be placed right now.
      */
     placePosition: Vec2 | null,
-    tilesInCurrentStroke: Vec2[],
+    currentStroke: PlacedTile[],
+    currentPosStroke: Vec2[],
     currentView: Rect,
     canvasSize: Vec2,
     levelToCanvasPos: (levelPos: Vec2) => Vec2,
@@ -107,7 +108,8 @@ export default function useEditorCanvasDrawing (
 
         return [active, behind, infront];
     }, [
-        tilesInCurrentStroke,
+        currentStroke,
+        currentPosStroke,
         currentView,
         levelCtx.activeSection,
         levelCtx.activeTerrainLayer,
@@ -131,7 +133,7 @@ export default function useEditorCanvasDrawing (
 
         return sprites;
     }, [
-        tilesInCurrentStroke,
+        currentStroke,
         currentView,
         levelCtx.spawnSelection,
         level.spawns,
@@ -271,7 +273,10 @@ export default function useEditorCanvasDrawing (
             if (isActiveLayer && _doesTerrainToolOverrideActiveLayer()) {
                 layerTiles = removePositionsFromTileList(
                     level.layers[i].tiles,
-                    tilesInCurrentStroke
+                    [
+                        ...currentStroke.map(t => t.position),
+                        ...currentPosStroke,
+                    ]
                 );
             }
             // some others don't replace any tiles, so culling is not necessary.
@@ -309,21 +314,21 @@ export default function useEditorCanvasDrawing (
             if (isActiveLayer === false) continue;
             if (levelCtx.terrainPaint === null) continue;
 
-            if (levelCtx.terrainTool === 'brush') {
-                for (const tile of tilesInCurrentStroke) {
-                    const tex = tileTextures[levelCtx.terrainPaint.id];
+            if (levelCtx.terrainTool === 'brush' || levelCtx.terrainTool === 'rectangle') {
+                for (const tile of currentStroke) {
+                    const tex = tileTextures[tile.tileId];
 
                     if (!tex) {
                         console.warn(
-                            `Couldn't find texture for '${levelCtx.terrainPaint.id}'`,
+                            `Couldn't find texture for '${tile.tileId}'`,
                             tileTextures
                         );
                         continue;
                     }
 
                     currentArr.push({
-                        key: vec2toString(tile),
-                        position: levelToCanvasPos(tile),
+                        key: vec2toString(tile.position),
+                        position: levelToCanvasPos(tile.position),
                         texture: tex,
                         scale: {
                             x: zoom,

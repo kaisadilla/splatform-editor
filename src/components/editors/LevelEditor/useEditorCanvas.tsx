@@ -10,7 +10,6 @@ import { Rect, Vec2, getCssVariableValue, vec2equals, vec2toString } from "utils
 import { removePositionsFromTileList } from "components/editors/LevelEditor/calculations";
 import useEditorCanvasDrawing from "./useEditorCanvasDrawing";
 import useEditorCanvasElement from "./useEditorCanvasElement";
-import { TileTraitId } from "data/TileTraits";
 import { LevelChangeFieldHandler } from ".";
 import { useAppContext } from "context/useAppContext";
 import useEditorCanvasInteraction from "./useEditorCanvasInteraction";
@@ -54,7 +53,10 @@ export default function useEditorCanvas (
 
     // the tiles being placed by this stroke, that will be added to the level
     // once the stroke is finished.
-    const [tilesInCurrentStroke, setTilesInCurrentStroke] = useState([] as Vec2[]);
+    const [currentStroke, setCurrentStroke] = useState([] as PlacedTile[]);
+    // the positions being affected by this stroke, used for things that need
+    // positions but don't place tiles, such as the eraser tool.
+    const [currentPosStroke, setCurrentPosStroke] = useState([] as Vec2[]);
 
     const {
         viewboxRef,
@@ -71,7 +73,8 @@ export default function useEditorCanvas (
         pack,
         level,
         placePosition,
-        tilesInCurrentStroke,
+        currentStroke,
+        currentPosStroke,
         currentView,
         canvasSize,
         levelToCanvasPos,
@@ -83,9 +86,11 @@ export default function useEditorCanvas (
         canvas,
         btnDown,
         placePosition,
-        tilesInCurrentStroke,
+        currentStroke,
+        currentPosStroke,
         onChangeField,
-        setTilesInCurrentStroke,
+        setCurrentStroke,
+        setCurrentPosStroke,
         getTileAtPos,
         windowToLevelPos,
         canvasToLevelPixelPos
@@ -99,7 +104,7 @@ export default function useEditorCanvas (
         return () => {
             document.removeEventListener('pointerup', f);
         };
-    }, [btnDown, tilesInCurrentStroke, levelCtx]);
+    }, [btnDown, currentStroke, currentPosStroke, levelCtx]);
 
     return {
         /**

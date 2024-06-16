@@ -2,7 +2,7 @@ import { Entity } from "models/Entity";
 import { ResourcePack } from "models/ResourcePack";
 import { TilePaint } from "models/sp_documents";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Vec2, WithId } from "utils";
+import { Vec2, __REMOVE_WithId } from "utils";
 
 export type ZoomLevel = '0.25' | '0.5' | '1' | '2' | '3' | '4' | '6' | '8';
 
@@ -60,7 +60,7 @@ interface LevelEditorContextState {
     /**
      * The tile (or tile composite) currently used to paint new tiles.
      */
-    terrainPaint: WithId<TilePaint> | null;
+    terrainPaint: TilePaint | null;
     /**
      * The entity currently selected to place new level entities.
      */
@@ -87,7 +87,7 @@ interface LevelEditorContextState {
     setActiveSection: (section: EditorSection) => void;
     setTileSelection: (positions: Vec2[]) => void;
     setSpawnSelection: (ids: string[]) => void;
-    setPaint: (paint: WithId<TilePaint> | null) => void;
+    setTerrainPaint: (paint: TilePaint | null) => void;
     setEntityPaint: (paint: Entity | null) => void;
     setTool: (tool: GridTool | null) => void;
     setActiveTerrainLayer: (index: number) => void;
@@ -164,7 +164,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
             }));
         }
 
-        function setPaint (paint: WithId<TilePaint> | null) {
+        function setTerrainPaint (paint: TilePaint | null) {
             setState(prevState => ({
                 ...prevState,
                 terrainPaint: paint,
@@ -270,7 +270,7 @@ const LevelEditorContextProvider = ({ children }: any) => {
             setActiveSection,
             setTileSelection,
             setSpawnSelection,
-            setPaint,
+            setTerrainPaint,
             setEntityPaint,
             setTool,
             setActiveTerrainLayer,

@@ -6,13 +6,14 @@ import { removePositionsFromTileList } from "./calculations";
 import { Tile } from "models/Tile";
 import { LevelChangeFieldHandler } from ".";
 import { Entity } from "models/Entity";
+import { useState } from "react";
 
 type _PointerDownEvt = React.PointerEvent<HTMLCanvasElement>;
 type _PointerMoveEvt = React.PointerEvent<HTMLCanvasElement>;
 type _PointerUpEvt = PointerEvent;
 
 const MOUSE_BUTTON_LEFT = 0;
-const MOUSE_BUTTON_RIGHT = 1;
+const MOUSE_BUTTON_RIGHT = 2;
 
 /**
  * The pixels contained in a single unit in a Level. This is not affected by any
@@ -30,9 +31,11 @@ export default function useEditorCanvasInteraction (
      * right now.
      */
     placePosition: Vec2 | null,
-    tilesInCurrentStroke: Vec2[],
+    currentStroke: PlacedTile[],
+    currentPosStroke: Vec2[],
     onChangeField: LevelChangeFieldHandler,
-    setTilesInCurrentStroke: React.Dispatch<React.SetStateAction<Vec2[]>>,
+    setCurrentStroke: React.Dispatch<React.SetStateAction<PlacedTile[]>>,
+    setCurrentPosStroke: React.Dispatch<React.SetStateAction<Vec2[]>>,
     getTileAtPos: (layerIndex: number, pos: Vec2) => PlacedTile | null,
     windowToLevelPos: (x: number, y: number, allowDecimals: boolean)
         => Vec2 | null,
@@ -41,6 +44,10 @@ export default function useEditorCanvasInteraction (
     const { width, height } = level.settings;
 
     const levelCtx = useLevelEditorContext();
+
+    // when using the rectangle tool, indicates the origin of the rectangle,
+    // if a rectangle is currently being drawn.
+    const [rectOrigin, setRectOrigin] = useState<Vec2 | null>(null);
 
     return {
         onPointerDown,
@@ -68,6 +75,8 @@ export default function useEditorCanvasInteraction (
         if (levelCtx.activeSection === 'terrain') {
             handlePointerUpForTerrain(evt);
         }
+        
+        resetStrokes();
     }
 
     function handlePointerDownForTerrain (evt: _PointerDownEvt) {
@@ -79,7 +88,7 @@ export default function useEditorCanvasInteraction (
             if (tool === 'select') {
                 selectAtPos(evt.clientX, evt.clientY);
             }
-            else if (tool === 'brush' || tool == 'eraser') {
+            else if (tool === 'brush') {
                 registerPlaceTileClickAt({
                     x: evt.clientX,
                     y: evt.clientY,
@@ -87,6 +96,14 @@ export default function useEditorCanvasInteraction (
                 levelCtx.cancelSelection();
             }
             else if (tool === 'rectangle') {
+                startRectangle(evt.clientX, evt.clientY);
+                levelCtx.cancelSelection();
+            }
+            else if (tool === 'eraser') {
+                registerRemoveTileClickAt({
+                    x: evt.clientX,
+                    y: evt.clientY,
+                });
                 levelCtx.cancelSelection();
             }
             else if (tool === 'bucket') {
@@ -98,8 +115,13 @@ export default function useEditorCanvasInteraction (
             }
         }
         else if (evt.button === MOUSE_BUTTON_RIGHT) {
-            if (tool === 'bucket') {
-                fillAreaFrom(evt.clientX, evt.clientY, 'unfill');
+            if (tool === 'rectangle') {
+                startRectangle(evt.clientX, evt.clientY);
+                levelCtx.cancelSelection();
+            }
+            else if (tool === 'bucket') {
+                fillAreaFrom(evt.clientX, evt.clientY, 'delete');
+                levelCtx.cancelSelection();
             }
         }
     }
@@ -107,7 +129,6 @@ export default function useEditorCanvasInteraction (
     function handlePointerMoveForTerrain (masterEvt: _PointerMoveEvt) {
         const tool = levelCtx.terrainTool;
         const coalescedEvts = masterEvt.nativeEvent.getCoalescedEvents();
-
 
         if (btnDown === 'left') {
             if (tool === 'select') {
@@ -124,11 +145,18 @@ export default function useEditorCanvasInteraction (
                         });
                     }
                 }
-                
-                registerPlaceTileClickAt(...newPoints);
+
+                if (tool === 'brush') {
+                    registerPlaceTileClickAt(...newPoints);
+                }
+                else if (tool === 'eraser') {
+                    registerRemoveTileClickAt(...newPoints);
+                }
             }
             else if (tool === 'rectangle') {
-
+                if (rectOrigin !== null) {
+                    updateRectangle(masterEvt.clientX, masterEvt.clientY);
+                }
             }
             else if (tool === 'bucket') {
 
@@ -138,17 +166,30 @@ export default function useEditorCanvasInteraction (
             }
         }
         else if (btnDown === 'right') {
-
+            if (tool === 'rectangle') {
+                if (rectOrigin !== null) {
+                    updateNegativeRectangle(masterEvt.clientX, masterEvt.clientY);
+                }
+            }
         }
     }
 
     function handlePointerUpForTerrain (evt: _PointerUpEvt) {
         if (btnDown === 'left') {
             if (levelCtx.terrainTool === 'brush') {
-                addDrawnTiles(tilesInCurrentStroke);
+                addDrawnTiles(currentStroke);
+                setCurrentStroke([]);
             }
             else if (levelCtx.terrainTool === 'eraser') {
-                removeDrawnTiles(tilesInCurrentStroke);
+                removeDrawnTiles(currentPosStroke);
+            }
+            else if (levelCtx.terrainTool === 'rectangle') {
+                endRectangle('fill');
+            }
+        }
+        else if (btnDown === 'right') {
+            if (levelCtx.terrainTool === 'rectangle') {
+                endRectangle('delete');
             }
         }
     }
@@ -253,32 +294,84 @@ export default function useEditorCanvasInteraction (
     //#endregion
 
     // #region brush stroke
-    function registerPlaceTileClickAt (...positions : Vec2[]) {
-        if (canvas === null) return [];
+    function registerPlaceTileClickAt (...winPositions : Vec2[]) {
+        addTilesToStroke(...winPositions.map(
+            p => windowToLevelPos(p.x, p.y, false)!
+        ));
+    }
+
+    function registerRemoveTileClickAt (...winPositions: Vec2[]) {
+        addTilesToPosStroke(...winPositions.map(
+            p => windowToLevelPos(p.x, p.y, false)!
+        ));
+    }
+
+    function startRectangle (winX: number, winY: number) {
+        setRectOrigin(windowToLevelPos(winX, winY, false)!);
+    }
+
+    function updateRectangle (winX: number, winY: number) {
         if (levelCtx.terrainPaint === null) return;
+        if (rectOrigin === null) return;
 
-        setTilesInCurrentStroke(prevState => {
-            const placedTiles = [] as Vec2[];
+        const levelPos = windowToLevelPos(winX, winY, false)!;
 
-            for (const pixelPos of positions) {
-                const tilePos = windowToLevelPos(pixelPos.x, pixelPos.y, false)!;
-    
-                if (prevState.find(lt => vec2equals(lt, tilePos))) {
-                    continue;
+        const xMin = Math.min(levelPos.x, rectOrigin.x);
+        const xMax = Math.max(levelPos.x, rectOrigin.x);
+        const yMin = Math.min(levelPos.y, rectOrigin.y);
+        const yMax = Math.max(levelPos.y, rectOrigin.y);
+
+        if (levelCtx.terrainPaint.type === 'tile') {
+            const placedTiles = [] as PlacedTile[];
+
+            for (let x = xMin; x <= xMax; x++) {
+                for (let y = yMin; y <= yMax; y++) {
+                    placedTiles.push(
+                        createLevelTile({x, y}, levelCtx.terrainPaint)
+                    );
                 }
-                if (placedTiles.find(pt => vec2equals(pt, tilePos))) {
-                    continue;
-                }
-    
-                placedTiles.push(tilePos);
             }
 
-            return [
-                ...prevState,
-                ...placedTiles,
-            ];
-        });
+            setCurrentStroke(placedTiles);
+        }
     }
+
+    function updateNegativeRectangle (winX: number, winY: number) {
+        if (levelCtx.terrainPaint === null) return;
+        if (rectOrigin === null) return;
+
+        const levelPos = windowToLevelPos(winX, winY, false)!;
+
+        const xMin = Math.min(levelPos.x, rectOrigin.x);
+        const xMax = Math.max(levelPos.x, rectOrigin.x);
+        const yMin = Math.min(levelPos.y, rectOrigin.y);
+        const yMax = Math.max(levelPos.y, rectOrigin.y);
+
+        if (levelCtx.terrainPaint.type === 'tile') {
+            const removedTiles = [] as Vec2[];
+
+            for (let x = xMin; x <= xMax; x++) {
+                for (let y = yMin; y <= yMax; y++) {
+                    removedTiles.push({x, y});
+                }
+            }
+
+            setCurrentPosStroke(removedTiles);
+        }
+    }
+
+    function endRectangle (mode: 'fill' | 'delete') {
+        if (mode === 'fill') {
+            addDrawnTiles(currentStroke);
+            //setCurrentStroke([]);
+        }
+        else if (mode === 'delete') {
+            removeDrawnTiles(currentPosStroke);
+            //setCurrentPosStroke([]);
+        }
+        setRectOrigin(null);
+    }
+
     //#endregion
     
     /**
@@ -287,7 +380,7 @@ export default function useEditorCanvasInteraction (
      * @param x The x position in the canvas.
      * @param y The y position in the canvas.
      */
-    function fillAreaFrom (x: number, y: number, fillMode: 'fill' | 'unfill') {
+    function fillAreaFrom (x: number, y: number, fillMode: 'fill' | 'delete') {
         if (canvas === null) return;
         if (levelCtx.terrainPaint === null) return;
 
@@ -295,7 +388,7 @@ export default function useEditorCanvasInteraction (
         if (origin === null) return;
         const originTile = getTileAtPos(levelCtx.activeTerrainLayer, origin)?.tileId;
 
-        const placedTiles = [] as Vec2[];
+        const placedTilePos = [] as Vec2[];
         const fillStack = [origin];
 
         while (fillStack.length > 0) {
@@ -310,11 +403,11 @@ export default function useEditorCanvasInteraction (
                 continue;
             }
             // the tile in this position was already iterated over.
-            if (placedTiles.find(pt => vec2equals(pt, pos))) {
+            if (placedTilePos.find(pt => vec2equals(pt, pos))) {
                 continue;
             }
 
-            placedTiles.push(pos);
+            placedTilePos.push(pos);
 
             fillStack.push({x: pos.x + 1, y: pos.y});
             fillStack.push({x: pos.x - 1, y: pos.y});
@@ -324,34 +417,43 @@ export default function useEditorCanvasInteraction (
 
         // replacing tiles
         if (fillMode === 'fill') {
-            addDrawnTiles(placedTiles);
+            if (levelCtx.terrainPaint === null) return;
+
+            if (levelCtx.terrainPaint.type === 'tile') {
+                const placedTiles = [];
+                for (const pos of placedTilePos) {
+                    placedTiles.push({
+                        ...getNewLevelTile(levelCtx.terrainPaint as Tile),
+                        position: pos,
+                    })
+                }
+                addDrawnTiles(placedTiles);
+            }
         }
-        else if (fillMode === 'unfill') {
-            removeDrawnTiles(placedTiles);
+        else if (fillMode === 'delete') {
+            removeDrawnTiles(placedTilePos);
         }
     }
 
     // #region Tile placement and removal
-    function addDrawnTiles (tiles: Vec2[]) {
+    function addDrawnTiles (tiles: PlacedTile[]) {
         if (levelCtx.terrainPaint === null) return;
 
         let layerTiles = removePositionsFromTileList(
             level.layers[levelCtx.activeTerrainLayer].tiles,
-            tiles
+            tiles.map(t => t.position)
         );
 
         const addedPositions = new Set<string>();
         for (const t of tiles) {
-            if (addedPositions.has(vec2toString(t))) {
+            if (addedPositions.has(vec2toString(t.position))) {
                 continue;
             }
             else {
-                addedPositions.add(vec2toString(t));
+                addedPositions.add(vec2toString(t.position));
             }
 
-            layerTiles.push(createLevelTile(
-                t, levelCtx.terrainPaint.object
-            ));
+            layerTiles.push(t);
         }
 
         const update: TileLayer[] = [...level.layers];
@@ -361,8 +463,6 @@ export default function useEditorCanvasInteraction (
         }
 
         onChangeField('layers', update);
-
-        setTilesInCurrentStroke([]);
     }
 
     function removeDrawnTiles (tiles: Vec2[]) {
@@ -378,8 +478,6 @@ export default function useEditorCanvasInteraction (
         }
 
         onChangeField('layers', update);
-
-        setTilesInCurrentStroke([]);
     }
 
     function deleteEntityAt (gridPosition: Vec2) {        
@@ -415,6 +513,71 @@ export default function useEditorCanvasInteraction (
     }
     // #endregion
 
+    // #region Interaction state management
+    /**
+     * Adds the positions given to the current stroke, modifying it as needed
+     * in case a tile composite is used as paint.
+     * @param positions The position(s) to add to the stroke.
+     */
+    function addTilesToStroke (...positions: Vec2[]) {
+        setCurrentStroke(prevState => {
+            if (levelCtx.terrainPaint === null) return prevState;
+
+            if (levelCtx.terrainPaint.type === 'tile') {
+                const placedTiles = [] as PlacedTile[];
+    
+                for (const pos of positions) {
+                    // position of tiles already in the current stroke
+                    if (prevState.find(lt => vec2equals(lt.position, pos))) {
+                        continue;
+                    }
+                    // position of tiles that will be added this frame
+                    if (placedTiles.find(pt => vec2equals(pt.position, pos))) {
+                        continue;
+                    }
+    
+                    placedTiles.push(createLevelTile(pos, levelCtx.terrainPaint));
+                }
+
+                return [
+                    ...prevState,
+                    ...placedTiles,
+                ]
+            }
+
+            return prevState;
+        });
+    }
+
+    /**
+     * Adds the given positions to the current position stroke.
+     * @param positions The position(s) to add to the stroke.
+     */
+    function addTilesToPosStroke (...positions: Vec2[]) {
+        setCurrentPosStroke(prevState => {
+            const addedPositions = [] as Vec2[];
+
+            for (const pos of positions) {
+                // position of tiles already in the current stroke
+                if (prevState.find(lt => vec2equals(lt, pos))) {
+                    continue;
+                }
+                // position of tiles that will be added this frame
+                if (addedPositions.find(pt => vec2equals(pt, pos))) {
+                    continue;
+                }
+
+                addedPositions.push(pos);
+            }
+
+            return [
+                ...prevState,
+                ...addedPositions,
+            ]
+        });
+    }
+    // #endregion
+
     /**
      * Returns the front-most entity at the level position given, or null if
      * no entity exists there.
@@ -444,6 +607,14 @@ export default function useEditorCanvasInteraction (
         }
 
         return null;
+    }
+
+    /**
+     * Empties all stroke arrays.
+     */
+    function resetStrokes () {
+        setCurrentStroke([]);
+        setCurrentPosStroke([]);
     }
 
     function levelPixelToGridPosition (pixelPosition: Vec2) : Vec2 {
