@@ -16,6 +16,10 @@ const VERSION_REVISION = 1;
 export default function compileLevel (pack: ResourcePack, level: Level) : Uint8Array {
     const writer = new BinaryWriter();
 
+    writer.writeUint8(0xA7); // magic number byte 1
+    writer.writeUint8(0xA5); // magic number byte 2
+    writer.writeUint8(0x1A); // magic number byte 3
+    writer.writeUint8(0x42); // magic number byte 4
     writer.writeUint8(0); // endianSignature
     writer.writeUint8(FILE_TYPE_VALUES.level); // fileType
     writer.writeUint8(VERSION_MAJOR); // versionMajor
@@ -133,8 +137,8 @@ function compileDynamicAnimation (
 function compileSpawn (
     writer: BinaryWriter, pack: ResourcePack, spawn: LevelSpawn
 ) {
-    writer.writeUint16(spawn.position.x); // xPos
-    writer.writeUint16(spawn.position.y); // yPos
+    writer.writeFloat32(spawn.position.x); // xPos
+    writer.writeFloat32(spawn.position.y); // yPos
     compileEntity(writer, pack, spawn.entity); // entity
 }
 

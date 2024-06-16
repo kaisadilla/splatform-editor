@@ -2,7 +2,7 @@ import { BrowserWindow, dialog } from "electron";
 import fsAsync from "fs/promises";
 import fs from "fs";
 import Path from "path";
-import { SPDocumentType } from "models/sp_documents";
+import { SPBinaryType, SPDocumentType } from "models/sp_documents";
 import { MediaAssetMetadata } from "models/ResourcePack";
 
 let parentWindow: BrowserWindow | null = null;
@@ -47,6 +47,23 @@ export function openTextFile (
 export function saveNewTextFile (
     title: string,
     content: string,
+    filters: Electron.FileFilter[]
+) : string | null {
+    const filePath = dialog.showSaveDialogSync(parentWindow!, {
+        title: title,
+        filters: filters,
+    });
+
+    if (filePath) {
+        fs.writeFileSync(filePath, content);
+    }
+
+    return filePath ?? null;
+}
+
+export function saveNewBinaryFile (
+    title: string,
+    content: Uint8Array,
     filters: Electron.FileFilter[]
 ) : string | null {
     const filePath = dialog.showSaveDialogSync(parentWindow!, {
@@ -163,4 +180,46 @@ export function confirmDocumentClose (
 
     // return 'true' when the document has been closed, false otherwise.
     return resp !== CANCEL_ID;
+}
+
+/**
+ * Prompts the user to select a path to save the file given.
+ * @param type The type of document to save.
+ * @param content The content of the document.
+ * @returns The path to where the user saved the document, or `null` if the user
+ * decided not to save it.
+ */
+export function saveNewBinary (
+    type: SPBinaryType,
+    content: Uint8Array,
+) : MediaAssetMetadata | null {
+    let filePath = null as string | null;
+
+    if (type == 'level') {
+        filePath = saveNewBinaryFile("Save level binary", content, [{
+            name: "SPlatform level binary",
+            extensions: ["spb-l"]
+        }]);
+    }
+    else if (type == 'game') {
+        filePath = saveNewBinaryFile("Save game binary", content, [{
+            name: "SPlatform game binary",
+            extensions: ["spb-l"]
+        }]);
+    }
+    else {
+        console.error("Unknown file type: ", type);
+    }
+
+    if (filePath === null) return null;
+
+    const path = Path.parse(filePath);
+
+    return {
+        id: filePath,
+        baseName: path.base,
+        fileName: path.name,
+        extension: path.ext,
+        fullPath: filePath
+    };
 }

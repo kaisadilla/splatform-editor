@@ -9,3 +9,5 @@ export const HANDLER_SAVE_NEW_TEXT_FILE = "filesystem/save/new/text-file";
 export const HANDLER_OPEN_DOCUMENT = "filesystem/open/document";
 export const HANDLER_SAVE_DOCUMENT = "filesystem/save/document";
 export const HANDLER_SAVE_NEW_DOCUMENT = "filesystem/save/new/document";
+
+export const HANDLER_SAVE_BINARY = "filesystem/save/new/binary";

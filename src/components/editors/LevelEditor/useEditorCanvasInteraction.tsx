@@ -72,6 +72,7 @@ export default function useEditorCanvasInteraction (
     }
 
     function onPointerUp (evt: _PointerUpEvt) {
+        // NOTE: Remember to update useEffect dependencies.
         if (levelCtx.activeSection === 'terrain') {
             handlePointerUpForTerrain(evt);
         }
@@ -175,6 +176,7 @@ export default function useEditorCanvasInteraction (
     }
 
     function handlePointerUpForTerrain (evt: _PointerUpEvt) {
+        // NOTE: Remember to update useEffect dependencies.
         if (btnDown === 'left') {
             if (levelCtx.terrainTool === 'brush') {
                 addDrawnTiles(currentStroke);

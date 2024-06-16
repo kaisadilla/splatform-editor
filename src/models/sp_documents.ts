@@ -13,7 +13,8 @@ export type SPDocumentType =
     | 'resource_pack'
     | 'manifest'
     | 'entity'
-    | 'tile';
+    | 'tile'
+;
 
 export type SPDocumentContent =
     Level
@@ -22,7 +23,8 @@ export type SPDocumentContent =
     | ResourcePack
     | ResourcePackManifest
     | EntityFile
-    | TileFile;
+    | TileFile
+;
 
 export interface SPDocument {
     id: string;
@@ -32,6 +34,11 @@ export interface SPDocument {
     hasUnsavedChanges: boolean;
     content: SPDocumentContent;
 };
+
+export type SPBinaryType =
+    'level'
+    | 'game'
+;
 
 export interface Version {
     major: number;

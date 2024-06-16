@@ -1,7 +1,7 @@
 import { MediaAssetMetadata, ResourcePack } from "models/ResourcePack";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT } from "./ipcNames";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY } from "./ipcNames";
 import { FileInfo } from "main/files/documentFiles";
-import { SPDocumentType } from "models/sp_documents";
+import { SPBinaryType, SPDocumentType } from "models/sp_documents";
 
 const Ipc = {
     /**
@@ -81,6 +81,14 @@ const Ipc = {
     ) : Promise<boolean> {
         return await getIpcRenderer().invoke(HANDLER_CLOSE_DOCUMENT, {
             tabName, type, fullPath, content
+        });
+    },
+
+    async saveNewBinary (type: SPBinaryType, content: Uint8Array)
+        : Promise<MediaAssetMetadata | null>
+    {
+        return await getIpcRenderer().invoke(HANDLER_SAVE_BINARY, {
+            type, content,
         });
     },
 }

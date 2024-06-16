@@ -1,8 +1,8 @@
 import { getWinPath } from "../main-utils";
-import { confirmDocumentClose, openTextFile, saveDocument, saveNewDocument, saveNewTextFile } from "../files/documentFiles";
+import { confirmDocumentClose, openTextFile, saveDocument, saveNewBinary, saveNewDocument, saveNewTextFile } from "../files/documentFiles";
 import { getInstalledResourcePacks, getUserdataFolderPath } from "../files/gameData";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT } from "./ipcNames";
-import { SPDocumentType } from "models/sp_documents";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY } from "./ipcNames";
+import { SPBinaryType, SPDocumentType } from "models/sp_documents";
 
 export function createIpcHandlers (ipcMain: Electron.IpcMain) {
     ipcMain.handle(HANDLER_SANITY, async (evt, obj) => {
@@ -42,6 +42,10 @@ export function createIpcHandlers (ipcMain: Electron.IpcMain) {
             args.tabName, args.type, args.fullPath, args.content
         );
     });
+
+    ipcMain.handle(HANDLER_SAVE_BINARY, async (evt, args: SaveNewBinaryArgs) => {
+        return saveNewBinary(args.type, args.content);
+    });
 }
 
 export interface ReadTextFileArgs {
@@ -63,6 +67,11 @@ export interface SaveDocumentArgs {
 export interface SaveNewDocumentArgs {
     type: SPDocumentType;
     content: string;
+}
+
+export interface SaveNewBinaryArgs {
+    type: SPBinaryType;
+    content: Uint8Array;
 }
 
 export interface CloseDocumentArgs {

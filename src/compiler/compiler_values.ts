@@ -2,9 +2,9 @@ import { TraitId } from "data/Traits";
 import { BlockRegenerationMode, Direction, EntityDamageType, ObjectAnimationType, PlayerDamageType, PowerUpType, RewardType } from "models/splatform";
 
 export const FILE_TYPE_VALUES = {
-    level: 0,
+    game: 0,
     world: 1,
-    game: 2,
+    level: 2,
 };
 
 export const ANIM_TYPE_VALUES: {[key in ObjectAnimationType]: number} = {

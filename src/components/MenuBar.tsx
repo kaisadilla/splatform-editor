@@ -5,6 +5,8 @@ import { FileIcons } from 'icons';
 import Ipc from 'main/ipc/ipcRenderer';
 import { useAppContext } from 'context/useAppContext';
 import { useUserContext } from 'context/useUserContext';
+import compileLevel from 'compiler/LevelCompiler';
+import { Level } from 'models/Level';
 
 export interface MenuBarProps {
     
@@ -90,6 +92,11 @@ function MenuBar (props: MenuBarProps) {
                 key: "save-copy",
                 label: "Save copy",
                 callback: handleSaveCopy,
+            },
+            {
+                key: "compile",
+                label: "Compile",
+                callback: handleCompile,
             }
         ]
     };
@@ -172,6 +179,23 @@ function MenuBar (props: MenuBarProps) {
 
     function handleSaveCopy () {
         userCtx.saveDocumentCopy(userCtx.getActiveDocument());
+    }
+
+    function handleCompile () {
+        const doc = userCtx.getActiveDocument();
+
+        if (doc.content.type === 'level') {
+            const level = doc.content as Level;
+
+            const pack = resourcePacks.find(
+                r => r.folderName === level.resourcePack
+            );
+            if (!pack) return;
+
+            const binary = compileLevel(pack, level);
+            console.log("output", binary);
+            userCtx.saveBinary('level', binary);
+        }
     }
 }
 

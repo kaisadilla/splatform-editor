@@ -3,11 +3,10 @@ import Ipc from "main/ipc/ipcRenderer";
 import { getNewEntity } from "models/Entity";
 import { getNewGame } from "models/Game";
 import { getNewLevel } from "models/Level";
-import { ResourcePack } from "models/ResourcePack";
 import { getNewTile } from "models/Tile";
 import { getNewWorld } from "models/World";
-import { SPDocument, SPDocumentContent, SPDocumentType } from "models/sp_documents";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { SPBinaryType, SPDocument, SPDocumentContent, SPDocumentType } from "models/sp_documents";
+import { createContext, useContext, useMemo, useState } from "react";
 import { deleteArrayItemAt } from "utils";
 
 interface UserContextState {
@@ -25,6 +24,7 @@ interface UserContextState {
     closeDocument: (id: string) => Promise<boolean>;
     saveDocument: (doc: SPDocument) => Promise<string | null>;
     saveDocumentCopy: (doc: SPDocument) => Promise<string | null>;
+    saveBinary: (type: SPBinaryType, content: Uint8Array) => Promise<string | null>;
 }
 
 const UserContext = createContext<UserContextState>({} as UserContextState);
@@ -132,6 +132,10 @@ const UserContextProvider = ({ children }: any) => {
             return path;
         }
 
+        async function saveBinary (type: SPBinaryType, content: Uint8Array) {
+            return await _saveNewBinary(type, content);
+        }
+
         return {
             ...state,
             getActiveDocument,
@@ -146,6 +150,7 @@ const UserContextProvider = ({ children }: any) => {
             closeDocument,
             saveDocument,
             saveDocumentCopy,
+            saveBinary,
         };
     }, [state]);
 
@@ -378,6 +383,13 @@ const UserContextProvider = ({ children }: any) => {
         return metadata.fullPath;
     }
 
+    async function _saveNewBinary (type: SPBinaryType, content: Uint8Array)
+        : Promise<string | null>
+    {
+        const metadata = await Ipc.saveNewBinary(type, content);
+        return metadata?.fullPath ?? null;
+    }
+
     /**
      * Removes the document given from the array of opened documents in the app.
      * If the given document was the active one, selects the document immediately
@@ -450,6 +462,5 @@ const UserContextProvider = ({ children }: any) => {
 }
 
 export {
-    useUserContext,
-    UserContextProvider,
+    UserContextProvider, useUserContext
 };
