@@ -1,5 +1,5 @@
 import { TraitId } from "data/Traits";
-import { BlockRegenerationMode, ObjectAnimationType, PlayerDamageType } from "models/splatform";
+import { BlockRegenerationMode, Direction, EntityDamageType, ObjectAnimationType, PlayerDamageType, PowerUpType, RewardType } from "models/splatform";
 
 export const FILE_TYPE_VALUES = {
     level: 0,
@@ -31,12 +31,41 @@ export const TRAIT_ID_INDICES: {[key in TraitId]: number} = {
     walk: 1_000_006,
 };
 
-export const REGENERATION_MODE_INDICES: {[key in BlockRegenerationMode]: number} = {
-    time: 0,
-    offscreen: 1,
+export const DIRECTION_INDICES: {[key in Direction]: number} = {
+    up: 0,
+    down: 1,
+    left: 2,
+    right: 3,
+};
+
+export const ENTITY_DAMAGE_INDICES: {[key in EntityDamageType]: number} = {
+    none: 0,
+    regular: 1,
+    fatal: 2,
+};
+
+export const OBJECT_TYPE_INDICES = {
+    tile: 0,
+    entity: 2,
+    coin: 10,
 };
 
 export const PLAYER_DAMAGE_INDICES: {[key in PlayerDamageType]: number} = {
-    regular: 0,
-    fatal: 1,
+    regular: 1,
+    fatal: 2,
+};
+
+export const POWER_UP_TYPE: {[key in PowerUpType]: number} = {
+    strong: 0,
+    fireball: 1,
+    frog: 2,
+    hammer: 3,
+    leaf: 4,
+    superball: 5,
+    tanooki: 6,
+}
+
+export const REGENERATION_MODE_INDICES: {[key in BlockRegenerationMode]: number} = {
+    time: 0,
+    offscreen: 1,
 };

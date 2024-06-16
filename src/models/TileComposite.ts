@@ -1,6 +1,6 @@
 import { WithId } from "./sp_documents";
 
-export type TileCompositeType = 'rectangle' | 'shapeless';
+export type TileCompositeType = 'free_form' | 'rectangle' | 'line';
 
 export interface TileCompositeFile {
     type: 'tile_composite',
