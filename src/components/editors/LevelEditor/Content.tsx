@@ -72,6 +72,12 @@ function _GridTools ({
                     scale={2}
                     bordered
                 />}
+                {paint?.type === 'tile_composite' && <TileImage
+                    pack={pack}
+                    tile={paint.thumbnailTile}
+                    scale={2}
+                    bordered
+                />}
                 {paint === null && <TileImage
                     pack={pack}
                     tile={null} 

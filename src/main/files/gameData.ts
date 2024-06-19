@@ -7,6 +7,7 @@ import { Entity, EntityFile } from "models/Entity";
 import { Tile, TileFile } from "models/Tile";
 import { LOCALE, getWinPath } from "../main-utils";
 import { app } from "electron";
+import { TileComposite } from "models/TileComposite";
 
 const REGKEY_USER_FOLDER = '\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders';
 const TEXT_FORMAT = "utf-8";
@@ -66,9 +67,11 @@ async function _readResourcePackFolder (path: string, folderName: string)
 
     const entityFiles = await _scandirForFileType(path + "/data/entities", ".spr-ent");
     const tileFiles = await _scandirForFileType(path + "/data/tiles", ".spr-til");
+    const tileCompositeFiles = await _scandirForFileType(path + "/data/tile-composites", ".spr-tco");
 
     const entityMetadata = [] as DataAssetMetadata<Entity>[];
     const tileMetadata = [] as DataAssetMetadata<Tile>[];
+    const tileCompositeMetadata = [] as DataAssetMetadata<TileComposite>[];
 
     for (const file of entityFiles) {
         const entityJson = _readTextFile(file.fullPath);
@@ -97,6 +100,20 @@ async function _readResourcePackFolder (path: string, folderName: string)
             data: tile,
         });
     }
+    
+    for (const file of tileCompositeFiles) {
+        const compositeJson = _readTextFile(file.fullPath);
+        const compositeFile = JSON.parse(compositeJson) as TileComposite;
+        const composite = {
+            ...compositeFile,
+            id: file.id
+        };
+
+        tileCompositeMetadata.push({
+            ...file,
+            data: composite,
+        });
+    }
 
     return {
         type: 'resource_pack',
@@ -118,6 +135,9 @@ async function _readResourcePackFolder (path: string, folderName: string)
             ui: spriteUiFiles,
         },
         tiles: tileMetadata.sort(
+            (a, b) => a.data.name.localeCompare(b.data.name, LOCALE)
+        ),
+        tileComposites: tileCompositeMetadata.sort(
             (a, b) => a.data.name.localeCompare(b.data.name, LOCALE)
         ),
     } as ResourcePack;

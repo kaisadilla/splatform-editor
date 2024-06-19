@@ -6,6 +6,7 @@ export interface TileCompositeFile {
     type: 'tile_composite',
     name: string;
     compositeType: TileCompositeType;
+    thumbnailTile: string;
     minSize: [number, number];
 }
 

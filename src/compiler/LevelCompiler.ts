@@ -331,7 +331,7 @@ function compilePlatformTileTrait (
 ) {
     writer.writeUint32(TRAIT_ID_INDICES.platform); // traitId
     
-    const tileDefTrait = _getTraitSpecificationFromTile(tileDef, 'breakable');
+    const tileDefTrait = _getTraitSpecificationFromTile(tileDef, 'platform');
 
     const values: PlatformTileValueCollection = {
         ...tileDefTrait.parameters as PlatformTileValueCollection,

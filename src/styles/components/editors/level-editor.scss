@@ -69,6 +69,23 @@
         width: 26px;
         height: 26px;
     }
+
+    .composite-button {
+        &.rectangle-composite-button {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            padding: 5px;
+
+            .tile-row {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                overflow: hidden;
+            }
+        }
+    }
 }
 
 .level-editor .entity-palette {
@@ -130,14 +147,12 @@
             }
         }
 
-        .level-grid-canvas-container > div {
-            flex: 1;
-            min-width: 0;
-            background: $color-component-1;
-            @include vertical-queue-stretch;
-
-            .canvas-element {
-                cursor: crosshair !important;
+        .level-grid-canvas-container {
+            > div {
+                flex: 1;
+                min-width: 0;
+                background: $color-component-1;
+                @include vertical-queue-stretch;
             }
         }
     }
@@ -256,6 +271,13 @@
                 position: absolute;
                 top: 16px;
                 left: 16px;
+            }
+            
+
+            &.tool-brush {
+                .canvas-element {
+                    cursor: crosshair !important;
+                }
             }
         }
     }

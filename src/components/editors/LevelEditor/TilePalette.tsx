@@ -4,6 +4,7 @@ import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import TileImage from 'elements/TileImage';
 import { DataAssetMetadata, ResourcePack } from 'models/ResourcePack';
 import { Tile } from 'models/Tile';
+import { RectangleTileComposite, TileComposite } from 'models/TileComposite';
 import React from 'react';
 import { getClassString } from 'utils';
 
@@ -33,81 +34,132 @@ function LevelEditor_TilePalette ({
         tilesByGroup[group].push(tile);
     }
 
-    return (
-        <Tabs
-            defaultValue='tiles'
-            classNames={{
-                root: "sp-section-tab-root",
-                list: "sp-section-tab-ribbon-list",
-                tab: "sp-section-tab-ribbon-tab",
-                tabLabel: "sp-section-tab-ribbon-tab-label",
-                panel: "sp-section-tab-panel",
-            }}
-        >
-            <Tabs.List>
-                <Tabs.Tab
-                    value='tiles'
-                >
-                    Tiles
-                </Tabs.Tab>
-                <Tabs.Tab
-                    value='tile-composites'
-                >
-                    Smart brushes
-                </Tabs.Tab>
-            </Tabs.List>
+    const rectangleComps = pack.tileComposites.filter(
+        t => t.data.compositeType === 'rectangle'
+    ) as DataAssetMetadata<RectangleTileComposite>[];
 
-            <div className="sp-section-tab-panel-container level-grid-feature-options">
-                <Tabs.Panel value='tiles'>
-                    <ScrollArea
-                        scrollbars='y'
-                        type='hover'
-                        classNames={{
-                            root: "tile-palette"
-                        }}
-                        scrollbarSize={16}
+    return (<Tabs
+        defaultValue='tiles'
+        classNames={{
+            root: "sp-section-tab-root",
+            list: "sp-section-tab-ribbon-list",
+            tab: "sp-section-tab-ribbon-tab",
+            tabLabel: "sp-section-tab-ribbon-tab-label",
+            panel: "sp-section-tab-panel",
+        }}
+    >
+        <Tabs.List>
+            <Tabs.Tab
+                value='tiles'
+            >
+                Tiles
+            </Tabs.Tab>
+            <Tabs.Tab
+                value='tile-composites'
+            >
+                Smart brushes
+            </Tabs.Tab>
+        </Tabs.List>
+
+        <div className="sp-section-tab-panel-container level-grid-feature-options">
+            <Tabs.Panel value='tiles'>
+                <ScrollArea
+                    scrollbars='y'
+                    type='hover'
+                    classNames={{
+                        root: "tile-palette"
+                    }}
+                    scrollbarSize={16}
+                >
+                <Accordion
+                    classNames={{
+                        root: "palette-root",
+                        item: "palette-item sp-accordion-panel",
+                        control: "palette-control sp-accordion-panel-control sp-small",
+                        label: "sp-accordion-panel-label",
+                        panel: "palette-panel sp-accordion-panel-panel",
+                        content: "palette-panel-content"
+                    }}
+                    multiple
+                    defaultValue={Object.keys(tilesByGroup)}
+                >
+
+                    {Object.keys(tilesByGroup).sort().map(gr => (<Accordion.Item
+                        key={gr}
+                        value={gr}
                     >
-                        <Accordion
-                            classNames={{
-                                root: "palette-root",
-                                item: "palette-item sp-accordion-panel",
-                                control: "palette-control sp-accordion-panel-control sp-small",
-                                label: "sp-accordion-panel-label",
-                                panel: "palette-panel sp-accordion-panel-panel",
-                                content: "palette-panel-content"
-                            }}
-                            multiple
-                            defaultValue={Object.keys(tilesByGroup)}
-                        >
-                            {Object.keys(tilesByGroup).sort().map(gr => (<Accordion.Item
-                                key={gr}
-                                value={gr}
-                            >
-                                <Accordion.Control>
-                                    {gr}
-                                </Accordion.Control>
-                                <Accordion.Panel>
-                                    {tilesByGroup[gr].map(t => <_TileButton
-                                        key={t.id}
-                                        pack={pack}
-                                        tile={t}
-                                        selected={terrainPaint?.id === t.id}
-                                        onClick={() => selectPaint(t)}
-                                    />)}
-                                </Accordion.Panel>
-                            </Accordion.Item>))}
-                        </Accordion>
-                    </ScrollArea>
-                </Tabs.Panel>
-                <Tabs.Panel value='tile-composites'>
-                    (tile composites)
-                </Tabs.Panel>
-            </div>
-        </Tabs>
-    );
+                        <Accordion.Control>
+                            {gr}
+                        </Accordion.Control>
+                        <Accordion.Panel>
+                            {tilesByGroup[gr].map(t => <_TileButton
+                                key={t.id}
+                                pack={pack}
+                                tile={t}
+                                selected={
+                                    terrainPaint !== null
+                                    && terrainPaint.type === 'tile'
+                                    && terrainPaint.id === t.id
+                                }
+                                onClick={() => selectPaint(t)}
+                            />)}
+                        </Accordion.Panel>
+                    </Accordion.Item>))}
+                    
+                </Accordion>
+                </ScrollArea>
+            </Tabs.Panel>
+            <Tabs.Panel value='tile-composites'>
+                <ScrollArea
+                    scrollbars='y'
+                    type='hover'
+                    classNames={{
+                        root: "tile-palette"
+                    }}
+                    scrollbarSize={16}
+                >
+                <Accordion
+                    classNames={{
+                        root: "palette-root",
+                        item: "palette-item sp-accordion-panel",
+                        control: "palette-control sp-accordion-panel-control sp-small",
+                        label: "sp-accordion-panel-label",
+                        panel: "palette-panel sp-accordion-panel-panel",
+                        content: "palette-panel-content"
+                    }}
+                    multiple
+                    defaultValue={["free_form", "rectangle", "line"]}
+                >
+
+                    <Accordion.Item
+                        value="rectangle"
+                    >
+                        <Accordion.Control>
+                            Rectangles
+                        </Accordion.Control>
+                        <Accordion.Panel>
+                            {rectangleComps.map(tc => <_RectangleCompositeButton
+                                key={tc.id}
+                                pack={pack}
+                                composite={tc.data}
+                                selected={
+                                    terrainPaint !== null
+                                    && terrainPaint.type === 'tile_composite'
+                                    && terrainPaint?.id === tc.id
+                                }
+                                onClick={() => selectPaint(tc)}
+                            />)}
+                        </Accordion.Panel>
+                    </Accordion.Item>
+
+                </Accordion>
+                </ScrollArea>
+            </Tabs.Panel>
+        </div>
+    </Tabs>);
     
-    function selectPaint (tile: DataAssetMetadata<Tile>) {
-        setTerrainPaint(tile.data);
+    function selectPaint (paint: DataAssetMetadata<Tile | TileComposite>) {
+        setTerrainPaint(paint.data);
     }
 }
 
@@ -134,11 +186,90 @@ function _TileButton ({
         <Tooltip label={tile.data.name}>
             <div className={classStr} onClick={() => onClick()}>
                 <TileImage
-                    key={tile.baseName}
-                    tile={tile.data}
                     pack={pack}
+                    tile={tile.data}
                     bordered
                 />
+            </div>
+        </Tooltip>
+    );
+}
+
+interface _RectangleCompositeButtonProps {
+    pack: ResourcePack;
+    composite: RectangleTileComposite;
+    selected: boolean;
+    onClick: () => void;
+}
+
+function _RectangleCompositeButton ({
+    pack,
+    composite,
+    selected,
+    onClick,
+}: _RectangleCompositeButtonProps) {
+    const classStr = getClassString(
+        "composite-button",
+        "rectangle-composite-button",
+        "sp-gallery-selectable-item",
+        selected && "selected",
+    );
+
+    const topLeftTile = pack.tilesById[composite.tiles.topLeft];
+    const topTile = pack.tilesById[composite.tiles.top];
+    const topRightTile = pack.tilesById[composite.tiles.topRight];
+    const leftTile = pack.tilesById[composite.tiles.left];
+    const centerTile = pack.tilesById[composite.tiles.center];
+    const rightTile = pack.tilesById[composite.tiles.right];
+    const bottomLeftTile = pack.tilesById[composite.tiles.bottomLeft];
+    const bottomTile = pack.tilesById[composite.tiles.bottom];
+    const bottomRightTile = pack.tilesById[composite.tiles.bottomRight];
+
+    return (
+        <Tooltip label={composite.name}>
+            <div className={classStr} onClick={() => onClick()}>
+                <div className="tile-row">
+                    <TileImage
+                        pack={pack}
+                        tile={topLeftTile.data}
+                    />
+                    <TileImage
+                        pack={pack}
+                        tile={topTile.data}
+                    />
+                    <TileImage
+                        pack={pack}
+                        tile={topRightTile.data}
+                    />
+                </div>
+                <div className="tile-row">
+                    <TileImage
+                        pack={pack}
+                        tile={leftTile.data}
+                    />
+                    <TileImage
+                        pack={pack}
+                        tile={centerTile.data}
+                    />
+                    <TileImage
+                        pack={pack}
+                        tile={rightTile.data}
+                    />
+                </div>
+                <div className="tile-row">
+                    <TileImage
+                        pack={pack}
+                        tile={bottomLeftTile.data}
+                    />
+                    <TileImage
+                        pack={pack}
+                        tile={bottomTile.data}
+                    />
+                    <TileImage
+                        pack={pack}
+                        tile={bottomRightTile.data}
+                    />
+                </div>
             </div>
         </Tooltip>
     );

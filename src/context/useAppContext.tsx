@@ -106,6 +106,7 @@ const AppContextProvider = ({ children }: any) => {
         for (const rp of resPacks) {
             rp.entitiesById = {};
             rp.tilesById = {};
+            rp.tileCompositesById = {};
 
             for (const e of rp.entities) {
                 rp.entitiesById[e.id] = e;
@@ -113,6 +114,10 @@ const AppContextProvider = ({ children }: any) => {
 
             for (const t of rp.tiles) {
                 rp.tilesById[t.id] = t;
+            }
+
+            for (const tc of rp.tileComposites) {
+                rp.tileCompositesById[tc.id] = tc;
             }
         }
 

@@ -1,5 +1,6 @@
 import { Entity } from "./Entity";
 import { Tile } from "./Tile";
+import { TileComposite } from "./TileComposite";
 import { Version } from "./sp_documents";
 
 export interface ResourcePack {
@@ -20,9 +21,11 @@ export interface ResourcePack {
         ui: MediaAssetMetadata[];
     };
     tiles: DataAssetMetadata<Tile>[];
+    tileComposites: DataAssetMetadata<TileComposite>[];
     // calculated automatically
     entitiesById: {[key: string]: DataAssetMetadata<Entity>};
     tilesById: {[key: string]: DataAssetMetadata<Tile>};
+    tileCompositesById: {[key: string]: DataAssetMetadata<TileComposite>};
 }
 
 export interface ResourcePackManifest {

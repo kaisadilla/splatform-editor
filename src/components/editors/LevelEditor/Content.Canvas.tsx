@@ -66,7 +66,7 @@ function LevelEditor_Content_Canvas ({
 
     const classStr = getClassString(
         "level-grid-canvas",
-        className,
+        "tool-" + levelCtx.terrainTool,
     );
 
     return (
@@ -81,7 +81,7 @@ function LevelEditor_Content_Canvas ({
                 //scrollbars='xy'
                 //type='auto'
             >
-                <div className="level-grid-canvas">
+                <div className={classStr}>
                     <div className="ruler-edge">
                         
                     </div>

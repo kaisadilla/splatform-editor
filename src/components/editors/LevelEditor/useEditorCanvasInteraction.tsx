@@ -1,12 +1,13 @@
 import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { Level, LevelSpawn, PlacedTile, TileLayer, getNewLevelEntity, getNewLevelTile } from "models/Level";
-import { ResourcePack } from "models/ResourcePack";
+import { DataAssetMetadata, ResourcePack } from "models/ResourcePack";
 import { Rect, Vec2, isVec2WithinRect, vec2equals, vec2toString } from "utils";
 import { removePositionsFromTileList } from "./calculations";
 import { Tile } from "models/Tile";
 import { LevelChangeFieldHandler } from ".";
 import { Entity } from "models/Entity";
 import { useState } from "react";
+import { RectangleTileComposite } from "models/TileComposite";
 
 type _PointerDownEvt = React.PointerEvent<HTMLCanvasElement>;
 type _PointerMoveEvt = React.PointerEvent<HTMLCanvasElement>;
@@ -335,6 +336,55 @@ export default function useEditorCanvasInteraction (
             }
 
             setCurrentStroke(placedTiles);
+
+            return;
+        }
+
+        // tile composite
+        if (levelCtx.terrainPaint.compositeType === 'rectangle') {
+            const comp = levelCtx.terrainPaint as RectangleTileComposite;
+
+            const topLeft = pack.tilesById[comp.tiles.topLeft];
+            const top = pack.tilesById[comp.tiles.top];
+            const topRight = pack.tilesById[comp.tiles.topRight];
+            const left = pack.tilesById[comp.tiles.left];
+            const center = pack.tilesById[comp.tiles.center];
+            const right = pack.tilesById[comp.tiles.right];
+            const bottomLeft = pack.tilesById[comp.tiles.bottomLeft];
+            const bottom = pack.tilesById[comp.tiles.bottom];
+            const bottomRight = pack.tilesById[comp.tiles.bottomRight];
+
+            const placedTiles = [] as PlacedTile[];
+
+            let selectedTile: DataAssetMetadata<Tile>;
+            for (let x = xMin; x <= xMax; x++) {
+
+                for (let y = yMin; y <= yMax; y++) {
+                    if (y === yMin) {
+                        if (x === xMin) selectedTile = topLeft;
+                        else if (x === xMax) selectedTile = topRight;
+                        else selectedTile = top;
+                    }
+                    else if (y === yMax) {
+                        if (x === xMin) selectedTile = bottomLeft;
+                        else if (x === xMax) selectedTile = bottomRight;
+                        else selectedTile = bottom;
+                    }
+                    else {
+                        if (x === xMin) selectedTile = left;
+                        else if (x === xMax) selectedTile = right;
+                        else selectedTile = center;
+                    }
+
+
+                    placedTiles.push(
+                        createLevelTile({x, y}, selectedTile.data)
+                    );
+                }
+            }
+
+            setCurrentStroke(placedTiles);
+            return;
         }
     }
 

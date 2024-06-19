@@ -245,7 +245,16 @@ const LevelEditorContextProvider = ({ children }: any) => {
                 selectableTools.push('select', 'eraser', 'picker');
     
                 if (state.terrainPaint !== null) {
-                    selectableTools.push('brush', 'rectangle', 'bucket');
+                    selectableTools.push('rectangle');
+
+                    if (state.terrainPaint.type === 'tile') {
+                        selectableTools.push('brush', 'bucket');
+                    }
+                    else if (state.terrainPaint.type === 'tile_composite') {
+                        if (state.terrainPaint.compositeType === 'free_form') {
+                            selectableTools.push('brush');
+                        }
+                    }
                 }
             }
             else if (state.activeSection === 'spawns') {
