@@ -4,7 +4,7 @@ import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import TileImage from 'elements/TileImage';
 import { DataAssetMetadata, ResourcePack } from 'models/ResourcePack';
 import { Tile } from 'models/Tile';
-import { RectangleTileComposite, TileComposite } from 'models/TileComposite';
+import { RectangleTileComposite, TileComposite, UnitTileComposite } from 'models/TileComposite';
 import React from 'react';
 import { getClassString } from 'utils';
 
@@ -37,6 +37,9 @@ function LevelEditor_TilePalette ({
     const rectangleComps = pack.tileComposites.filter(
         t => t.data.compositeType === 'rectangle'
     ) as DataAssetMetadata<RectangleTileComposite>[];
+    const unitComps = pack.tileComposites.filter(
+        t => t.data.compositeType === 'unit'
+    ) as DataAssetMetadata<UnitTileComposite>[];
 
     return (<Tabs
         defaultValue='tiles'
@@ -128,7 +131,7 @@ function LevelEditor_TilePalette ({
                         content: "palette-panel-content"
                     }}
                     multiple
-                    defaultValue={["free_form", "rectangle", "line"]}
+                    defaultValue={["free_form", "rectangle", "line", "unit"]}
                 >
 
                     <Accordion.Item
@@ -146,6 +149,26 @@ function LevelEditor_TilePalette ({
                                     terrainPaint !== null
                                     && terrainPaint.type === 'tile_composite'
                                     && terrainPaint?.id === tc.id
+                                }
+                                onClick={() => selectPaint(tc)}
+                            />)}
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                    <Accordion.Item
+                        value="unit"
+                    >
+                        <Accordion.Control>
+                            Units
+                        </Accordion.Control>
+                        <Accordion.Panel>
+                            {unitComps.map(tc => <_UnitCompositeButton
+                                key={tc.id}
+                                pack={pack}
+                                composite={tc.data}
+                                selected={
+                                    terrainPaint !== null
+                                    && terrainPaint.type === 'tile_composite'
+                                    && terrainPaint?.id === tc.data.id
                                 }
                                 onClick={() => selectPaint(tc)}
                             />)}
@@ -215,15 +238,16 @@ function _RectangleCompositeButton ({
         selected && "selected",
     );
 
-    const topLeftTile = pack.tilesById[composite.tiles.topLeft];
-    const topTile = pack.tilesById[composite.tiles.top];
-    const topRightTile = pack.tilesById[composite.tiles.topRight];
-    const leftTile = pack.tilesById[composite.tiles.left];
-    const centerTile = pack.tilesById[composite.tiles.center];
-    const rightTile = pack.tilesById[composite.tiles.right];
-    const bottomLeftTile = pack.tilesById[composite.tiles.bottomLeft];
-    const bottomTile = pack.tilesById[composite.tiles.bottom];
-    const bottomRightTile = pack.tilesById[composite.tiles.bottomRight];
+    const defTile = pack.tilesById[composite.tiles.default];
+    const topLeftTile = pack.tilesById[composite.tiles.topLeft!] ?? defTile;
+    const topTile = pack.tilesById[composite.tiles.top!] ?? defTile;
+    const topRightTile = pack.tilesById[composite.tiles.topRight!] ?? defTile;
+    const leftTile = pack.tilesById[composite.tiles.left!] ?? defTile;
+    const centerTile = pack.tilesById[composite.tiles.center!] ?? defTile;
+    const rightTile = pack.tilesById[composite.tiles.right!] ?? defTile;
+    const bottomLeftTile = pack.tilesById[composite.tiles.bottomLeft!] ?? defTile;
+    const bottomTile = pack.tilesById[composite.tiles.bottom!] ?? defTile;
+    const bottomRightTile = pack.tilesById[composite.tiles.bottomRight!] ?? defTile;
 
     return (
         <Tooltip label={composite.name}>
@@ -275,5 +299,44 @@ function _RectangleCompositeButton ({
     );
 }
 
+interface _UnitCompositeButtonProps {
+    pack: ResourcePack;
+    composite: UnitTileComposite;
+    selected: boolean;
+    onClick: () => void;
+}
+
+function _UnitCompositeButton ({
+    pack,
+    composite,
+    selected,
+    onClick,
+}: _UnitCompositeButtonProps) {
+    const classStr = getClassString(
+        "composite-button",
+        "unit-composite-button",
+        "sp-gallery-selectable-item",
+        selected && "selected",
+    );
+
+    return (
+        <Tooltip label={composite.name}>
+            <div className={classStr} onClick={() => onClick()}>
+                {composite.shape.map((rowArr, x) => <div
+                    key={x}
+                    className="tile-row"
+                >
+                    {rowArr.map((t, y) => {
+                        return <TileImage
+                            key={y}
+                            pack={pack}
+                            tile={t}
+                        />
+                    })}
+                </div>)}
+            </div>
+        </Tooltip>
+    );
+}
 
 export default LevelEditor_TilePalette;

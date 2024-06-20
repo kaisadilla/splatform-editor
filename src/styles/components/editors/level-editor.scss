@@ -85,6 +85,21 @@
                 overflow: hidden;
             }
         }
+
+        &.unit-composite-button {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            padding: 5px;
+
+            .tile-row {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                overflow: hidden;
+            }
+        }
     }
 }
 
@@ -273,8 +288,12 @@
                 left: 16px;
             }
             
-
             &.tool-brush {
+                .canvas-element {
+                    cursor: crosshair !important;
+                }
+            }
+            &.tool-rectangle {
                 .canvas-element {
                     cursor: crosshair !important;
                 }

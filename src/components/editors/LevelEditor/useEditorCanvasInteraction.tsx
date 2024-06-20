@@ -7,7 +7,7 @@ import { Tile } from "models/Tile";
 import { LevelChangeFieldHandler } from ".";
 import { Entity } from "models/Entity";
 import { useState } from "react";
-import { RectangleTileComposite } from "models/TileComposite";
+import { RectangleTileComposite, UnitTileComposite } from "models/TileComposite";
 
 type _PointerDownEvt = React.PointerEvent<HTMLCanvasElement>;
 type _PointerMoveEvt = React.PointerEvent<HTMLCanvasElement>;
@@ -149,7 +149,11 @@ export default function useEditorCanvasInteraction (
                 }
 
                 if (tool === 'brush') {
-                    registerPlaceTileClickAt(...newPoints);
+                    if (levelCtx.terrainPaint === null) return;
+
+                    if (levelCtx.terrainPaint.type === 'tile') {
+                        registerPlaceTileClickAt(...newPoints);
+                    }
                 }
                 else if (tool === 'eraser') {
                     registerRemoveTileClickAt(...newPoints);
@@ -344,15 +348,21 @@ export default function useEditorCanvasInteraction (
         if (levelCtx.terrainPaint.compositeType === 'rectangle') {
             const comp = levelCtx.terrainPaint as RectangleTileComposite;
 
-            const topLeft = pack.tilesById[comp.tiles.topLeft];
-            const top = pack.tilesById[comp.tiles.top];
-            const topRight = pack.tilesById[comp.tiles.topRight];
-            const left = pack.tilesById[comp.tiles.left];
-            const center = pack.tilesById[comp.tiles.center];
-            const right = pack.tilesById[comp.tiles.right];
-            const bottomLeft = pack.tilesById[comp.tiles.bottomLeft];
-            const bottom = pack.tilesById[comp.tiles.bottom];
-            const bottomRight = pack.tilesById[comp.tiles.bottomRight];
+            //if ((xMax - xMin) < comp.minSize[0] - 1 || (yMax - yMin) < comp.minSize[1] - 1) {
+            //    setCurrentStroke([]);
+            //    return;
+            //}
+
+            const defTile = pack.tilesById[comp.tiles.default];
+            const topLeft = pack.tilesById[comp.tiles.topLeft!] ?? defTile;
+            const top = pack.tilesById[comp.tiles.top!] ?? defTile;
+            const topRight = pack.tilesById[comp.tiles.topRight!] ?? defTile;
+            const left = pack.tilesById[comp.tiles.left!] ?? defTile;
+            const center = pack.tilesById[comp.tiles.center!] ?? defTile;
+            const right = pack.tilesById[comp.tiles.right!] ?? defTile;
+            const bottomLeft = pack.tilesById[comp.tiles.bottomLeft!] ?? defTile;
+            const bottom = pack.tilesById[comp.tiles.bottom!] ?? defTile;
+            const bottomRight = pack.tilesById[comp.tiles.bottomRight!] ?? defTile;
 
             const placedTiles = [] as PlacedTile[];
 
@@ -375,7 +385,6 @@ export default function useEditorCanvasInteraction (
                         else if (x === xMax) selectedTile = right;
                         else selectedTile = center;
                     }
-
 
                     placedTiles.push(
                         createLevelTile({x, y}, selectedTile.data)
@@ -589,6 +598,40 @@ export default function useEditorCanvasInteraction (
                     }
     
                     placedTiles.push(createLevelTile(pos, levelCtx.terrainPaint));
+                }
+
+                return [
+                    ...prevState,
+                    ...placedTiles,
+                ]
+            }
+            if (levelCtx.terrainPaint.compositeType === 'unit') {
+                const unitComp = levelCtx.terrainPaint as UnitTileComposite;
+                const placedTiles = [] as PlacedTile[];
+                const pos = positions[positions.length - 1];
+
+                // position of tiles already in the current stroke
+                if (prevState.find(lt => vec2equals(lt.position, pos))) {
+                    return prevState;
+                }
+                // position of tiles that will be added this frame
+                if (placedTiles.find(pt => vec2equals(pt.position, pos))) {
+                    return prevState;
+                }
+
+                for (let y = 0; y < unitComp.shape.length; y++) {
+                    for (let x = 0; x < unitComp.shape[y].length; x++) {
+                        const tileId = unitComp.shape[y][x];
+                        if (!tileId) continue;
+
+                        const tile = pack.tilesById[tileId];
+                        if (!tile) continue;
+
+                        placedTiles.push(createLevelTile(
+                            {x: pos.x + x, y: pos.y + y},
+                            tile.data
+                        ));
+                    }
                 }
 
                 return [

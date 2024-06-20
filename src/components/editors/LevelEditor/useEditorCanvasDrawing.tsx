@@ -10,6 +10,7 @@ import { ResourcePack } from "models/ResourcePack";
 import { BaseTexture, Rectangle, SCALE_MODES, Texture, Graphics as PixiGraphics, ColorMatrixFilter, RenderTexture } from "pixi.js";
 import { useMemo } from "react";
 import { Rect, Vec2, vec2equals, vec2toString } from "utils";
+import { RectangleTileComposite, UnitTileComposite } from "models/TileComposite";
 
 /**
  * The amount of pixels per unit in a level.
@@ -404,19 +405,55 @@ export default function useEditorCanvasDrawing (
             return <></>;
         }
 
-        const tex = tileTextures[levelCtx.terrainPaint.id];
-        if (tex === null) return <></>;
-    
-        const sprites = (<Sprite
-            x={canvasPos.x}
-            y={canvasPos.y}
-            texture={tex}
-            alpha={0.8}
-            scale={zoom}
-            filters={[ETHEREAL_FILTER]}
-        />);
+        if (levelCtx.terrainPaint.type === 'tile') {
+            return _tileSprite(levelCtx.terrainPaint.id, canvasPos.x, canvasPos.y);
+        }
+        
+        if (levelCtx.terrainPaint.compositeType === 'rectangle') {
+            const rectComp = levelCtx.terrainPaint as RectangleTileComposite;
+            return _tileSprite(rectComp.tiles.default, canvasPos.x, canvasPos.y);
+        }
+        if (levelCtx.terrainPaint.compositeType === 'unit') {
+            const unitComp = levelCtx.terrainPaint as UnitTileComposite;
+            const sprites = [];
 
-        return sprites;
+            for (let y = 0; y < unitComp.shape.length; y++) {
+                for (let x = 0; x < unitComp.shape[y].length; x++) {
+                    const tileId = unitComp.shape[y][x];
+                    if (!tileId) continue;
+
+                    const tile = pack.tilesById[tileId];
+                    if (!tile) continue;
+
+                    sprites.push(_tileSprite(
+                        tile.data.id,
+                        canvasPos.x + (x * cellSizeInCanvas),
+                        canvasPos.y + (y * cellSizeInCanvas)
+                    ));
+                }
+            }
+
+            return sprites;
+        }
+
+        /**
+         * Returns a single tile as the hovering sprite.
+         * @param tileId The id of the tile to show.
+         */
+        function _tileSprite (tileId: string, x: number, y: number) {
+            const tex = tileTextures[tileId];
+            if (!tex) return <></>;
+        
+            return (<Sprite
+                key={`${x},${y}`}
+                x={x}
+                y={y}
+                texture={tex}
+                alpha={0.8}
+                scale={zoom}
+                filters={[ETHEREAL_FILTER]}
+            />);
+        }
     }
 
     function generateHoveringEntityPaint (canvasPos: Vec2, lookLeft: boolean) {

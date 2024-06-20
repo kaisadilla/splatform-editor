@@ -243,17 +243,23 @@ const LevelEditorContextProvider = ({ children }: any) => {
 
             if (state.activeSection === 'terrain') {
                 selectableTools.push('select', 'eraser', 'picker');
-    
-                if (state.terrainPaint !== null) {
-                    selectableTools.push('rectangle');
 
-                    if (state.terrainPaint.type === 'tile') {
-                        selectableTools.push('brush', 'bucket');
+                if (state.terrainPaint === null) {
+                    return selectableTools;
+                }
+
+                if (state.terrainPaint.type === 'tile') {
+                    selectableTools.push('brush', 'rectangle', 'bucket');
+                }
+                else if (state.terrainPaint.type === 'tile_composite') {
+                    if (state.terrainPaint.compositeType === 'free_form') {
+                        selectableTools.push('brush');
                     }
-                    else if (state.terrainPaint.type === 'tile_composite') {
-                        if (state.terrainPaint.compositeType === 'free_form') {
-                            selectableTools.push('brush');
-                        }
+                    else if (state.terrainPaint.compositeType === 'rectangle') {
+                        selectableTools.push('rectangle');
+                    }
+                    else if (state.terrainPaint.compositeType === 'unit') {
+                        selectableTools.push('brush');
                     }
                 }
             }
