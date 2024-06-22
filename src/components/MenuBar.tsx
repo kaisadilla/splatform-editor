@@ -8,7 +8,7 @@ import { useUserContext } from 'context/useUserContext';
 import compileLevel from 'compiler/LevelCompiler';
 import { Level } from 'models/Level';
 import { useDisclosure } from '@mantine/hooks';
-import CreateProjecModal from './CreateProjectModal';
+import CreateProjectModal from './CreateProjectModal';
 
 export interface MenuBarProps {
     
@@ -56,14 +56,6 @@ function MenuBar (props: MenuBarProps) {
                             <span>World</span>
                         </div>),
                         callback: handleNew_world,
-                    },
-                    {
-                        key: "game",
-                        label: (<div className="menu-bar-option-with-icon">
-                            <img src={FileIcons.game} alt="" />
-                            <span>Game</span>
-                        </div>),
-                        callback: handleNew_game,
                     },
                     {
                         key: "resource-pack",
@@ -159,7 +151,8 @@ function MenuBar (props: MenuBarProps) {
                 }}
             />
         </div>
-        <CreateProjecModal
+        <CreateProjectModal
+            key={newProjOpened.toString()}
             opened={newProjOpened}
             onClose={closeNewProj}
             centered

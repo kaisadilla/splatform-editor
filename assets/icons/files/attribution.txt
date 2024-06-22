@@ -1,0 +1,4 @@
+world: https://www.freepik.com/icon/map_979557
+project: https://www.freepik.com/icon/platformer_6694987
+resource_pack: https://www.freepik.com/icon/box_4704652
+turtle: https://www.freepik.com/icon/turtle_616651

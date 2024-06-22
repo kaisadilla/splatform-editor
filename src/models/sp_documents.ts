@@ -1,17 +1,18 @@
-import { ResourcePack, ResourcePackManifest } from "./ResourcePack";
-import { Entity, EntityFile } from "./Entity";
-import { Tile, TileFile } from "./Tile";
-import { World } from "./World";
-import { Game } from "./Game";
+import { EntityFile } from "./Entity";
 import { Level } from "./Level";
+import { Project, ProjectManifest } from "./Project";
+import { ResourcePack, ResourcePackManifest } from "./ResourcePack";
+import { Tile, TileFile } from "./Tile";
 import { TileComposite } from "./TileComposite";
+import { World } from "./World";
 
 export type SPDocumentType =
     'level'
     | 'world'
-    | 'game'
+    | 'project'
+    | 'project_manifest'
     | 'resource_pack'
-    | 'manifest'
+    | 'resource_pack_manifest'
     | 'entity'
     | 'tile'
 ;
@@ -19,15 +20,19 @@ export type SPDocumentType =
 export type SPDocumentContent =
     Level
     | World
-    | Game
+    | Project
+    | ProjectManifest
     | ResourcePack
     | ResourcePackManifest
     | EntityFile
     | TileFile
 ;
 
+export type SPFolderContent = Project | ResourcePack;
+
 export interface SPDocument {
     id: string;
+    displayName?: string;
     baseName?: string;
     fileName?: string;
     fullPath?: string;

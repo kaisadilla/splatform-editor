@@ -33,7 +33,7 @@ export interface LevelEditorProps {
 }
 
 function LevelEditor ({
-    doc
+    doc,
 }: LevelEditorProps) {
     const { getResourcePack } = useAppContext();
     const { activeTab, updateDocument } = useUserContext();

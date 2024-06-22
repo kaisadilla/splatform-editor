@@ -1,11 +1,11 @@
 import { FileInfo } from "main/files/documentFiles";
 import Ipc from "main/ipc/ipcRenderer";
 import { getNewEntity } from "models/Entity";
-import { getNewGame } from "models/Game";
+import { Project, getNewProjectManifest } from "models/Project";
 import { getNewLevel } from "models/Level";
 import { getNewTile } from "models/Tile";
 import { getNewWorld } from "models/World";
-import { SPBinaryType, SPDocument, SPDocumentContent, SPDocumentType } from "models/sp_documents";
+import { SPBinaryType, SPDocument, SPDocumentContent, SPDocumentType, SPFolderContent } from "models/sp_documents";
 import { createContext, useContext, useMemo, useState } from "react";
 import { deleteArrayItemAt } from "utils";
 
@@ -15,6 +15,12 @@ interface UserContextState {
     getActiveDocument: () => SPDocument;
     setActiveTab: (id: string) => void;
     updateDocument: (docId: string, content: SPDocumentContent) => void;
+    createNewProject: (
+        directory: string,
+        folderName: string,
+        displayName: string,
+        resourcePack: string
+    ) => Promise<SPDocument | null>;
     createNewLevel: () => SPDocument;
     createNewWorld: () => SPDocument;
     createNewGame: () => SPDocument;
@@ -76,6 +82,26 @@ const UserContextProvider = ({ children }: any) => {
             }));
         }
 
+        async function createNewProject (
+            directory: string,
+            folderName: string,
+            displayName: string,
+            resourcePack: string
+        ) : Promise<SPDocument | null> {
+            const project = await Ipc.createNewProject(
+                directory + "/" + folderName,
+                displayName,
+                resourcePack
+            );
+    
+            if (project === null) {
+                console.error("Error while creating project.");
+                return null;
+            }
+
+            return _openFolderDocument(project);
+        }
+
         function createNewLevel () : SPDocument {
             const level = getNewLevel();
             return _createNewDocument(level);
@@ -83,10 +109,6 @@ const UserContextProvider = ({ children }: any) => {
         function createNewWorld () : SPDocument {
             const world = getNewWorld();
             return _createNewDocument(world);
-        }
-        function createNewGame () : SPDocument {
-            const game = getNewGame();
-            return _createNewDocument(game);
         }
         function createNewEntity () : SPDocument {
             const entity = getNewEntity();
@@ -141,9 +163,9 @@ const UserContextProvider = ({ children }: any) => {
             getActiveDocument,
             setActiveTab,
             updateDocument,
+            createNewProject,
             createNewLevel,
             createNewWorld,
-            createNewGame,
             createNewEntity,
             createNewTile,
             openDocument,
@@ -179,7 +201,6 @@ const UserContextProvider = ({ children }: any) => {
 
         return doc;
     }
-
     function _getNextDocumentIndex () : number {
         const index = internal.nextDocumentIndex;
 
@@ -269,18 +290,46 @@ const UserContextProvider = ({ children }: any) => {
 
         if (fileInfo === null) return null;
 
-        const docContent: SPDocumentContent = JSON.parse(fileInfo.content);
+        const content: SPDocumentContent = JSON.parse(fileInfo.content);
 
-        if (!docContent) return null;
-        
+        if (!content) return null;
+
+        return _openFileDocument(fileInfo, content);
+    }
+
+    function _openFileDocument (
+        fileInfo: FileInfo<string>, content: SPDocumentContent
+    ) {
         const doc: SPDocument = {
             id: fileInfo.fullPath,
             baseName: fileInfo.baseName,
             fileName: fileInfo.fileName,
             fullPath: fileInfo.fullPath,
-            content: docContent,
+            content: content,
             hasUnsavedChanges: false,
         };
+
+        _openFileInEditor(doc);
+
+        return doc;
+    }
+
+    function _openFolderDocument (content: SPFolderContent) {
+        const doc: SPDocument = {
+            id: content.fullPath,
+            displayName: content.manifest.displayName,
+            baseName: content.folderName,
+            fullPath: content.fullPath,
+            content: content,
+            hasUnsavedChanges: false,
+        }
+
+        _openFileInEditor(doc);
+
+        return doc;
+    }
+
+    function _openFileInEditor (doc: SPDocument) {
         // try to find the newly opened document within the array of
         // documents that are already opened.
         const currentDoc = state.documents.find(d => d.fullPath === doc.fullPath);
@@ -306,8 +355,6 @@ const UserContextProvider = ({ children }: any) => {
                 activeTab: doc.id,
             }));
         }
-
-        return doc;
     }
 
     /**

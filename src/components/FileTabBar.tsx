@@ -24,7 +24,7 @@ function FileTabBar ({}: FileTabBarProps) {
     for (const doc of userCtx.documents) {
         files.push({
             id: doc.id,
-            displayName: (doc.baseName ?? doc.id) + (doc.hasUnsavedChanges ? "*" : ""),
+            displayName: (doc.displayName ?? doc.baseName ?? doc.id) + (doc.hasUnsavedChanges ? "*" : ""),
             icon: _getFileIcon(doc.content.type),
         });
     }
@@ -77,7 +77,7 @@ function FileTabBar ({}: FileTabBarProps) {
 function _getFileIcon (fileType: SPDocumentType) {
     if (fileType === 'level') return FileIcons.level;
     if (fileType === 'world') return FileIcons.world;
-    if (fileType === 'game') return FileIcons.game;
+    if (fileType === 'project') return FileIcons.project;
     if (fileType === 'resource_pack') return FileIcons.manifest;
     if (fileType === 'entity') return FileIcons.entity;
     if (fileType === 'tile') return FileIcons.tile;

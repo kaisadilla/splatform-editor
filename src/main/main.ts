@@ -97,6 +97,7 @@ const createWindow = async () => {
             contextIsolation: false,
             nodeIntegration: true,
             webSecurity: process.env.isProduction !== undefined,
+            spellcheck: false,
         },
         // TODO: custom title bar
         titleBarStyle: "hidden",

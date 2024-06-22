@@ -1,5 +1,4 @@
-import { MONTHS } from "_constants";
-import { saveAs } from "file-saver";
+import { MONTHS } from "./_constants";
 
 export const LOCALE = "en-US";
 
@@ -452,4 +451,8 @@ export function getCssVariableValue (variable: string) {
 export function isVec2WithinRect (vec: Vec2, rect: Rect) {
     return vec.x >= rect.left && vec.x <= rect.left + rect.width
         && vec.y >= rect.top && vec.y <= rect.top + rect.height
+}
+
+export function removeNonAscii (str: string) {
+    return str.replace(/[^\x20-\x7E]/g, "");
 }

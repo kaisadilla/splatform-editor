@@ -4,6 +4,9 @@ import fs from "fs";
 import Path from "path";
 import { SPBinaryType, SPDocumentType } from "models/sp_documents";
 import { MediaAssetMetadata } from "models/ResourcePack";
+import { Project, getNewProjectManifest } from "../../models/Project";
+import EXTENSIONS from "../../file-extensions";
+import { serializeObject } from "../../models/jsonOps";
 
 let parentWindow: BrowserWindow | null = null;
 
@@ -152,12 +155,13 @@ export function saveNewDocument (
             }
         ]);
     }
-    else if (type == 'game') {
-        filePath = saveNewTextFile("Save game", content, [{
-            name: "SPlatform game",
-            extensions: ["sp-gme", "json"]
-        }]);
-    }
+    // TODO: Remove
+    //else if (type == 'game') {
+    //    filePath = saveNewTextFile("Save game", content, [{
+    //        name: "SPlatform game",
+    //        extensions: ["sp-gme", "json"]
+    //    }]);
+    //}
     else if (type == 'entity') {
         filePath = saveNewTextFile("Save entity", content, [{
             name: "SPlatform entity",
@@ -262,4 +266,44 @@ export function saveNewBinary (
         extension: path.ext,
         fullPath: filePath
     };
+}
+
+export function createNewProject (
+    fullPath: string, name: string, pack: string
+) : Project | null {
+    if (fs.existsSync(fullPath)) {
+        console.error(
+            `Path '${fullPath}' already exists. Cannot create a project here.`
+        );
+        return null;
+    }
+
+    fs.mkdirSync(fullPath, {
+        recursive: true,
+    });
+
+    fs.mkdirSync(fullPath + "/levels");
+    fs.mkdirSync(fullPath + "/worlds");
+
+    const manifest = getNewProjectManifest(name, pack);
+    const manifestJson = serializeObject(manifest);
+    const manifestPath = fullPath + "/manifest." + EXTENSIONS.project;
+
+    saveDocument(manifestPath, manifestJson);
+
+    const path = Path.parse(fullPath);
+
+    return {
+        type: 'project',
+        folderName: path.base,
+        fullPath: fullPath,
+        manifestPath: manifestPath,
+        manifest: manifest,
+        levels: [],
+        worlds: [],
+    };
+}
+
+export function directoryExists (path: string) : boolean {
+    return fs.existsSync(path);
 }

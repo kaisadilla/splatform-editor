@@ -1,7 +1,8 @@
 import { MediaAssetMetadata, ResourcePack } from "models/ResourcePack";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY, HANDLER_OPEN_DIRECTORY } from "./ipcNames";
-import { FileInfo, FolderInfo } from "main/files/documentFiles";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY, HANDLER_OPEN_DIRECTORY, HANDLER_DIRECTORY_EXISTS, HANDLER_CREATE_PROJECT } from "./ipcNames";
+import { FileInfo, FolderInfo, directoryExists } from "main/files/documentFiles";
 import { SPBinaryType, SPDocumentType } from "models/sp_documents";
+import { Project } from "models/Project";
 
 const Ipc = {
     /**
@@ -19,6 +20,10 @@ const Ipc = {
 
     async loadResourcePacks () : Promise<ResourcePack[]> {
         return await getIpcRenderer().invoke(HANDLER_LOAD_RESOURCE_PACKS);
+    },
+
+    async directoryExists (path: string) : Promise<boolean> {
+        return await getIpcRenderer().invoke(HANDLER_DIRECTORY_EXISTS, path);
     },
 
     async openTextFile (title: string, filters: Electron.FileFilter[])
@@ -65,6 +70,25 @@ const Ipc = {
     ) : Promise<MediaAssetMetadata | null> {
         return await getIpcRenderer().invoke(HANDLER_SAVE_NEW_DOCUMENT, {
             type, content,
+        });
+    },
+
+    /**
+     * Creates a new project at the path given.
+     * @param fullPath The path in which to create all project files. Note that
+     * this path is the root folder of the project (i.e. where project files are
+     * placed)
+     * @param displayName The name of the project.
+     * @param resourcePack The resource pack used for this project.
+     * @returns A project, or null if the operation failed.
+     */
+    async createNewProject (
+        fullPath: string, displayName: string, resourcePack: string
+    ) : Promise<Project | null> {
+        return await getIpcRenderer().invoke(HANDLER_CREATE_PROJECT, {
+            fullPath: fullPath,
+            name: displayName,
+            pack: resourcePack,
         });
     },
 

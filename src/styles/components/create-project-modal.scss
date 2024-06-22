@@ -1,5 +1,12 @@
 .sp-new-project-root {
     .sp-new-project-body {
-        padding: 8px;
+        @include vertical-queue-stretch;
+
+        .modal-content {
+            @include vertical-list-stretch;
+            flex: 1;
+            padding: 16px;
+            gap: 8px;
+        }
     }
 }

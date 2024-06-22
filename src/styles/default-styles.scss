@@ -50,6 +50,11 @@
         .sp-tab-ribbon-tab-label {
             @include horizontal-queue;
             gap: 6px;
+
+            > img {
+                max-width: 16px;
+                max-height: 16px;
+            }
         }
     }
 

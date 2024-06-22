@@ -29,7 +29,7 @@ export interface ResourcePack {
 }
 
 export interface ResourcePackManifest {
-    type: 'manifest';
+    type: 'resource_pack_manifest';
     displayName: string;
     version: Version;
     settings: ResourcePackManifestSettings;
