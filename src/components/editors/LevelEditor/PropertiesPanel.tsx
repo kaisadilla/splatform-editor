@@ -134,7 +134,7 @@ function _LevelProperties ({
                 size='sm'
                 label="Name"
                 value={level.displayName}
-                onChangePath={evt => onChangeField(
+                onChange={evt => onChangeField(
                     'displayName', evt.currentTarget.value
                 )}
             />

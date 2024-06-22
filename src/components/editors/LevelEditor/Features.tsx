@@ -157,7 +157,7 @@ function _TerrainTab ({
                         >
                             <ActivatableTextInput
                                 value={l.name}
-                                onChangePath={evt => handleRenameLayer(evt, i)}
+                                onChange={evt => handleRenameLayer(evt, i)}
                             />
                         </Tabs.Tab>)}
                         <button
@@ -179,7 +179,7 @@ function _TerrainTab ({
                             <Checkbox
                                 label="Active collisions"
                                 checked={level.layers[i].settings.checksCollisions ?? false}
-                                onChangePath={() => {}}
+                                onChange={() => {}}
                             />
                         </Tooltip>
                     </Tabs.Panel>)}

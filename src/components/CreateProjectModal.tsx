@@ -1,4 +1,4 @@
-import { FileInput, Modal, ModalProps } from '@mantine/core';
+import { FileInput, Modal, ModalProps, TextInput } from '@mantine/core';
 import DirectoryInput from 'elements/DirectoryInput';
 import LocalStorage from 'localStorage';
 import React, { useState } from 'react';
@@ -10,6 +10,8 @@ export interface CreateProjectModalProps extends ModalProps {
 function CreateProjecModal ({
     ...modalProps
 }: CreateProjectModalProps) {
+    const [projectName, setProjectName] = useState("Project 1");
+    const [folderName, setFolderName] = useState("project-1");
     const [parentFolder, setParentFolder] = useState(
         LocalStorage.directories.projects.get()
     );
@@ -28,14 +30,23 @@ function CreateProjecModal ({
             size="60%"
             {...modalProps}
         >
+            <TextInput
+                label="Project name"
+                value={projectName}
+                onChange={handleChangeProjectName}
+            />
             <DirectoryInput
-                label="Parent folder"
+                label="Location"
                 description="The directory in which to place this project's folder."
                 value={parentFolder}
                 onSelectPath={handleChangeParentFolder}
             />
         </Modal>
     );
+
+    function handleChangeProjectName (v: React.ChangeEvent<HTMLInputElement>) {
+        
+    }
 
     function handleChangeParentFolder (v: string | null) {
         if (v === null) return;
