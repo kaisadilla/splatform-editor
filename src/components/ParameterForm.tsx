@@ -281,7 +281,7 @@ function _BooleanProperty ({
                 label={param.displayName}
                 description={param.description}
                 checked={value}
-                onChange={evt => onChange(evt.currentTarget.checked)}
+                onChangePath={evt => onChange(evt.currentTarget.checked)}
             />
         </div>
     );
@@ -332,7 +332,7 @@ function _StringProperty ({
                 label={param.displayName}
                 description={param.description}
                 value={value}
-                onChange={evt => onChange(evt.currentTarget.value)}
+                onChangePath={evt => onChange(evt.currentTarget.value)}
             />
         </div>
     );

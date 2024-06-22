@@ -15,8 +15,36 @@ export interface FileInfo<T> {
     content: T;
 }
 
+export interface FolderInfo {
+    folderName: string;
+    fullPath: string;
+    subfolders: string[];
+}
+
 export function setDialogParentWindow (window: BrowserWindow) {
     parentWindow = window;
+}
+
+export async function selectFolder (title: string) : Promise<FolderInfo | null> {
+    const folderPath = dialog.showOpenDialogSync(parentWindow!, {
+        title: title,
+        properties: ['openDirectory'],
+    });
+
+    if (folderPath && folderPath[0]) {
+        const path = Path.parse(folderPath[0]);
+        const subfolders = (await fsAsync.readdir(folderPath[0], {
+            withFileTypes: true,
+        })).filter(e => e.isDirectory()).map(f => f.name);
+
+        return {
+            folderName: path.base,
+            fullPath: folderPath[0],
+            subfolders: subfolders,
+        }
+    }
+
+    return null;
 }
 
 export function openTextFile (
@@ -30,7 +58,7 @@ export function openTextFile (
 
     if (filePath && filePath[0]) {
         const path = Path.parse(filePath[0]);
-        const content =  fs.readFileSync(filePath[0]).toString();
+        const content = fs.readFileSync(filePath[0]).toString();
 
         return {
             fileName: path.name,
@@ -101,16 +129,28 @@ export function saveNewDocument (
     let filePath = null as string | null;
 
     if (type == 'level') {
-        filePath = saveNewTextFile("Save level", content, [{
-            name: "SPlatform level",
-            extensions: ["sp-lev", "json"]
-        }]);
+        filePath = saveNewTextFile("Save level", content, [
+            {
+                name: "SPlatform level",
+                extensions: ["sp-lev"]
+            },
+            {
+                name: "JSON file",
+                extensions: ["json"]
+            }
+        ]);
     }
     else if (type == 'world') {
-        filePath = saveNewTextFile("Save world", content, [{
-            name: "SPlatform world",
-            extensions: ["sp-wld", "json"]
-        }]);
+        filePath = saveNewTextFile("Save world", content, [
+            {
+                name: "SPlatform world",
+                extensions: ["sp-wld"]
+            },
+            {
+                name: "JSON file",
+                extensions: ["json"]
+            }
+        ]);
     }
     else if (type == 'game') {
         filePath = saveNewTextFile("Save game", content, [{

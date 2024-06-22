@@ -7,6 +7,8 @@ import { useAppContext } from 'context/useAppContext';
 import { useUserContext } from 'context/useUserContext';
 import compileLevel from 'compiler/LevelCompiler';
 import { Level } from 'models/Level';
+import { useDisclosure } from '@mantine/hooks';
+import CreateProjecModal from './CreateProjectModal';
 
 export interface MenuBarProps {
     
@@ -16,6 +18,11 @@ function MenuBar (props: MenuBarProps) {
     const { resourcePacks } = useAppContext();
     const userCtx = useUserContext();
 
+    const [newProjOpened, {
+        open: openNewProj,
+        close: closeNewProj,
+    }] = useDisclosure(false);
+
     useEffect(() => {
         console.log(resourcePacks);
     }, [resourcePacks]);
@@ -24,6 +31,11 @@ function MenuBar (props: MenuBarProps) {
         key: "file",
         label: <div className="menu-bar-button">File</div>,
         items: [
+            {
+                key: "new-project",
+                label: "New project",
+                callback: handleNewProject,
+            },
             {
                 key: "new",
                 label: "New",
@@ -111,7 +123,7 @@ function MenuBar (props: MenuBarProps) {
         ]
     };
 
-    return (
+    return (<>
         <div className="menu-bar">
             <NestedDropdown
                 menuItemsData={fileData}
@@ -147,7 +159,18 @@ function MenuBar (props: MenuBarProps) {
                 }}
             />
         </div>
-    );
+        <CreateProjecModal
+            opened={newProjOpened}
+            onClose={closeNewProj}
+            centered
+            closeOnEscape={false}
+            closeOnClickOutside={false}
+        />
+    </>);
+
+    function handleNewProject () {
+        openNewProj();
+    }
 
     function handleNew_level () {
         userCtx.createNewLevel();

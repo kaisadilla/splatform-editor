@@ -1,6 +1,6 @@
 import { MediaAssetMetadata, ResourcePack } from "models/ResourcePack";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY } from "./ipcNames";
-import { FileInfo } from "main/files/documentFiles";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY, HANDLER_OPEN_DIRECTORY } from "./ipcNames";
+import { FileInfo, FolderInfo } from "main/files/documentFiles";
 import { SPBinaryType, SPDocumentType } from "models/sp_documents";
 
 const Ipc = {
@@ -27,6 +27,12 @@ const Ipc = {
         return await getIpcRenderer().invoke(HANDLER_OPEN_TEXT_FILE, {
             title, filters,
         });
+    },
+
+    async openDirectory (title: string)
+        : Promise<FolderInfo | null>
+    {
+        return await getIpcRenderer().invoke(HANDLER_OPEN_DIRECTORY, title);
     },
 
     async saveNewTextFile (

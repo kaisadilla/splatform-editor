@@ -1,14 +1,10 @@
-import { CloseIcon, ScrollArea, Tabs } from '@mantine/core';
-import { NO_DOCUMENT_ID } from '_constants';
+import { Tabs } from '@mantine/core';
 import FilePanelContainer from 'components/FilePanelContainer';
 import FileTabBar from 'components/FileTabBar';
 import TitleBar from 'components/TitleBar';
 import { AppStatus, useAppContext } from 'context/useAppContext';
 import { useUserContext } from 'context/useUserContext';
-import { FileIcons } from 'icons';
-import { SPDocumentType } from 'models/sp_documents';
-import React, { useEffect, useState } from 'react';
-import { MaterialSymbol } from 'react-material-symbols';
+import { useEffect } from 'react';
 
 export interface WindowProps {
     

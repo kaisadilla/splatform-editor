@@ -1,0 +1,27 @@
+.sp-directory-input-root {
+    .sp-directory-input-content {
+        @include horizontal-queue;
+        gap: 8px;
+        padding-top: $mantine-input-wrapper-margin;
+
+        .sp-directory-input-text {
+            flex: 1;
+            flex-shrink: 0;
+            min-width: 80px;
+        }
+
+        .sp-directory-input-button {
+            flex-shrink: 0;
+            color: $color-highlight-text;
+
+            svg {
+                color: $color-highlight-text;
+            }
+
+            .sp-directory-input-label {
+                @include horizontal-queue;
+                gap: 6px;
+            }
+        }
+    }
+}

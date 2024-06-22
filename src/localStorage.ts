@@ -1,4 +1,10 @@
 const LocalStorage = {
+    directories: {
+        projects: {
+            get: () => localStorage.getItem("directories/projects"),
+            set: (v: string) => localStorage.setItem("directories/projects", v),
+        }
+    },
     levelEditor: {
         panels: {
             paletteWidth: {

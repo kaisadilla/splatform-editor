@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowPointer, faChevronDown, faCirclePlay, faCircleQuestion, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faLocationDot, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowPointer, faChevronDown, faCirclePlay, faCircleQuestion, faEraser, faExpand, faEyeDropper, faEyeDropperEmpty, faFillDrip, faFolderOpen, faLocationDot, faPaintbrush, faUpDownLeftRight } from '@fortawesome/free-solid-svg-icons';
 import { MantineProvider, createTheme as createMantineTheme } from '@mantine/core';
 import loader from '@monaco-editor/loader';
 import { Shadows, ThemeProvider, createTheme as createMuiTheme } from '@mui/material';
@@ -97,6 +97,7 @@ function initFontAwesome () {
         faEyeDropper,
         faEyeDropperEmpty,
         faFillDrip,
+        faFolderOpen,
         faLocationDot,
         faPaintbrush,
         faUpDownLeftRight,

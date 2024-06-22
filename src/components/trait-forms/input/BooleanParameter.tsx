@@ -27,7 +27,7 @@ function BooleanParameter ({
                 label={param.displayName}
                 description={param.description}
                 checked={value}
-                onChange={evt => onChange?.(evt.currentTarget.checked)}
+                onChangePath={evt => onChange?.(evt.currentTarget.checked)}
                 disabled={disabled}
             />
         </div>
