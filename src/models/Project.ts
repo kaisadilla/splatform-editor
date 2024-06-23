@@ -1,4 +1,4 @@
-import { MediaAssetMetadata } from "./ResourcePack";
+import { FolderMetadata, FileMetadata } from "./ResourcePack";
 import { Version } from "./sp_documents";
 
 export type ProjectContentType = 'worlds' | 'levels';
@@ -9,8 +9,14 @@ export interface Project {
     fullPath: string;
     manifestPath: string;
     manifest: ProjectManifest;
-    levels: MediaAssetMetadata[];
-    worlds: MediaAssetMetadata[];
+    levels: ProjectFolder;
+    worlds: ProjectFolder;
+}
+
+export interface ProjectFolder {
+    meta: FolderMetadata;
+    files: FileMetadata[];
+    folders: ProjectFolder[];
 }
 
 export interface ProjectManifest {

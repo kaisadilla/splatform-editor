@@ -2,7 +2,7 @@ import { Accordion, Tooltip } from '@mantine/core';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import EntityImage from 'elements/EntityImage';
 import { Entity } from 'models/Entity';
-import { DataAssetMetadata, ResourcePack } from 'models/ResourcePack';
+import { DocumentMetadata, ResourcePack } from 'models/ResourcePack';
 import React from 'react';
 import { getClassString } from 'utils';
 
@@ -21,7 +21,7 @@ function LevelEditor_EntityPalette ({
         </div>;
     }
 
-    const entitiesByGroup = {} as {[category: string]: DataAssetMetadata<Entity>[]};
+    const entitiesByGroup = {} as {[category: string]: DocumentMetadata<Entity>[]};
 
     for (const entity of pack.entities) {
         const group = entity.data.category ?? "null";
@@ -70,7 +70,7 @@ function LevelEditor_EntityPalette ({
 
 interface _EntityButtonProps {
     pack: ResourcePack;
-    entity: DataAssetMetadata<Entity>;
+    entity: DocumentMetadata<Entity>;
     selected: boolean;
     onClick: () => void;
 }

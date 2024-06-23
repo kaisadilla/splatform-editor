@@ -37,6 +37,11 @@ function MenuBar (props: MenuBarProps) {
                 callback: handleNewProject,
             },
             {
+                key: "open-project",
+                label: "Open project",
+                callback: handleOpenProject,
+            },
+            {
                 key: "new",
                 label: "New",
                 delay: 0,
@@ -165,16 +170,16 @@ function MenuBar (props: MenuBarProps) {
         openNewProj();
     }
 
+    function handleOpenProject () {
+        userCtx.openProject();
+    }
+
     function handleNew_level () {
         userCtx.createNewLevel();
     }
 
     function handleNew_world () {
         userCtx.createNewWorld();
-    }
-
-    function handleNew_game () {
-        userCtx.createNewGame();
     }
 
     function handleNew_entity () {

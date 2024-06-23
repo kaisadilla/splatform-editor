@@ -1,6 +1,6 @@
 import { useLevelEditorContext } from "context/useLevelEditorContext";
 import { Level, LevelSpawn, PlacedTile, TileLayer, getNewLevelEntity, getNewLevelTile } from "models/Level";
-import { DataAssetMetadata, ResourcePack } from "models/ResourcePack";
+import { DocumentMetadata, ResourcePack } from "models/ResourcePack";
 import { Rect, Vec2, isVec2WithinRect, vec2equals, vec2toString } from "utils";
 import { removePositionsFromTileList } from "./calculations";
 import { Tile } from "models/Tile";
@@ -366,7 +366,7 @@ export default function useEditorCanvasInteraction (
 
             const placedTiles = [] as PlacedTile[];
 
-            let selectedTile: DataAssetMetadata<Tile>;
+            let selectedTile: DocumentMetadata<Tile>;
             for (let x = xMin; x <= xMax; x++) {
 
                 for (let y = yMin; y <= yMax; y++) {

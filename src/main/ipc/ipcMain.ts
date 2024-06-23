@@ -1,7 +1,7 @@
-import { getWinPath } from "../main-utils";
-import { confirmDocumentClose, createNewProject, directoryExists, openTextFile, saveDocument, saveNewBinary, saveNewDocument, saveNewTextFile, selectFolder } from "../files/documentFiles";
+import { getWinPath } from "../files/fileOps";
+import { confirmDocumentClose, createNewProject, directoryExists, openProject, openTextFile, saveDocument, saveNewBinary, saveNewDocument, saveNewTextFile, selectFolder } from "../files/documentFiles";
 import { getInstalledResourcePacks, getUserdataFolderPath } from "../files/gameData";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY, HANDLER_OPEN_DIRECTORY, HANDLER_DIRECTORY_EXISTS, HANDLER_CREATE_PROJECT } from "./ipcNames";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY, HANDLER_OPEN_DIRECTORY, HANDLER_DIRECTORY_EXISTS, HANDLER_CREATE_PROJECT, HANDLER_OPEN_PROJECT } from "./ipcNames";
 import { SPBinaryType, SPDocumentType } from "models/sp_documents";
 
 export function createIpcHandlers (ipcMain: Electron.IpcMain) {
@@ -31,6 +31,10 @@ export function createIpcHandlers (ipcMain: Electron.IpcMain) {
 
     ipcMain.handle(HANDLER_OPEN_DIRECTORY, async (evt, title: string) => {
         return selectFolder(title);
+    });
+
+    ipcMain.handle(HANDLER_OPEN_PROJECT, async (evt, title: string) => {
+        return openProject(title);
     });
 
     ipcMain.handle(HANDLER_SAVE_NEW_TEXT_FILE, async (evt, args: SaveNewTextFileArgs) => {

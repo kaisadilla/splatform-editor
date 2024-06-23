@@ -1,5 +1,5 @@
-import { MediaAssetMetadata, ResourcePack } from "models/ResourcePack";
-import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY, HANDLER_OPEN_DIRECTORY, HANDLER_DIRECTORY_EXISTS, HANDLER_CREATE_PROJECT } from "./ipcNames";
+import { FileMetadata, ResourcePack } from "models/ResourcePack";
+import { HANDLER_GET_USERDATA_PATH, HANDLER_LOAD_RESOURCE_PACKS, HANDLER_SANITY, HANDLER_SAVE_NEW_TEXT_FILE, HANDLER_OPEN_TEXT_FILE, HANDLER_CLOSE_DOCUMENT, HANDLER_SAVE_NEW_DOCUMENT, HANDLER_SAVE_DOCUMENT, HANDLER_SAVE_BINARY, HANDLER_OPEN_DIRECTORY, HANDLER_DIRECTORY_EXISTS, HANDLER_CREATE_PROJECT, HANDLER_OPEN_PROJECT } from "./ipcNames";
 import { FileInfo, FolderInfo, directoryExists } from "main/files/documentFiles";
 import { SPBinaryType, SPDocumentType } from "models/sp_documents";
 import { Project } from "models/Project";
@@ -34,10 +34,12 @@ const Ipc = {
         });
     },
 
-    async openDirectory (title: string)
-        : Promise<FolderInfo | null>
-    {
+    async openDirectory (title: string) : Promise<FolderInfo | null> {
         return await getIpcRenderer().invoke(HANDLER_OPEN_DIRECTORY, title);
+    },
+
+    async openProject (title: string) : Promise<Project | null> {
+        return await getIpcRenderer().invoke(HANDLER_OPEN_PROJECT, title);
     },
 
     async saveNewTextFile (
@@ -67,7 +69,7 @@ const Ipc = {
 
     async saveNewDocument (
         type: SPDocumentType, content: string,
-    ) : Promise<MediaAssetMetadata | null> {
+    ) : Promise<FileMetadata | null> {
         return await getIpcRenderer().invoke(HANDLER_SAVE_NEW_DOCUMENT, {
             type, content,
         });
@@ -115,7 +117,7 @@ const Ipc = {
     },
 
     async saveNewBinary (type: SPBinaryType, content: Uint8Array)
-        : Promise<MediaAssetMetadata | null>
+        : Promise<FileMetadata | null>
     {
         return await getIpcRenderer().invoke(HANDLER_SAVE_BINARY, {
             type, content,

@@ -1,6 +1,6 @@
 import { Button, InputWrapper, InputWrapperProps, Modal, ScrollArea, Tabs, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { DataAssetMetadata, ResourcePack } from 'models/ResourcePack';
+import { DocumentMetadata, ResourcePack } from 'models/ResourcePack';
 import { ItemReferenceType, ItemReferenceTypeValueArr, LevelObject, ParameterValueCollection, Reference, TileReference } from 'models/splatform';
 import React, { useState } from 'react';
 import TileImage from './TileImage';
@@ -301,7 +301,7 @@ function _TilePicker ({
 
 interface _TileIconProps {
     pack: ResourcePack;
-    tile: DataAssetMetadata<Tile>
+    tile: DocumentMetadata<Tile>
     selected: boolean;
     onSelect: () => void;
     onSubmit: () => void;

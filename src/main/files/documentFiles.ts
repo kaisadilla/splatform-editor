@@ -3,10 +3,11 @@ import fsAsync from "fs/promises";
 import fs from "fs";
 import Path from "path";
 import { SPBinaryType, SPDocumentType } from "models/sp_documents";
-import { MediaAssetMetadata } from "models/ResourcePack";
-import { Project, getNewProjectManifest } from "../../models/Project";
+import { FileMetadata, FolderMetadata } from "models/ResourcePack";
+import { Project, ProjectFolder, ProjectManifest, getNewProjectManifest } from "../../models/Project";
 import EXTENSIONS from "../../file-extensions";
 import { serializeObject } from "../../models/jsonOps";
+import { scandirForFileType, scandirForFolders } from "./fileOps";
 
 let parentWindow: BrowserWindow | null = null;
 
@@ -128,7 +129,7 @@ export function saveDocument (fullPath: string, content: string) {
 export function saveNewDocument (
     type: SPDocumentType,
     content: string,
-) : MediaAssetMetadata | null {
+) : FileMetadata | null {
     let filePath = null as string | null;
 
     if (type == 'level') {
@@ -236,7 +237,7 @@ export function confirmDocumentClose (
 export function saveNewBinary (
     type: SPBinaryType,
     content: Uint8Array,
-) : MediaAssetMetadata | null {
+) : FileMetadata | null {
     let filePath = null as string | null;
 
     if (type == 'level') {
@@ -299,11 +300,87 @@ export function createNewProject (
         fullPath: fullPath,
         manifestPath: manifestPath,
         manifest: manifest,
-        levels: [],
-        worlds: [],
+        levels: {
+            meta: {
+                id: "levels",
+                name: "levels",
+                fullPath: fullPath + "/levels",
+            },
+            files: [],
+            folders: [],
+        },
+        worlds: {
+            meta: {
+                id: "worlds",
+                name: "worlds",
+                fullPath: fullPath + "/worlds",
+            },
+            files: [],
+            folders: [],
+        },
+    };
+}
+
+export async function openProject (title: string) : Promise<Project | null> {
+    const filePath = dialog.showOpenDialogSync(parentWindow!, {
+        title: title,
+        filters: [{
+            name: "SPlatform project manifest",
+            extensions: [EXTENSIONS.project],
+        }],
+    });
+
+    if (!filePath || !filePath[0]) return null;
+    
+    const path = Path.parse(filePath[0]);
+    const json = fs.readFileSync(filePath[0]).toString();
+    const manifest = JSON.parse(json) as ProjectManifest;
+    const folderPath = Path.parse(path.dir);
+
+    const levelsMeta = {
+        id: "levels",
+        name: "levels",
+        fullPath: path.dir + "/levels",
+    };
+    const worldsMeta = {
+        id: "levels",
+        name: "levels",
+        fullPath: path.dir + "/worlds",
+    };
+
+    const levels = await _readProjectFolder(levelsMeta, "." + EXTENSIONS.level);
+    const worlds = await _readProjectFolder(worldsMeta, "." + EXTENSIONS.world);
+
+    return {
+        type: 'project',
+        folderName: folderPath.base,
+        fullPath: path.dir,
+        manifestPath: filePath[0],
+        manifest: manifest,
+        levels: levels,
+        worlds: worlds,
     };
 }
 
 export function directoryExists (path: string) : boolean {
     return fs.existsSync(path);
+}
+
+async function _readProjectFolder (
+    meta: FolderMetadata, targetExtension: string
+) : Promise<ProjectFolder> {
+    const files = await scandirForFileType(meta.fullPath, targetExtension);
+    const folderMetas = await scandirForFolders(meta.fullPath);
+
+    const folders = [] as ProjectFolder[];
+    for (const fmeta of folderMetas) {
+        const folder = await _readProjectFolder(fmeta, targetExtension);
+        folders.push(folder);
+    }
+
+    return {
+        meta: meta,
+        files: files,
+        folders: folders,
+    }
 }

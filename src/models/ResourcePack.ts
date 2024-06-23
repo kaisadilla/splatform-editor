@@ -10,22 +10,22 @@ export interface ResourcePack {
     relativePath: string;
     manifestPath: string;
     manifest: ResourcePackManifest;
-    backgrounds: MediaAssetMetadata[];
-    entities: DataAssetMetadata<Entity>[];
-    music: MediaAssetMetadata[];
-    sound: MediaAssetMetadata[];
+    backgrounds: FileMetadata[];
+    entities: DocumentMetadata<Entity>[];
+    music: FileMetadata[];
+    sound: FileMetadata[];
     sprites: {
-        entities: MediaAssetMetadata[];
-        particles: MediaAssetMetadata[];
-        tiles: MediaAssetMetadata[];
-        ui: MediaAssetMetadata[];
+        entities: FileMetadata[];
+        particles: FileMetadata[];
+        tiles: FileMetadata[];
+        ui: FileMetadata[];
     };
-    tiles: DataAssetMetadata<Tile>[];
-    tileComposites: DataAssetMetadata<TileComposite>[];
+    tiles: DocumentMetadata<Tile>[];
+    tileComposites: DocumentMetadata<TileComposite>[];
     // calculated automatically
-    entitiesById: {[key: string]: DataAssetMetadata<Entity>};
-    tilesById: {[key: string]: DataAssetMetadata<Tile>};
-    tileCompositesById: {[key: string]: DataAssetMetadata<TileComposite>};
+    entitiesById: {[key: string]: DocumentMetadata<Entity>};
+    tilesById: {[key: string]: DocumentMetadata<Tile>};
+    tileCompositesById: {[key: string]: DocumentMetadata<TileComposite>};
 }
 
 export interface ResourcePackManifest {
@@ -39,7 +39,13 @@ export interface ResourcePackManifestSettings {
     
 }
 
-export interface MediaAssetMetadata {
+export interface FolderMetadata {
+    id: string;
+    name: string;
+    fullPath: string;
+}
+
+export interface FileMetadata {
     id: string;
     baseName: string;
     fileName: string;
@@ -47,7 +53,7 @@ export interface MediaAssetMetadata {
     fullPath: string;
 }
 
-export interface DataAssetMetadata<T> {
+export interface DocumentMetadata<T> {
     id: string;
     baseName: string;
     fileName: string;

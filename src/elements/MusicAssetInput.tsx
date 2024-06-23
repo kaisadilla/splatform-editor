@@ -1,7 +1,7 @@
 import { Button, InputProps, InputWrapper, InputWrapperProps, Modal, useMantineTheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppContext } from 'context/useAppContext';
-import { MediaAssetMetadata, ResourcePack } from 'models/ResourcePack';
+import { FileMetadata, ResourcePack } from 'models/ResourcePack';
 import React, { useId, useRef, useState } from 'react';
 import { getClassString, isString } from 'utils';
 import AssetInput, { AssetInputProps } from './AssetInput';
@@ -83,13 +83,13 @@ function _MusicPicker ({
         </div>
     );
 
-    function handlePlay (music: MediaAssetMetadata) {
+    function handlePlay (music: FileMetadata) {
         setPlayingMusic("asset://" + music.fullPath);
     }
 }
 
 interface _MusicImageProps {
-    metadata: MediaAssetMetadata;
+    metadata: FileMetadata;
     selected: boolean;
     onSelect: () => void;
     onPlay: () => void;

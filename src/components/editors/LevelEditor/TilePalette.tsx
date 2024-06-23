@@ -2,7 +2,7 @@ import { Accordion, ScrollArea, Tooltip, Tabs } from '@mantine/core';
 import { useAppContext } from 'context/useAppContext';
 import { useLevelEditorContext } from 'context/useLevelEditorContext';
 import TileImage from 'elements/TileImage';
-import { DataAssetMetadata, ResourcePack } from 'models/ResourcePack';
+import { DocumentMetadata, ResourcePack } from 'models/ResourcePack';
 import { Tile } from 'models/Tile';
 import { RectangleTileComposite, TileComposite, UnitTileComposite } from 'models/TileComposite';
 import React from 'react';
@@ -23,7 +23,7 @@ function LevelEditor_TilePalette ({
         </div>;
     }
 
-    const tilesByGroup = {} as {[category: string]: DataAssetMetadata<Tile>[]};
+    const tilesByGroup = {} as {[category: string]: DocumentMetadata<Tile>[]};
 
     for (const tile of pack.tiles) {
         const group = tile.data.category ?? "null";
@@ -36,10 +36,10 @@ function LevelEditor_TilePalette ({
 
     const rectangleComps = pack.tileComposites.filter(
         t => t.data.compositeType === 'rectangle'
-    ) as DataAssetMetadata<RectangleTileComposite>[];
+    ) as DocumentMetadata<RectangleTileComposite>[];
     const unitComps = pack.tileComposites.filter(
         t => t.data.compositeType === 'unit'
-    ) as DataAssetMetadata<UnitTileComposite>[];
+    ) as DocumentMetadata<UnitTileComposite>[];
 
     return (<Tabs
         defaultValue='tiles'
@@ -181,14 +181,14 @@ function LevelEditor_TilePalette ({
         </div>
     </Tabs>);
     
-    function selectPaint (paint: DataAssetMetadata<Tile | TileComposite>) {
+    function selectPaint (paint: DocumentMetadata<Tile | TileComposite>) {
         setTerrainPaint(paint.data);
     }
 }
 
 interface _TileButtonProps {
     pack: ResourcePack;
-    tile: DataAssetMetadata<Tile>;
+    tile: DocumentMetadata<Tile>;
     selected: boolean;
     onClick: () => void;
 }

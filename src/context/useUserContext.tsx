@@ -27,6 +27,7 @@ interface UserContextState {
     createNewEntity: () => SPDocument;
     createNewTile: () => SPDocument;
     openDocument: () => Promise<SPDocument | null>;
+    openProject: () => Promise<SPDocument | null>;
     closeDocument: (id: string) => Promise<boolean>;
     saveDocument: (doc: SPDocument) => Promise<string | null>;
     saveDocumentCopy: (doc: SPDocument) => Promise<string | null>;
@@ -126,6 +127,15 @@ const UserContextProvider = ({ children }: any) => {
             return doc;
         }
 
+        async function openProject () : Promise<SPDocument | null> {
+            const project = await Ipc.openProject("Open project's manifest");
+            if (project === null) return null;
+
+            console.log(project);
+
+            return _openFolderDocument(project);
+        }
+
         async function closeDocument (id: string) {
             return await _promptCloseDocument(id);
         }
@@ -169,6 +179,7 @@ const UserContextProvider = ({ children }: any) => {
             createNewEntity,
             createNewTile,
             openDocument,
+            openProject,
             closeDocument,
             saveDocument,
             saveDocumentCopy,
